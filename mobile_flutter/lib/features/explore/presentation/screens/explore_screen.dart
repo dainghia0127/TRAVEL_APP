@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/services/storage_service.dart';
+import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
+import 'package:mobile_flutter/core/widgets/tactical_badge.dart';
+import 'package:mobile_flutter/features/offline_map/services/location_service.dart';
+import 'package:mobile_flutter/features/explore/presentation/widgets/bento_destination_grid.dart';
+import 'package:mobile_flutter/features/explore/presentation/widgets/category_selector.dart';
+import 'package:mobile_flutter/features/explore/presentation/widgets/trail_compact_row.dart';
+import 'package:mobile_flutter/features/explore/presentation/widgets/destination_card.dart';
+import 'package:mobile_flutter/features/explore/presentation/widgets/search_filter_bar.dart';
+import 'package:mobile_flutter/features/explore/presentation/widgets/empty_filter_state.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -10,17 +21,50 @@ class ExploreScreen extends StatefulWidget {
 }
 
 class _ExploreScreenState extends State<ExploreScreen> {
+  final TextEditingController _searchController = TextEditingController();
   String _selectedCategory = 'Tất cả';
   String _searchQuery = '';
+  int? _selectedDifficulty;
   Set<String> _favoriteSpots = {};
 
-  final List<Map<String, String>> _categories = const [
-    {'title': 'Tất cả', 'icon': '🌲'},
-    {'title': 'Trekking / Leo núi', 'icon': '🥾'},
-    {'title': 'Camping / Cắm trại', 'icon': '⛺'},
-    {'title': 'Suối / Thác nước', 'icon': '🌊'},
-    {'title': 'Cung đường đèo', 'icon': '🏍️'},
-    {'title': 'Bãi biển hoang sơ', 'icon': '🏖️'},
+  String _currentLocationName = 'Quận 9, TP. Hồ Chí Minh • 14m';
+  String _currentWeatherBrief = '31°C Nắng ráo';
+  bool _isDetectingGps = false;
+
+  final List<Map<String, String>> _presetLocations = const [
+    {
+      'name': 'Quận 9, TP. Hồ Chí Minh • 14m',
+      'weather': '31°C Nắng ráo',
+      'desc': 'Vị trí hiện tại của bạn (TP. Thủ Đức, TP.HCM)',
+      'isGps': 'true',
+    },
+    {
+      'name': 'Tây Nguyên (Tà Năng) • 1,485m',
+      'weather': '18°C Ít mây',
+      'desc': 'Khu vực dã ngoại cao nguyên Lâm Đồng',
+      'isGps': 'false',
+    },
+    {
+      'name': 'Đỉnh Fansipan • 3,143m',
+      'weather': '9°C Sương mù lạnh',
+      'desc': 'Nóc nhà Đông Dương (Sa Pa, Lào Cai)',
+      'isGps': 'false',
+    },
+    {
+      'name': 'Rừng Nam Cát Tiên • 120m',
+      'weather': '28°C Râm mát',
+      'desc': 'Rừng mưa nhiệt đới Đồng Nai',
+      'isGps': 'false',
+    },
+  ];
+
+  final List<CategoryItem> _categories = const [
+    CategoryItem(title: 'Tất cả', icon: Icons.explore),
+    CategoryItem(title: 'Trekking / Leo núi', icon: Icons.hiking),
+    CategoryItem(title: 'Camping / Cắm trại', icon: Icons.holiday_village),
+    CategoryItem(title: 'Suối / Thác nước', icon: Icons.water),
+    CategoryItem(title: 'Cung đường đèo', icon: Icons.two_wheeler),
+    CategoryItem(title: 'Bãi biển hoang sơ', icon: Icons.beach_access),
   ];
 
   final List<Map<String, dynamic>> _spots = [
@@ -29,7 +73,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       'title': 'Cung Tà Năng - Phan Dũng',
       'category': 'Trekking / Leo núi',
       'difficulty': 'Khó (55km)',
-      'difficultyLevel': 3, // 1: Dễ, 2: Vừa, 3: Khó
+      'difficultyLevel': 3,
       'elevation': '1,100 m',
       'distance': '55 km',
       'water': 'Suối cạn theo mùa',
@@ -37,13 +81,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
       'location': 'Lâm Đồng - Bình Thuận',
       'rating': '4.9',
       'reviews': '284',
-      'accentColor': const Color(0xFF10B981),
+      'imageUrl': 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&q=80',
       'description': 'Cung trekking đẹp nhất miền Nam qua sống lưng khủng long, đồi cỏ bạt ngàn và rừng khộp hoang dã.',
       'highlights': ['Đồi cỏ mênh mông', 'Ngắm bình minh sống lưng', 'Off-grid 100%'],
+      'isFeatured': true,
     },
     {
       'id': 'spot_2',
-      'title': 'Hồ Tuyền Lâm & Rừng Thông Cổ',
+      'title': 'Hồ Tuyền Lâm & Rừng Thông',
       'category': 'Camping / Cắm trại',
       'difficulty': 'Dễ',
       'difficultyLevel': 1,
@@ -54,9 +99,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
       'location': 'Đà Lạt, Lâm Đồng',
       'rating': '4.8',
       'reviews': '512',
-      'accentColor': const Color(0xFF06B6D4),
+      'imageUrl': 'https://images.unsplash.com/photo-1510312305653-8ed496efae75?w=800&q=80',
       'description': 'Bãi cắm trại ven hồ yên bình, sương mây lãng đãng quanh rừng thông, cực kỳ thích hợp chèo SUP dã ngoại.',
       'highlights': ['Chèo SUP mặt hồ', 'Nước ngọt dồi dào', 'Phù hợp người mới'],
+      'isFeatured': true,
     },
     {
       'id': 'spot_3',
@@ -71,9 +117,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
       'location': 'Khu BTTN Kon Chư Răng, Gia Lai',
       'rating': '5.0',
       'reviews': '142',
-      'accentColor': const Color(0xFF3B82F6),
+      'imageUrl': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800&q=80',
       'description': 'Dải lụa bạc hùng vĩ ẩn sâu giữa rừng nguyên sinh Tây Nguyên, tiếng nước ầm vang cả một góc thung lũng.',
       'highlights': ['Thác nước tráng lệ', 'Tổ chim én tự nhiên', 'Rừng nguyên sinh'],
+      'isFeatured': true,
     },
     {
       'id': 'spot_4',
@@ -88,9 +135,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
       'location': 'Vườn Quốc Gia Bidoup Núi Bà',
       'rating': '4.9',
       'reviews': '189',
-      'accentColor': const Color(0xFF8B5CF6),
+      'imageUrl': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',
       'description': 'Nóc nhà tỉnh Lâm Đồng với thảm rừng rêu ma mị, cây thông 2 lá dẹt ngàn năm tuổi và không khí lạnh 10°C.',
       'highlights': ['Rừng rêu ma thuật', 'Nóc nhà Lâm Đồng', 'Hệ sinh vật đa dạng'],
+      'isFeatured': false,
     },
     {
       'id': 'spot_5',
@@ -105,9 +153,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
       'location': 'Lào Cai - Lai Châu',
       'rating': '4.9',
       'reviews': '680',
-      'accentColor': const Color(0xFFF59E0B),
+      'imageUrl': 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80',
       'description': 'Một trong tứ đại đỉnh đèo hiểm trở và ngoạn mục nhất Tây Bắc, nơi săn mây bồng bềnh và hoàng hôn tráng lệ.',
       'highlights': ['Săn biển mây cuồn cuộn', 'Cung đường uốn lượn', 'Hoàng hôn rực rỡ'],
+      'isFeatured': false,
     },
   ];
 
@@ -115,6 +164,138 @@ class _ExploreScreenState extends State<ExploreScreen> {
   void initState() {
     super.initState();
     _loadFavorites();
+    _autoDetectGpsLocation();
+  }
+
+  Future<void> _autoDetectGpsLocation() async {
+    setState(() => _isDetectingGps = true);
+    try {
+      final pos = await LocationService.getCurrentLocation();
+      if (pos != null && mounted) {
+        if (pos.latitude >= 10.3 && pos.latitude <= 11.2 && pos.longitude >= 106.3 && pos.longitude <= 107.1) {
+          setState(() {
+            _currentLocationName = 'Quận 9, TP. Hồ Chí Minh • 14m';
+            _currentWeatherBrief = '31°C Nắng ráo';
+          });
+        } else {
+          setState(() {
+            _currentLocationName = '${pos.latitude.toStringAsFixed(2)}°N, ${pos.longitude.toStringAsFixed(2)}°E';
+          });
+        }
+      }
+    } catch (_) {
+      // Default to Quận 9, TP. Hồ Chí Minh
+    } finally {
+      if (mounted) setState(() => _isDetectingGps = false);
+    }
+  }
+
+  void _showLocationSelectorSheet() {
+    HapticFeedback.selectionClick();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surfaceElevated,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(color: Colors.white24, borderRadius: AppRadius.roundedPill),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('VỊ TRÍ & ĐỊA ĐIỂM DÃ NGOẠI', style: AppTypography.captionBadge.copyWith(color: AppColors.emerald)),
+                  if (_isDetectingGps)
+                    const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.emerald),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              ..._presetLocations.map((loc) {
+                final isSelected = _currentLocationName == loc['name'];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: BouncingButton(
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      setState(() {
+                        _currentLocationName = loc['name']!;
+                        _currentWeatherBrief = loc['weather']!;
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: isSelected ? AppColors.surfaceHigh : AppColors.surfaceBase,
+                        borderRadius: AppRadius.roundedMd,
+                        border: Border.all(
+                          color: isSelected ? AppColors.emerald : AppColors.borderSubtle,
+                          width: isSelected ? 1.5 : 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            loc['isGps'] == 'true' ? Icons.my_location : Icons.landscape_outlined,
+                            color: isSelected ? AppColors.emerald : AppColors.textSecondary,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  loc['name']!,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  '${loc['desc']!} • ${loc['weather']!}',
+                                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (isSelected)
+                            const Icon(Icons.check_circle, color: AppColors.emerald, size: 20),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadFavorites() async {
@@ -139,121 +320,90 @@ class _ExploreScreenState extends State<ExploreScreen> {
     return _spots.where((spot) {
       final matchCat = _selectedCategory == 'Tất cả' || spot['category'] == _selectedCategory;
       final matchSearch = _searchQuery.isEmpty ||
-          spot['title'].toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          spot['location'].toLowerCase().contains(_searchQuery.toLowerCase());
-      return matchCat && matchSearch;
+          (spot['title'] as String).toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          (spot['location'] as String).toLowerCase().contains(_searchQuery.toLowerCase());
+      final matchDiff = _selectedDifficulty == null || spot['difficultyLevel'] == _selectedDifficulty;
+      return matchCat && matchSearch && matchDiff;
     }).toList();
+  }
+
+  void _resetFilters() {
+    setState(() {
+      _searchController.clear();
+      _searchQuery = '';
+      _selectedCategory = 'Tất cả';
+      _selectedDifficulty = null;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final filtered = _filteredSpots;
+    final isFiltering = _searchQuery.isNotEmpty || _selectedCategory != 'Tất cả' || _selectedDifficulty != null;
+
     return Scaffold(
-      backgroundColor: AppTheme.bgDark,
+      backgroundColor: AppColors.bgDark,
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            // Top App Bar & Hero Header
+            // Top App Bar & Weather Scrim
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.space16,
+                  AppSpacing.space12,
+                  AppSpacing.space16,
+                  AppSpacing.space12,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Location & Weather Pill
+                    // Ambient Location & Weather (Interactive)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: AppTheme.surfaceHigh,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: AppTheme.borderLight),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.location_on, size: 14, color: AppTheme.emerald),
-                              SizedBox(width: 4),
-                              Text(
-                                'Tây Nguyên • 1,485m',
-                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textMain),
-                              ),
-                            ],
+                        BouncingButton(
+                          onTap: _showLocationSelectorSheet,
+                          child: TacticalPill(
+                            icon: Icons.my_location,
+                            text: _currentLocationName,
+                            color: AppColors.emerald,
+                            backgroundColor: AppColors.surfaceHigh,
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: AppTheme.surfaceHigh,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: AppTheme.borderLight),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.wb_sunny_outlined, size: 14, color: AppTheme.tacticalOrange),
-                              SizedBox(width: 4),
-                              Text(
-                                '18°C Ít mây',
-                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textMain),
-                              ),
-                            ],
-                          ),
+                        TacticalPill(
+                          icon: Icons.wb_sunny_outlined,
+                          text: _currentWeatherBrief,
+                          color: AppColors.tacticalOrange,
+                          backgroundColor: AppColors.surfaceHigh,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: AppSpacing.space16),
 
-                    // Main App Heading
-                    const Text(
-                      'Khám Phá Địa Điểm Dã Ngoại',
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.8,
-                        color: AppTheme.textMain,
-                      ),
-                    ),
+                    // Editorial Headline
+                    Text(
+                      'Khám Phá Cung Đường',
+                      style: AppTypography.displayHero,
+                    ).animate().fadeIn(duration: 260.ms).slideX(begin: -0.05, end: 0),
                     const SizedBox(height: 4),
-                    const Text(
-                      'Cung đường hoang dã & cẩm nang sinh tồn ngoại tuyến',
-                      style: TextStyle(fontSize: 13, color: AppTheme.textSub),
+                    Text(
+                      'Bản đồ địa hình & cẩm nang sinh tồn ngoại tuyến 100%',
+                      style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.space16),
 
-                    // Search Field
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppTheme.surfaceBase,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppTheme.borderLight),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: TextField(
-                        style: const TextStyle(color: AppTheme.textMain, fontSize: 14),
-                        decoration: InputDecoration(
-                          hintText: 'Tìm núi, thác, bãi cắm trại, đèo...',
-                          hintStyle: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
-                          prefixIcon: const Icon(Icons.search, color: AppTheme.emerald, size: 20),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                          suffixIcon: _searchQuery.isNotEmpty
-                              ? IconButton(
-                                  icon: const Icon(Icons.clear, size: 18, color: AppTheme.textMuted),
-                                  onPressed: () => setState(() => _searchQuery = ''),
-                                )
-                              : const Icon(Icons.tune, color: AppTheme.textMuted, size: 18),
-                        ),
-                        onChanged: (val) => setState(() => _searchQuery = val),
-                      ),
+                    // Search & Filter Interface
+                    SearchFilterBar(
+                      controller: _searchController,
+                      selectedDifficulty: _selectedDifficulty,
+                      onChanged: (val) => setState(() => _searchQuery = val),
+                      onClear: () => setState(() {
+                        _searchController.clear();
+                        _searchQuery = '';
+                      }),
+                      onSelectDifficulty: (lvl) => setState(() => _selectedDifficulty = lvl),
                     ),
                   ],
                 ),
@@ -262,357 +412,104 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
             // Horizontal Categories Selector
             SliverToBoxAdapter(
-              child: SizedBox(
-                height: 42,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: _categories.length,
-                  itemBuilder: (context, index) {
-                    final cat = _categories[index];
-                    final isSelected = cat['title'] == _selectedCategory;
+              child: CategorySelector(
+                categories: _categories,
+                selectedCategory: _selectedCategory,
+                onSelectCategory: (cat) => setState(() => _selectedCategory = cat),
+              ),
+            ),
 
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: InkWell(
-                        onTap: () => setState(() => _selectedCategory = cat['title']!),
-                        borderRadius: BorderRadius.circular(20),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: isSelected ? AppTheme.emerald : AppTheme.surfaceHigh,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: isSelected ? AppTheme.emerald : AppTheme.borderLight,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Text(cat['icon']!, style: const TextStyle(fontSize: 14)),
-                              const SizedBox(width: 6),
-                              Text(
-                                cat['title']!,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                                  color: isSelected ? Colors.black : AppTheme.textMain,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+            const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.space20)),
+
+            // 1. Bento Grid Spotlight (Only show when not actively searching to avoid clutter)
+            if (!isFiltering) ...[
+              SliverToBoxAdapter(
+                child: BentoDestinationGrid(
+                  spots: _spots,
+                  favoriteSpots: _favoriteSpots,
+                  onToggleFavorite: _toggleFavorite,
+                ),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.space24)),
+            ],
+
+            // Section 2: Diverse Trail Section Header
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      isFiltering ? 'Kết Quả Bộ Lọc' : 'Tất Cả Cung Đường (Danh Mục)',
+                      style: AppTypography.headlineMedium.copyWith(fontSize: 18),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceHigh,
+                        borderRadius: AppRadius.roundedPill,
+                        border: Border.all(color: AppColors.borderSubtle),
                       ),
-                    );
-                  },
+                      child: Text(
+                        '${filtered.length} địa điểm',
+                        style: AppTypography.captionBadge.copyWith(color: AppColors.textMuted),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
 
-            const SliverToBoxAdapter(child: SizedBox(height: 16)),
+            const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.space12)),
 
-            // Outdoor Spot Cards List
-            _filteredSpots.isEmpty
-                ? const SliverFillRemaining(
-                    child: Center(
-                      child: Text(
-                        'Không tìm thấy địa điểm phù hợp',
-                        style: TextStyle(color: AppTheme.textMuted),
-                      ),
-                    ),
-                  )
-                : SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final spot = _filteredSpots[index];
-                          return _buildSpotCard(spot);
-                        },
-                        childCount: _filteredSpots.length,
-                      ),
-                    ),
+            // Cards vs Rows based on context to BREAK CARD MONOTONY:
+            // When filtering: show rich detailed destination cards
+            // When general browsing: show clean compact editorial rows!
+            if (filtered.isEmpty)
+              SliverToBoxAdapter(
+                child: EmptyFilterState(onReset: _resetFilters),
+              )
+            else if (isFiltering)
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space16),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final spot = filtered[index];
+                      return DestinationCard(
+                        spot: spot,
+                        isFavorite: _favoriteSpots.contains(spot['id']),
+                        onToggleFavorite: () => _toggleFavorite(spot['id'] as String),
+                      );
+                    },
+                    childCount: filtered.length,
                   ),
+                ),
+              )
+            else
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space16),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final spot = filtered[index];
+                      return TrailCompactRow(
+                        spot: spot,
+                        isFavorite: _favoriteSpots.contains(spot['id']),
+                        onToggleFavorite: () => _toggleFavorite(spot['id'] as String),
+                      );
+                    },
+                    childCount: filtered.length,
+                  ),
+                ),
+              ),
 
-            const SliverToBoxAdapter(child: SizedBox(height: 24)),
+            // Bottom Safe Inset Clearance
+            const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.space32)),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildSpotCard(Map<String, dynamic> spot) {
-    final isFav = _favoriteSpots.contains(spot['id']);
-    final Color accent = spot['accentColor'] as Color;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceBase,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.borderLight),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.4),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => _showSpotDetails(spot),
-          borderRadius: BorderRadius.circular(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Hero Banner Header with Visual Pattern
-              Container(
-                height: 110,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                  gradient: LinearGradient(
-                    colors: [accent.withValues(alpha: 0.7), AppTheme.surfaceBase],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Category Tag
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.5),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.white24),
-                          ),
-                          child: Text(
-                            spot['category'] as String,
-                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white),
-                          ),
-                        ),
-                        // Favorite Heart
-                        InkWell(
-                          onTap: () => _toggleFavorite(spot['id'] as String),
-                          child: CircleAvatar(
-                            radius: 16,
-                            backgroundColor: Colors.black.withValues(alpha: 0.5),
-                            child: Icon(
-                              isFav ? Icons.favorite : Icons.favorite_border,
-                              color: isFav ? AppTheme.emergencyRed : Colors.white70,
-                              size: 16,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    // Rating & Difficulty Pills
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.6),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.star, size: 12, color: AppTheme.tacticalOrange),
-                              const SizedBox(width: 3),
-                              Text(
-                                '${spot['rating']} (${spot['reviews']})',
-                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: _getDifficultyColor(spot['difficultyLevel'] as int).withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: _getDifficultyColor(spot['difficultyLevel'] as int).withValues(alpha: 0.6)),
-                          ),
-                          child: Text(
-                            spot['difficulty'] as String,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: _getDifficultyColor(spot['difficultyLevel'] as int),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // Content Body
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      spot['title'] as String,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.4,
-                        color: AppTheme.textMain,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(Icons.place, size: 14, color: AppTheme.textMuted),
-                        const SizedBox(width: 4),
-                        Text(
-                          spot['location'] as String,
-                          style: const TextStyle(fontSize: 12, color: AppTheme.textSub),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      spot['description'] as String,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13, height: 1.4, color: AppTheme.textSub),
-                    ),
-                    const SizedBox(height: 14),
-
-                    // 4 Outdoor Badges in Grid
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppTheme.surfaceHigh,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppTheme.borderLight),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildStatBadge(Icons.straighten, spot['distance'] as String, 'Cự ly'),
-                          _buildStatDivider(),
-                          _buildStatBadge(Icons.terrain, spot['elevation'] as String, 'Cao độ'),
-                          _buildStatDivider(),
-                          _buildStatBadge(Icons.water_drop, spot['water'] as String, 'Nước ngọt'),
-                          _buildStatDivider(),
-                          _buildStatBadge(Icons.signal_cellular_alt, spot['signal'] as String, 'Sóng 4G'),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Color _getDifficultyColor(int level) {
-    if (level == 1) return AppTheme.emerald;
-    if (level == 2) return AppTheme.tacticalOrange;
-    return AppTheme.emergencyRed;
-  }
-
-  Widget _buildStatBadge(IconData icon, String value, String label) {
-    return Column(
-      children: [
-        Icon(icon, size: 16, color: AppTheme.emerald),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textMain),
-        ),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 9, color: AppTheme.textMuted),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatDivider() {
-    return Container(width: 1, height: 24, color: Colors.white12);
-  }
-
-  void _showSpotDetails(Map<String, dynamic> spot) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppTheme.surfaceBase,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) {
-        final highlights = spot['highlights'] as List<String>;
-        return Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                spot['title'] as String,
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppTheme.textMain),
-              ),
-              const SizedBox(height: 4),
-              Text(spot['location'] as String, style: const TextStyle(color: AppTheme.emerald, fontSize: 13)),
-              const Divider(height: 24, color: AppTheme.borderLight),
-              Text(
-                spot['description'] as String,
-                style: const TextStyle(fontSize: 14, height: 1.5, color: AppTheme.textSub),
-              ),
-              const SizedBox(height: 16),
-              const Text('Điểm nổi bật của cung đường:', style: TextStyle(fontWeight: FontWeight.w700, color: AppTheme.textMain)),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: highlights.map((h) => Chip(
-                  backgroundColor: AppTheme.surfaceHigh,
-                  label: Text(h, style: const TextStyle(fontSize: 11, color: AppTheme.textMain)),
-                )).toList(),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.emerald,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                  icon: const Icon(Icons.navigation, size: 18),
-                  label: const Text('Bắt đầu dẫn đường ngoại tuyến', style: TextStyle(fontWeight: FontWeight.w800)),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }
