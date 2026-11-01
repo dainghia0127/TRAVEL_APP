@@ -1,0 +1,1254 @@
+import json
+import os
+
+destinations = [
+    # =========================================================================
+    # 1. TRONG NƯỚC: MIỀN BẮC (Northern Vietnam)
+    # =========================================================================
+    {
+        "id": "dest_vn_ma_pi_leng",
+        "slug": "deo-ma-pi-leng-ha-giang",
+        "name": "Đèo Mã Pí Lèng & Cao Nguyên Đá",
+        "local_name": "Đèo Mã Pí Lèng, Đồng Văn, Hà Giang",
+        "province": "Hà Giang",
+        "country_name": "Việt Nam",
+        "country_ids": ["VN"],
+        "region_id": "vn_north",
+        "category_ids": ["road_trip", "hiking", "unesco", "nature"],
+        "center_latitude": 23.2389,
+        "center_longitude": 105.4180,
+        "elevation_meters": 1400,
+        "editorial_summary": "Tứ đại đỉnh đèo hiểm trở bậc nhất phương Bắc, thuộc Công viên Địa chất Toàn cầu UNESCO Cao nguyên đá Đồng Văn.",
+        "editorial_content": "Cung đường Hạnh Phúc uốn lượn bên bờ vực hẻm Tu Sản - hẻm vực kiến tạo sâu nhất Đông Nam Á với dòng sông Nho Quế màu ngọc bích huyền ảo. Điểm đến hội tụ vẻ đẹp hùng vĩ của đá tai mèo và sắc hoa tam giác mạch.",
+        "best_travel_seasons": ["09", "10", "11", "12", "01", "02"],
+        "is_featured": True,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-03-15",
+        "data_source": "UNESCO Global Geoparks & Cục Du lịch Quốc gia Việt Nam",
+        "media": [
+            {
+                "id": "media_mapileng_1",
+                "image_url": "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Nhiếp ảnh phong cảnh",
+                "source_name": "Unsplash / Creative Commons",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Outdoor Travel on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ],
+        "route": {
+            "id": "route_ma_pi_leng_walk",
+            "name": "Đường đi bộ Vách Đá Trắng Mã Pí Lèng",
+            "distance_km": 8.5,
+            "elevation_gain_meters": 350,
+            "difficulty_level": 2,
+            "estimated_duration_days": 1,
+            "is_verified": True,
+            "stages": [
+                {
+                    "stage_number": 1,
+                    "title": "Bảo tàng Con Đường Hạnh Phúc đến Mỏm Đá Vươn",
+                    "description": "Đi men theo lối mòn đá cổ, ngắm toàn cảnh sông Nho Quế từ trên cao.",
+                    "distance_km": 4.0,
+                    "elevation_gain_meters": 200,
+                    "terrain_type": "Đường mòn đá tai mèo"
+                },
+                {
+                    "stage_number": 2,
+                    "title": "Đoạn vượt vách đá trắng xuống bến thuyền Hẻm Tu Sản",
+                    "description": "Bậc đá dốc dẫn xuống chân hẻm sâu, đón gió lộng thung lũng.",
+                    "distance_km": 4.5,
+                    "elevation_gain_meters": 150,
+                    "terrain_type": "Bậc đá tự nhiên"
+                }
+            ],
+            "safety": {
+                "water_advice": "Mang tối thiểu 2 lít nước điện giải; không có nguồn nước tự nhiên trên vách đá.",
+                "mobile_coverage_summary": "Sóng 4G Viettel/Vina ổn định tại đỉnh đèo; yếu tại đáy hẻm vực.",
+                "primary_hazards": ["Gió xoáy mạnh trên vách hẹp", "Đá tai mèo sắc nhọn", "Sương mù giảm tầm nhìn mùa đông"],
+                "required_gear": ["Giày bám móng đá", "Áo gió cản nước", "Gậy trekking", "Đèn pin dã ngoại"],
+                "emergency_contact_info": "Kiểm lâm Đồng Văn / Công an xã Pải Lủng: (+84) 219 3856 115",
+                "verification_date": "2026-03-15",
+                "verified_by": "Ban Quản lý CVĐC Đồng Văn"
+            }
+        }
+    },
+    {
+        "id": "dest_vn_o_quy_ho",
+        "slug": "deo-o-quy-ho-fansipan-sa-pa",
+        "name": "Đèo Ô Quy Hồ & Dãy Hoàng Liên Sơn",
+        "local_name": "Đèo Ô Quý Hồ / Đèo Hoàng Liên Sơn",
+        "province": "Lào Cai",
+        "country_name": "Việt Nam",
+        "country_ids": ["VN"],
+        "region_id": "vn_north",
+        "category_ids": ["trekking", "camping", "road_trip", "nature"],
+        "center_latitude": 22.3551,
+        "center_longitude": 103.7745,
+        "elevation_meters": 2035,
+        "editorial_summary": "Vua đèo miền Bắc nối liền Lào Cai và Lai Châu, nơi biển mây Hoàng Liên Sơn bao bọc đỉnh Fansipan 3.143m.",
+        "editorial_content": "Đèo Ô Quy Hồ là ranh giới khí hậu kỳ thú giữa sương lạnh Sa Pa mù mịt và nắng ấm rực rỡ Lai Châu. Cung đường dã ngoại tuyệt đỉnh để chiêm ngưỡng hoàng hôn rực lửa trên biển mây trắng bồng bềnh.",
+        "best_travel_seasons": ["09", "10", "11", "12", "02", "03", "04"],
+        "is_featured": True,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-02-20",
+        "data_source": "Vườn Quốc gia Hoàng Liên & Wikidata (Q10800366)",
+        "media": [
+            {
+                "id": "media_oquyho_1",
+                "image_url": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Nhiếp ảnh phong cảnh",
+                "source_name": "Unsplash / Creative Commons",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Hoàng Liên Explorer on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ],
+        "route": {
+            "id": "route_fansipan_tram_ton",
+            "name": "Trekking Chinh Phục Đỉnh Fansipan qua Trạm Tôn",
+            "distance_km": 22.0,
+            "elevation_gain_meters": 1200,
+            "difficulty_level": 3,
+            "estimated_duration_days": 2,
+            "is_verified": True,
+            "stages": [
+                {
+                    "stage_number": 1,
+                    "title": "Trạm Tôn (1.900m) lên Trạm dừng chân 2.800m",
+                    "description": "Đi xuyên rừng trúc lùn, rừng đỗ quyên cổ thụ và suối nguồn Hoàng Liên.",
+                    "distance_km": 11.5,
+                    "elevation_gain_meters": 900,
+                    "terrain_type": "Đường mòn rừng nguyên sinh & bậc đá"
+                },
+                {
+                    "stage_number": 2,
+                    "title": "Trạm 2.800m lên Đỉnh Fansipan 3.143m & Hạ sơn",
+                    "description": "Chạm đỉnh chóp Nóc nhà Đông Dương ngắm trọn biển mây ngút ngàn.",
+                    "distance_km": 10.5,
+                    "elevation_gain_meters": 343,
+                    "terrain_type": "Vách đá & bậc thang kỹ thuật"
+                }
+            ],
+            "safety": {
+                "water_advice": "Bổ sung nước tại lán 2.800m; phải lọc khử khuẩn trước khi uống.",
+                "mobile_coverage_summary": "Có sóng Viettel tại Trạm Tôn và Đỉnh; dọc rừng trúc sóng rất yếu.",
+                "primary_hazards": ["Hạ thân nhiệt do gió buốt và mưa phùn", "Sốc độ cao nhẹ (>2.500m)", "Trơn trượt trên vách đá rêu"],
+                "required_gear": ["Áo mưa bọc balo", "Áo lông vũ giữ nhiệt", "Găng tay leo núi có gai bám", "Còi sinh tồn"],
+                "emergency_contact_info": "Trung tâm Cứu hộ Vườn Quốc gia Hoàng Liên: (+84) 214 3871 146",
+                "verification_date": "2026-02-20",
+                "verified_by": "Vườn Quốc gia Hoàng Liên"
+            }
+        }
+    },
+    {
+        "id": "dest_vn_ban_gioc",
+        "slug": "thac-ban-gioc-cao-bang",
+        "name": "Thác Bản Giốc & Non Nước Cao Bằng",
+        "local_name": "Thác Bản Giốc, Đàm Thủy, Trùng Khánh",
+        "province": "Cao Bằng",
+        "country_name": "Việt Nam",
+        "country_ids": ["VN"],
+        "region_id": "vn_north",
+        "category_ids": ["nature", "camping", "unesco", "hiking"],
+        "center_latitude": 22.8542,
+        "center_longitude": 106.7231,
+        "elevation_meters": 350,
+        "editorial_summary": "Thác nước tự nhiên lớn thứ tư thế giới nằm trên đường biên giới quốc gia, thuộc Công viên Địa chất Toàn cầu UNESCO Non Nước Cao Bằng.",
+        "editorial_content": "Dòng sông Quây Sơn trong xanh như ngọc đổ xuống tầng thác ba tầng hùng vĩ, bao quanh bởi những ngọn núi karst hình nón tuyệt mỹ và đồng lúa trù phú của bản làng người Tày, Nùng.",
+        "best_travel_seasons": ["08", "09", "10", "11", "12"],
+        "is_featured": True,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-01-18",
+        "data_source": "UNESCO Global Geoparks & Sở VHTT&DL Cao Bằng",
+        "media": [
+            {
+                "id": "media_bangioc_1",
+                "image_url": "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Nhiếp ảnh gia",
+                "source_name": "Creative Commons",
+                "license": "CC-BY",
+                "attribution": "Wikimedia Commons / Non Nuoc Cao Bang",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ],
+        "route": {
+            "id": "route_quay_son_river_walk",
+            "name": "Cung Đi Bộ Dọc Sông Quây Sơn & Thung Lũng Phong Nậm",
+            "distance_km": 12.0,
+            "elevation_gain_meters": 180,
+            "difficulty_level": 1,
+            "estimated_duration_days": 1,
+            "is_verified": True,
+            "stages": [
+                {
+                    "stage_number": 1,
+                    "title": "Lối ven sông Quây Sơn qua xóm Bản Gun",
+                    "description": "Đi bộ êm đềm dọc bờ sông biếc, ngắm cọn nước tre truyền thống.",
+                    "distance_km": 6.0,
+                    "elevation_gain_meters": 80,
+                    "terrain_type": "Đường bờ ruộng & lối mòn ven sông"
+                },
+                {
+                    "stage_number": 2,
+                    "title": "Chân thác Bản Giốc & Chùa Phật Tích Trúc Lâm",
+                    "description": "Bậc thang đá lên chùa trên sườn núi Phia Nhăm ngắm toàn cảnh thác.",
+                    "distance_km": 6.0,
+                    "elevation_gain_meters": 100,
+                    "terrain_type": "Bậc thang đá & thảm cỏ"
+                }
+            ],
+            "safety": {
+                "water_advice": "Không uống trực tiếp nước sông Quây Sơn; sử dụng nước đóng chai tại điểm dịch vụ.",
+                "mobile_coverage_summary": "Sóng di động ổn định dọc khu du lịch; lưu ý chuyển vùng quốc tế do gần biên giới.",
+                "primary_hazards": ["Dòng nước xiết chân thác", "Khu vực biên giới yêu cầu tuân thủ biển chỉ dẫn"],
+                "required_gear": ["Giày đi nước chống trượt", "Mũ che nắng", "Túi chống nước cho thiết bị"],
+                "emergency_contact_info": "Đồn Biên phòng Đàm Thủy: (+84) 206 3828 119",
+                "verification_date": "2026-01-18",
+                "verified_by": "Ban Quản lý KDL Thác Bản Giốc"
+            }
+        }
+    },
+    {
+        "id": "dest_vn_ha_long_bay",
+        "slug": "vinh-ha-long-quang-ninh",
+        "name": "Vịnh Hạ Long & Quần Đảo Cát Bà",
+        "local_name": "Vịnh Hạ Long, Quảng Ninh",
+        "province": "Quảng Ninh",
+        "country_name": "Việt Nam",
+        "country_ids": ["VN"],
+        "region_id": "vn_north",
+        "category_ids": ["unesco", "nature", "beach", "hiking"],
+        "center_latitude": 20.9101,
+        "center_longitude": 107.1839,
+        "elevation_meters": 45,
+        "editorial_summary": "Di sản Thiên nhiên Thế giới UNESCO hai lần vinh danh, với hàng ngàn đảo đá vôi kỳ vĩ và hang động thạch nhũ hàng triệu năm tuổi.",
+        "editorial_content": "Kỳ quan thiên nhiên thế giới nổi tiếng với các hoạt động chèo thuyền kayak qua hang Luồn, trekking rừng kim giao Vườn Quốc gia Cát Bà và cắm trại ngắm sao trên các vụng vịnh biệt lập Lan Hạ.",
+        "best_travel_seasons": ["03", "04", "05", "09", "10", "11"],
+        "is_featured": True,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-02-10",
+        "data_source": "UNESCO World Heritage Centre (#672) & Ban Quản lý Vịnh Hạ Long",
+        "media": [
+            {
+                "id": "media_halong_1",
+                "image_url": "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Nhiếp ảnh gia biển",
+                "source_name": "Unsplash",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Ha Long Explorer on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ],
+        "route": {
+            "id": "route_cat_ba_national_park",
+            "name": "Trekking Rừng Kim Giao & Đỉnh Ngự Lâm Cát Bà",
+            "distance_km": 7.0,
+            "elevation_gain_meters": 225,
+            "difficulty_level": 2,
+            "estimated_duration_days": 1,
+            "is_verified": True,
+            "stages": [
+                {
+                    "stage_number": 1,
+                    "title": "Cổng Vườn Quốc Gia lên Rừng Kim Giao",
+                    "description": "Đi dưới tán cây gỗ quý đặc hữu mọc trên núi đá vôi.",
+                    "distance_km": 3.5,
+                    "elevation_gain_meters": 120,
+                    "terrain_type": "Bậc đá tự nhiên và rễ cây"
+                },
+                {
+                    "stage_number": 2,
+                    "title": "Chinh phục Đài quan sát Đỉnh Ngự Lâm",
+                    "description": "Ngắm trọn thung lũng đá karst trùng điệp của quần đảo Cát Bà.",
+                    "distance_km": 3.5,
+                    "elevation_gain_meters": 105,
+                    "terrain_type": "Mỏm đá vôi dốc"
+                }
+            ],
+            "safety": {
+                "water_advice": "Mang ít nhất 1.5 lít nước; độ ẩm rừng cao gây mất nước nhanh.",
+                "mobile_coverage_summary": "Sóng di động tốt trên đỉnh Ngự Lâm; chập chờn dưới tán rừng sâu.",
+                "primary_hazards": ["Vắt rừng mùa mưa", "Đá vôi sắc cạnh", "Muỗi rừng nhiệt đới"],
+                "required_gear": ["Thuốc xịt chống vắt", "Giày leo núi bám đá ẩm", "Nón tai bèo"],
+                "emergency_contact_info": "Ban Quản lý Vườn Quốc gia Cát Bà: (+84) 225 3888 358",
+                "verification_date": "2026-02-10",
+                "verified_by": "Vườn Quốc gia Cát Bà"
+            }
+        }
+    },
+    {
+        "id": "dest_vn_lao_than",
+        "slug": "dinh-lao-than-y-ty-lao-cai",
+        "name": "Đỉnh Lảo Thẩn & Y Tý Đại Ngàn",
+        "local_name": "Đỉnh Lảo Thẩn, xã Y Tý, huyện Bát Xát",
+        "province": "Lào Cai",
+        "country_name": "Việt Nam",
+        "country_ids": ["VN"],
+        "region_id": "vn_north",
+        "category_ids": ["trekking", "camping", "hiking", "nature"],
+        "center_latitude": 22.6139,
+        "center_longitude": 103.6289,
+        "elevation_meters": 2860,
+        "editorial_summary": "Nóc nhà Y Tý - Thiên đường săn mây số một Tây Bắc với đồi cỏ vàng hoang sơ và view ngắm hoàng hôn ngút mắt.",
+        "editorial_content": "Lảo Thẩn được mệnh danh là cung trekking 'quốc dân' nhờ độ khó vừa phải, địa hình đồi trọc thoáng đãng, là điểm cắm trại ngắm sao dải ngân hà và săn mây luồn lộng lẫy bậc nhất Việt Nam.",
+        "best_travel_seasons": ["09", "10", "11", "12", "01", "02", "03", "04"],
+        "is_featured": True,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-03-01",
+        "data_source": "UBND Huyện Bát Xát & Hội Dã Ngoại Tây Bắc",
+        "media": [
+            {
+                "id": "media_laothan_1",
+                "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Tây Bắc Trekking",
+                "source_name": "Unsplash",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Lao Than Trekker on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ],
+        "route": {
+            "id": "route_lao_than_trek",
+            "name": "Chinh Phục Đỉnh Lảo Thẩn Đón Bình Minh",
+            "distance_km": 16.0,
+            "elevation_gain_meters": 800,
+            "difficulty_level": 2,
+            "estimated_duration_days": 2,
+            "is_verified": True,
+            "stages": [
+                {
+                    "stage_number": 1,
+                    "title": "Trang trại rau sạch lên Lán nghỉ 2.500m",
+                    "description": "Đi qua đồi cây bụi thấp và những triền cỏ bạt ngàn.",
+                    "distance_km": 9.0,
+                    "elevation_gain_meters": 500,
+                    "terrain_type": "Đường mòn đồi cỏ & dốc thoải"
+                },
+                {
+                    "stage_number": 2,
+                    "title": "Lán nghỉ lên Mỏm đá Câu Cá & Đỉnh 2.860m",
+                    "description": "Chinh phục đỉnh chóp lộng gió, ngắm mây cuồn cuộn dưới chân.",
+                    "distance_km": 7.0,
+                    "elevation_gain_meters": 360,
+                    "terrain_type": "Đá phong hóa & vách đá gió xoáy"
+                }
+            ],
+            "safety": {
+                "water_advice": "Lấy nước tại lán của porter người Hà Nhì; cần đun sôi trước khi dùng.",
+                "mobile_coverage_summary": "Có sóng 4G ở bãi cắm trại và đỉnh núi; một số đoạn dốc khuất sóng yếu.",
+                "primary_hazards": ["Gió đêm cực mạnh quật lều", "Nhiệt độ xuống dưới 5 độ C vào mùa đông"],
+                "required_gear": ["Lều chống gió chịu bão", "Túi ngủ 0 độ C", "Áo gió Gore-Tex", "Đèn đội đầu"],
+                "emergency_contact_info": "Công an xã Y Tý: (+84) 214 3512 113",
+                "verification_date": "2026-03-01",
+                "verified_by": "Ban Chỉ Đạo Du Lịch Bát Xát"
+            }
+        }
+    },
+
+    # =========================================================================
+    # 2. TRONG NƯỚC: MIỀN TRUNG (Central Vietnam)
+    # =========================================================================
+    {
+        "id": "dest_vn_phong_nha",
+        "slug": "vuon-quoc-gia-phong-nha-ke-bang",
+        "name": "Vườn Quốc Gia Phong Nha – Kẻ Bàng",
+        "local_name": "VQG Phong Nha - Kẻ Bàng, Bố Trạch, Quảng Bình",
+        "province": "Quảng Bình",
+        "country_name": "Việt Nam",
+        "country_ids": ["VN"],
+        "region_id": "vn_central",
+        "category_ids": ["unesco", "trekking", "nature", "hiking"],
+        "center_latitude": 17.5900,
+        "center_longitude": 106.2833,
+        "elevation_meters": 400,
+        "editorial_summary": "Di sản Thiên nhiên Thế giới UNESCO, được mệnh danh là 'Vương quốc hang động' với hệ thống karst cổ đại 400 triệu năm và hang Sơn Đoòng vĩ đại.",
+        "editorial_content": "Thiên đường thám hiểm rừng nhiệt đới trên núi đá vôi nguyên sinh, sông ngầm trong vắt và các hang động kỳ ảo bậc nhất hành tinh như Hang Én, Động Thiên Đường và Tú Làn.",
+        "best_travel_seasons": ["02", "03", "04", "05", "06", "07", "08"],
+        "is_featured": True,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-02-15",
+        "data_source": "UNESCO World Heritage Centre (#951) & BQL VQG Phong Nha - Kẻ Bàng",
+        "media": [
+            {
+                "id": "media_phongnha_1",
+                "image_url": "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Nhiếp ảnh thám hiểm",
+                "source_name": "Unsplash / Creative Commons",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Cave Explorer on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ],
+        "route": {
+            "id": "route_tu_lan_expedition",
+            "name": "Thám Hiểm Rừng Nguyên Sinh & Hệ Thống Hang Tú Làn",
+            "distance_km": 18.0,
+            "elevation_gain_meters": 450,
+            "difficulty_level": 3,
+            "estimated_duration_days": 2,
+            "is_verified": True,
+            "stages": [
+                {
+                    "stage_number": 1,
+                    "title": "Tân Hóa băng qua thung lũng đá vôi đến Hang Chuột",
+                    "description": "Lội suối cạn, leo dốc đá tai mèo và khám phá hang động khô.",
+                    "distance_km": 9.0,
+                    "elevation_gain_meters": 250,
+                    "terrain_type": "Đường mòn rừng già & lội suối"
+                },
+                {
+                    "stage_number": 2,
+                    "title": "Bơi hang ngầm Tú Làn đến bãi cắm trại bờ thác",
+                    "description": "Bơi áo phao qua sông ngầm bóng tối dài 300m giữa vòm thạch nhũ.",
+                    "distance_km": 9.0,
+                    "elevation_gain_meters": 200,
+                    "terrain_type": "Bơi hang động & rừng hỗn giao"
+                }
+            ],
+            "safety": {
+                "water_advice": "Tuyệt đối không uống nước trong hang; porter cung cấp nước lọc tiệt trùng.",
+                "mobile_coverage_summary": "100% không có sóng di động trong thung lũng Tú Làn; sử dụng điện thoại vệ tinh.",
+                "primary_hazards": ["Lũ quét đột ngột vào mùa mưa (tháng 9-11)", "Đá sắc nhọn trong hang ẩm", "Bơi trong nước lạnh"],
+                "required_gear": ["Áo phao tiêu chuẩn chuyên dụng", "Đèn pin thám hiểm chống nước IPX8", "Giày thoát nước chuyên dụng"],
+                "emergency_contact_info": "Trung tâm Cứu hộ VQG Phong Nha - Kẻ Bàng: (+84) 232 3677 021",
+                "verification_date": "2026-02-15",
+                "verified_by": "Ban Quản lý VQG Phong Nha - Kẻ Bàng"
+            }
+        }
+    },
+    {
+        "id": "dest_vn_trang_an",
+        "slug": "quan-the-danh-thang-trang-an-ninh-binh",
+        "name": "Quần Thể Danh Thắng Tràng An",
+        "local_name": "Di sản hỗn hợp Tràng An, Hoa Lư, Ninh Bình",
+        "province": "Ninh Bình",
+        "country_name": "Việt Nam",
+        "country_ids": ["VN"],
+        "region_id": "vn_central",
+        "category_ids": ["unesco", "hiking", "nature"],
+        "center_latitude": 20.2583,
+        "center_longitude": 105.9083,
+        "elevation_meters": 120,
+        "editorial_summary": "Di sản Văn hóa và Thiên nhiên Thế giới KÉP đầu tiên và duy nhất tại Đông Nam Á được UNESCO công nhận.",
+        "editorial_content": "Hạ Long trên cạn với hệ thống tháp karst biến dạng độc nhất vô nhị, hang động xuyên thủy, các di chỉ khảo cổ thời tiền sử 30.000 năm và Đỉnh Ngọa Long (Hang Múa) ngắm toàn cảnh sông Ngô Đồng.",
+        "best_travel_seasons": ["01", "02", "03", "04", "05", "09", "10"],
+        "is_featured": True,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-01-25",
+        "data_source": "UNESCO World Heritage Centre (#1438) & Sở Du lịch Ninh Bình",
+        "media": [
+            {
+                "id": "media_trangan_1",
+                "image_url": "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Nhiếp ảnh gia",
+                "source_name": "Unsplash",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Trang An Heritage on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ],
+        "route": {
+            "id": "route_hang_mua_ngo_long",
+            "name": "Chinh Phục Đỉnh Ngọa Long - Hang Múa",
+            "distance_km": 3.0,
+            "elevation_gain_meters": 142,
+            "difficulty_level": 1,
+            "estimated_duration_days": 1,
+            "is_verified": True,
+            "stages": [
+                {
+                    "stage_number": 1,
+                    "title": "Vượt gần 500 bậc đá mô phỏng Vạn Lý Trường Thành",
+                    "description": "Bậc đá zíc zắc trên sườn núi đá vôi dốc đứng ngắm đầm sen.",
+                    "distance_km": 1.5,
+                    "elevation_gain_meters": 80,
+                    "terrain_type": "Bậc đá xây"
+                },
+                {
+                    "stage_number": 2,
+                    "title": "Chạm đỉnh tượng rồng đá ngắm toàn cảnh Tam Cốc",
+                    "description": "Chiêm ngưỡng khúc sông uốn lượn giữa các dãy núi đá vôi kỳ vĩ.",
+                    "distance_km": 1.5,
+                    "elevation_gain_meters": 62,
+                    "terrain_type": "Mỏm đá tự nhiên"
+                }
+            ],
+            "safety": {
+                "water_advice": "Mang đủ nước khi bắt đầu leo bậc đá; không có hàng quán trên đỉnh.",
+                "mobile_coverage_summary": "Sóng 4G phủ sóng rất mạnh toàn bộ khu vực.",
+                "primary_hazards": ["Bậc đá trơn trượt vào ngày mưa ẩm", "Đông đúc vào mùa cao điểm lễ hội"],
+                "required_gear": ["Giày thể thao đế bám", "Mũ che nắng", "Trang phục thấm hút mồ hôi"],
+                "emergency_contact_info": "Ban Quản lý Danh thắng Tràng An: (+84) 229 3620 089",
+                "verification_date": "2026-01-25",
+                "verified_by": "BQL Quần thể Danh thắng Tràng An"
+            }
+        }
+    },
+    {
+        "id": "dest_vn_hai_van",
+        "slug": "deo-hai-van-thien-ha-de-nhat-hung-quan",
+        "name": "Đèo Hải Vân & Vịnh Lăng Cô",
+        "local_name": "Đèo Hải Vân, Đà Nẵng - Thừa Thiên Huế",
+        "province": "Đà Nẵng",
+        "country_name": "Việt Nam",
+        "country_ids": ["VN"],
+        "region_id": "vn_central",
+        "category_ids": ["road_trip", "camping", "beach", "nature"],
+        "center_latitude": 16.1969,
+        "center_longitude": 108.1322,
+        "elevation_meters": 496,
+        "editorial_summary": "Thiên hạ đệ nhất hùng quan nối liền biển xanh Lăng Cô với vịnh Đà Nẵng, cung đèo duyên hải quyến rũ bậc nhất thế giới.",
+        "editorial_content": "Một bên là sườn núi Bạch Mã dựng đứng, một bên là biển Đông xanh ngắt đến tận chân trời. Điểm cắm trại ngắm bình minh trên đỉnh Hải Vân Quan và bãi hoang Làng Vân thơ mộng.",
+        "best_travel_seasons": ["02", "03", "04", "05", "06", "07", "08"],
+        "is_featured": False,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-01-20",
+        "data_source": "Sở Du lịch Đà Nẵng & Sở Du lịch Thừa Thiên Huế",
+        "media": [
+            {
+                "id": "media_haivan_1",
+                "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Nhiếp ảnh phong cảnh",
+                "source_name": "Unsplash / Creative Commons",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Hai Van Pass Explorer on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ]
+    },
+
+    # =========================================================================
+    # 3. TRONG NƯỚC: TÂY NGUYÊN (Central Highlands)
+    # =========================================================================
+    {
+        "id": "dest_vn_ta_nang_phan_dung",
+        "slug": "cung-trekking-ta-nang-phan-dung",
+        "name": "Trekking Tà Năng – Phan Dũng",
+        "local_name": "Cung Tà Năng (Lâm Đồng) qua Phan Dũng (Bình Thuận)",
+        "province": "Lâm Đồng",
+        "country_name": "Việt Nam",
+        "country_ids": ["VN"],
+        "region_id": "vn_highlands",
+        "category_ids": ["trekking", "camping", "nature"],
+        "center_latitude": 11.6420,
+        "center_longitude": 108.4230,
+        "elevation_meters": 1100,
+        "editorial_summary": "Cung đường trekking kinh điển băng qua 3 tỉnh Lâm Đồng, Ninh Thuận, Bình Thuận với những đồi cỏ xanh ngút mắt và rừng khộp rực lửa mùa khô.",
+        "editorial_content": "Hành trình dã ngoại vượt qua những triền đồi cỏ lộng gió, sống lưng khủng long trập trùng, hạ trại ngắm hoàng hôn đỏ ối và dải ngân hà rực sáng về đêm.",
+        "best_travel_seasons": ["10", "11", "12", "01", "02", "03", "04", "05"],
+        "is_featured": True,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-03-01",
+        "data_source": "Kiểm lâm Đức Trọng & Tuy Phong & Hội Dã Ngoại Việt Nam",
+        "media": [
+            {
+                "id": "media_tanang_1",
+                "image_url": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Trekking Vietnam",
+                "source_name": "Creative Commons",
+                "license": "CC-BY-SA",
+                "attribution": "Photo by Ta Nang Explorer",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ],
+        "route": {
+            "id": "route_ta_nang_phan_dung_classic",
+            "name": "Cung Đường Mòn Sống Lưng Khủng Long Tà Năng - Phan Dũng",
+            "distance_km": 35.0,
+            "elevation_gain_meters": 850,
+            "difficulty_level": 3,
+            "estimated_duration_days": 3,
+            "is_verified": True,
+            "stages": [
+                {
+                    "stage_number": 1,
+                    "title": "Bìa rừng Tà Năng lên Đồi cỏ Mốc 2 Tỉnh",
+                    "description": "Vượt dốc đất đỏ, xuyên rừng thông già và đồi cỏ xanh ngút mắt.",
+                    "distance_km": 14.0,
+                    "elevation_gain_meters": 450,
+                    "terrain_type": "Đường mòn đồi thông & đất đỏ bazan"
+                },
+                {
+                    "stage_number": 2,
+                    "title": "Sống lưng Khủng Long xuống Rừng Khộp Phan Dũng",
+                    "description": "Đi trên đỉnh sống trâu lộng gió, chuyển đổi hệ sinh thái từ rừng lá kim sang rừng rụng lá.",
+                    "distance_km": 12.0,
+                    "elevation_gain_meters": 250,
+                    "terrain_type": "Sống đồi hẹp & dốc trơn trượt"
+                },
+                {
+                    "stage_number": 3,
+                    "title": "Suối Lớn ra UBND Xã Phan Dũng",
+                    "description": "Lội suối cạn mùa khô, đi dưới tán rừng khộp bằng phẳng kết thúc cung.",
+                    "distance_km": 9.0,
+                    "elevation_gain_meters": 150,
+                    "terrain_type": "Đường mòn đá sỏi ven suối"
+                }
+            ],
+            "safety": {
+                "water_advice": "Đoạn trên sống lưng đồi hoàn toàn không có nước; phải nạp đủ 3 lít tại bìa rừng.",
+                "mobile_coverage_summary": "Mất sóng 90% toàn chặng; chỉ có sóng yếu chập chờn tại Đồi Mốc 2 Tỉnh.",
+                "primary_hazards": ["Lạc đường tại các ngã rẽ nhánh rừng", "Lũ quét suối Phan Dũng mùa mưa (tháng 6-9)", "Sốc nhiệt nắng trảng cỏ"],
+                "required_gear": ["GPS cầm tay hoặc bản đồ offline", "Mũ tai bèo rộng vành", "Nước điện giải Oresol", "Lều chịu gió lớn"],
+                "emergency_contact_info": "UBND Xã Phan Dũng, Huyện Tuy Phong: (+84) 252 3855 010",
+                "verification_date": "2026-03-01",
+                "verified_by": "Kiểm lâm Hạt Tuy Phong"
+            }
+        }
+    },
+    {
+        "id": "dest_vn_langbiang",
+        "slug": "dinh-langbiang-doi-co-hong-da-lat",
+        "name": "Đỉnh Langbiang & Đồi Cỏ Hồng",
+        "local_name": "Đỉnh Langbiang, Lạc Dương, Lâm Đồng",
+        "province": "Lâm Đồng",
+        "country_name": "Việt Nam",
+        "country_ids": ["VN"],
+        "region_id": "vn_highlands",
+        "category_ids": ["trekking", "camping", "hiking", "nature"],
+        "center_latitude": 12.0469,
+        "center_longitude": 108.4389,
+        "elevation_meters": 2167,
+        "editorial_summary": "Nóc nhà xứ ngàn hoa Đà Lạt, nằm trong Khu Dự trữ Sinh quyển Thế giới Langbiang của UNESCO.",
+        "editorial_content": "Cung đường đi bộ dưới những tán thông ba lá cổ thụ, xuyên qua rừng sương mù ẩm ướt lên đỉnh Bidoup hoang sơ và các thung lũng đồi cỏ hồng bạt ngàn vào dịp cuối thu đầu đông.",
+        "best_travel_seasons": ["10", "11", "12", "01", "02", "03", "04"],
+        "is_featured": False,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-02-18",
+        "data_source": "UNESCO Biosphere Reserve & VQG Bidoup - Núi Bà",
+        "media": [
+            {
+                "id": "media_langbiang_1",
+                "image_url": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Nhiếp ảnh gia Đà Lạt",
+                "source_name": "Creative Commons",
+                "license": "CC-BY",
+                "attribution": "Photo by Langbiang Trekker",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ]
+    },
+
+    # =========================================================================
+    # 4. TRONG NƯỚC: MIỀN NAM (Southern Vietnam)
+    # =========================================================================
+    {
+        "id": "dest_vn_cat_tien",
+        "slug": "vuon-quoc-gia-cat-tien-dong-nai",
+        "name": "Vườn Quốc Gia Cát Tiên",
+        "local_name": "VQG Cát Tiên, Tân Phú, Đồng Nai",
+        "province": "Đồng Nai",
+        "country_name": "Việt Nam",
+        "country_ids": ["VN"],
+        "region_id": "vn_south",
+        "category_ids": ["nature", "hiking", "camping", "unesco"],
+        "center_latitude": 11.4239,
+        "center_longitude": 107.4294,
+        "elevation_meters": 120,
+        "editorial_summary": "Khu Dự trữ Sinh quyển Thế giới và Khu Ramsar Quốc tế với hệ sinh thái đất ngập nước Bàu Sấu và động vật hoang dã phong phú.",
+        "editorial_content": "Lá phổi xanh nguyên sơ của Đông Nam Bộ, nơi lý tưởng cho các chuyến đạp xe xuyên rừng cổ thụ, trekking ngắm cá sấu xiêm tại Bàu Sấu và xem thú đêm trong môi trường tự nhiên.",
+        "best_travel_seasons": ["11", "12", "01", "02", "03", "04", "05"],
+        "is_featured": True,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-01-15",
+        "data_source": "UNESCO Biosphere Reserve & VQG Cát Tiên",
+        "media": [
+            {
+                "id": "media_cattien_1",
+                "image_url": "https://images.unsplash.com/photo-1511497584788-87676104235f?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Nhiếp ảnh thiên nhiên",
+                "source_name": "Unsplash",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Cat Tien Forest Explorer on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ],
+        "route": {
+            "id": "route_bau_sau_trek",
+            "name": "Trekking Xuyên Rừng Cổ Thụ Vào Đầm Lầy Bàu Sấu",
+            "distance_km": 14.0,
+            "elevation_gain_meters": 120,
+            "difficulty_level": 1,
+            "estimated_duration_days": 1,
+            "is_verified": True,
+            "stages": [
+                {
+                    "stage_number": 1,
+                    "title": "Trạm kiểm lâm Cây Gõ Bác Đồng vào Bàu Sấu",
+                    "description": "Đi bộ dưới vòm tán rừng mưa nhiệt đới râm mát, cây Tung nghìn năm.",
+                    "distance_km": 9.0,
+                    "elevation_gain_meters": 70,
+                    "terrain_type": "Đường mòn đất bằng phẳng & cầu gỗ"
+                },
+                {
+                    "stage_number": 2,
+                    "title": "Vọng cảnh Bàu Sấu & Chèo thuyền ngắm chim nước",
+                    "description": "Ngắm hàng trăm cá sấu xiêm tự nhiên phơi mình trong vùng lõi Ramsar.",
+                    "distance_km": 5.0,
+                    "elevation_gain_meters": 50,
+                    "terrain_type": "Vùng ngập nước & chòi quan sát"
+                }
+            ],
+            "safety": {
+                "water_advice": "Uống nước đun sôi tại trạm kiểm lâm Bàu Sấu; mang dự phòng 2 lít.",
+                "mobile_coverage_summary": "Mất sóng hoàn toàn tại khu vực Bàu Sấu; trạm dùng bộ đàm kiểm lâm.",
+                "primary_hazards": ["Vắt rừng sau cơn mưa ẩm", "Không đến sát mép nước đầm lầy vào ban đêm"],
+                "required_gear": ["Tất chống vắt", "Thuốc Dep bôi chống vắt", "Đèn pin dã ngoại"],
+                "emergency_contact_info": "Ban Quản lý Vườn Quốc gia Cát Tiên: (+84) 251 3669 228",
+                "verification_date": "2026-01-15",
+                "verified_by": "Trạm Kiểm lâm Bàu Sấu"
+            }
+        }
+    },
+    {
+        "id": "dest_vn_ba_den",
+        "slug": "nui-ba-den-tay-ninh",
+        "name": "Núi Bà Đen – Nóc Nhà Nam Bộ",
+        "local_name": "Núi Bà Đen, Thạnh Tân, TP. Tây Ninh",
+        "province": "Tây Ninh",
+        "country_name": "Việt Nam",
+        "country_ids": ["VN"],
+        "region_id": "vn_south",
+        "category_ids": ["trekking", "camping", "hiking"],
+        "center_latitude": 11.3783,
+        "center_longitude": 106.1683,
+        "elevation_meters": 986,
+        "editorial_summary": "Ngọn núi lửa đã tắt cao nhất Đông Nam Bộ (986m), điểm đến cắm trại săn mây và rèn luyện thể lực số 1 gần TP.HCM.",
+        "editorial_content": "Được mệnh danh là 'Đệ nhất thiên sơn', Núi Bà Đen sở hữu nhiều cung đường leo núi đa dạng từ đường Cột Điện, đường Chùa đến đường Ma Thiên Lãnh đầy thử thách.",
+        "best_travel_seasons": ["11", "12", "01", "02", "03", "04", "05"],
+        "is_featured": False,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-02-12",
+        "data_source": "Sở VHTT&DL Tây Ninh & Ban Quản lý KDL Núi Bà Đen",
+        "media": [
+            {
+                "id": "media_baden_1",
+                "image_url": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Tây Ninh Trekker",
+                "source_name": "Creative Commons",
+                "license": "CC-BY",
+                "attribution": "Photo by Ba Den Summit",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ]
+    },
+
+    # =========================================================================
+    # 5. TRONG NƯỚC: TÂY NAM BỘ & HẢI ĐẢO (Mekong Delta & Islands)
+    # =========================================================================
+    {
+        "id": "dest_vn_con_dao",
+        "slug": "quan-dao-con-dao-ba-ria-vung-tau",
+        "name": "Quần Đảo Côn Đảo",
+        "local_name": "Vườn Quốc Gia Côn Đảo, Bà Rịa - Vũng Tàu",
+        "province": "Bà Rịa - Vũng Tàu",
+        "country_name": "Việt Nam",
+        "country_ids": ["VN"],
+        "region_id": "vn_mekong",
+        "category_ids": ["beach", "nature", "hiking", "camping"],
+        "center_latitude": 8.6833,
+        "center_longitude": 106.6000,
+        "elevation_meters": 577,
+        "editorial_summary": "Quần đảo biển đảo hoang sơ tuyệt mỹ với rạn san hô nguyên vẹn, bãi đẻ rùa biển lớn nhất Việt Nam và Vườn Quốc Gia Côn Đảo.",
+        "editorial_content": "Hòn đảo linh thiêng và thanh bình bậc nhất, nơi du khách có thể trekking rừng nhiệt đới Ông Đụng, lặn biển ngắm dugong (bò biển) và cắm trại trên những bãi cát trắng mịn như bột.",
+        "best_travel_seasons": ["03", "04", "05", "06", "07", "08", "09"],
+        "is_featured": True,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-01-22",
+        "data_source": "Vườn Quốc gia Côn Đảo & Khu Ramsar Quốc tế",
+        "media": [
+            {
+                "id": "media_condao_1",
+                "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Nhiếp ảnh biển đảo",
+                "source_name": "Unsplash",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Con Dao Islands on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ]
+    },
+    {
+        "id": "dest_vn_phu_quoc",
+        "slug": "dao-ngoc-phu-quoc-nam-du-kien-giang",
+        "name": "Đảo Ngọc Phú Quốc & Quần Đảo Nam Du",
+        "local_name": "Vườn Quốc Gia Phú Quốc & Quần đảo Nam Du, Kiên Giang",
+        "province": "Kiên Giang",
+        "country_name": "Việt Nam",
+        "country_ids": ["VN"],
+        "region_id": "vn_mekong",
+        "category_ids": ["beach", "nature", "camping", "unesco"],
+        "center_latitude": 10.2899,
+        "center_longitude": 103.9840,
+        "elevation_meters": 603,
+        "editorial_summary": "Khu Dự trữ Sinh quyển Kiên Giang được UNESCO công nhận, nơi hội tụ những bãi biển cát trắng tinh khôi và rừng nguyên sinh giáp biển.",
+        "editorial_content": "Cung đường trekking xuyên rừng nguyên sinh lên đỉnh núi Chúa, chèo thuyền sup ngắm hoàng hôn Bãi Sao và cắm trại đêm bên bờ biển Nam Du thanh bình.",
+        "best_travel_seasons": ["11", "12", "01", "02", "03", "04"],
+        "is_featured": False,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-02-05",
+        "data_source": "UNESCO Biosphere Reserve & Sở Du lịch Kiên Giang",
+        "media": [
+            {
+                "id": "media_phuquoc_1",
+                "image_url": "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Nhiếp ảnh gia biển",
+                "source_name": "Unsplash",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Phu Quoc Explorer on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ]
+    },
+
+    # =========================================================================
+    # 6. QUỐC TẾ: CHÂU Á (Asia)
+    # =========================================================================
+    {
+        "id": "intl_mount_fuji",
+        "slug": "nui-phu-si-mount-fuji-japan",
+        "name": "Núi Phú Sĩ (Mount Fuji)",
+        "local_name": "富士山 (Fujisan)",
+        "province": "Shizuoka & Yamanashi",
+        "country_name": "Nhật Bản",
+        "country_ids": ["JP"],
+        "region_id": "asia",
+        "category_ids": ["unesco", "trekking", "nature"],
+        "center_latitude": 35.3606,
+        "center_longitude": 138.7274,
+        "elevation_meters": 3776,
+        "editorial_summary": "Di sản Văn hóa Thế giới UNESCO và biểu tượng thiêng liêng trường tồn của đất nước Mặt trời mọc.",
+        "editorial_content": "Ngọn núi lửa tầng dạng chóp nón đối xứng tuyệt đẹp cao 3.776m. Hành trình leo núi đêm đón ánh bình minh Goraiko rực sáng trên biển mây là một trải nghiệm tâm linh và thể chất kỳ diệu.",
+        "best_travel_seasons": ["07", "08", "09"],
+        "is_featured": True,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-02-15",
+        "data_source": "UNESCO World Heritage Centre (#1418) & Japan National Tourism Organization (JNTO)",
+        "media": [
+            {
+                "id": "media_fuji_1",
+                "image_url": "https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "JNTO / Creative Commons",
+                "source_name": "Unsplash",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Mount Fuji Explorer on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ],
+        "route": {
+            "id": "route_yoshida_trail",
+            "name": "Trekking Yoshida Trail (Tuyến Cổ Điển)",
+            "distance_km": 14.5,
+            "elevation_gain_meters": 1450,
+            "difficulty_level": 3,
+            "estimated_duration_days": 2,
+            "is_verified": True,
+            "stages": [
+                {
+                    "stage_number": 1,
+                    "title": "Trạm 5 Fuji Subaru (2.300m) lên Trạm 8 (3.100m)",
+                    "description": "Băng qua những triền đá tro núi lửa màu nâu đỏ dưới bầu trời lộng gió.",
+                    "distance_km": 8.0,
+                    "elevation_gain_meters": 800,
+                    "terrain_type": "Đá sỏi núi lửa zíc zắc"
+                },
+                {
+                    "stage_number": 2,
+                    "title": "Trạm 8 lên Đỉnh miệng núi lửa Kengamine (3.776m)",
+                    "description": "Chinh phục cổng Torii trên đỉnh đón bình minh Goraiko huyền thoại.",
+                    "distance_km": 6.5,
+                    "elevation_gain_meters": 676,
+                    "terrain_type": "Bậc đá dốc & đất tro"
+                }
+            ],
+            "safety": {
+                "water_advice": "Mua nước đóng chai tại các lán nghỉ sơn trạm; giá tăng dần theo độ cao.",
+                "mobile_coverage_summary": "Phủ sóng 5G/4G của Docomo/Softbank tới tận đỉnh núi vào mùa leo núi chính.",
+                "primary_hazards": ["Say độ cao (AMS)", "Hạ thân nhiệt do nhiệt độ trên đỉnh 0-5 độ C vào mùa hè"],
+                "required_gear": ["Gậy leo núi kèm vòng gắn mộc", "Áo gió chống nước 10.000mm", "Đèn pin đội đầu"],
+                "emergency_contact_info": "Cứu hộ Khẩn cấp Nhật Bản: 110 (Cảnh sát) / 119 (Y tế)",
+                "verification_date": "2026-02-15",
+                "verified_by": "Fuji Climbing Official Council"
+            }
+        }
+    },
+    {
+        "id": "intl_everest_base_camp",
+        "slug": "everest-base-camp-ebc-nepal",
+        "name": "Everest Base Camp (EBC)",
+        "local_name": "Sagarmatha National Park, Khumbu",
+        "province": "Khumbu, Solukhumbu",
+        "country_name": "Nepal",
+        "country_ids": ["NP"],
+        "region_id": "asia",
+        "category_ids": ["unesco", "trekking", "nature"],
+        "center_latitude": 28.0042,
+        "center_longitude": 86.8572,
+        "elevation_meters": 5364,
+        "editorial_summary": "Vườn Quốc gia Sagarmatha UNESCO - Tuyến trekking huyền thoại đưa người lữ hành đến tận chân Nóc nhà Thế giới 8.848m.",
+        "editorial_content": "Cung trekking vĩ đại xuyên qua thung lũng Khumbu, những tu viện Phật giáo Tây Tạng nghìn năm tuổi, dòng sông băng Khumbu gầm gào và tầm nhìn choáng ngợp tới đỉnh Everest, Lhotse, Ama Dablam.",
+        "best_travel_seasons": ["03", "04", "05", "10", "11"],
+        "is_featured": True,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-01-30",
+        "data_source": "UNESCO World Heritage Centre (#120) & Nepal Tourism Board",
+        "media": [
+            {
+                "id": "media_ebc_1",
+                "image_url": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Himalayan Explorer",
+                "source_name": "Unsplash",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Everest Base Camp on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ]
+    },
+    {
+        "id": "intl_taj_mahal",
+        "slug": "quan-the-den-taj-mahal-an-do",
+        "name": "Quần Thể Taj Mahal & Agra",
+        "local_name": "ताज महल (Taj Mahal), Agra, Uttar Pradesh",
+        "province": "Uttar Pradesh",
+        "country_name": "Ấn Độ",
+        "country_ids": ["IN"],
+        "region_id": "asia",
+        "category_ids": ["unesco", "hiking"],
+        "center_latitude": 27.1751,
+        "center_longitude": 78.0421,
+        "elevation_meters": 171,
+        "editorial_summary": "Di sản Văn hóa Thế giới UNESCO và kiệt tác kiến trúc cẩm thạch trắng được ca tụng là 'Giọt nước mắt trên má thời gian'.",
+        "editorial_content": "Một trong 7 kỳ quan thế giới mới bên bờ sông Yamuna thơ mộng, đỉnh cao của nghệ thuật Mughal pha trộn kiến trúc Ba Tư, Hồi giáo và Ấn Độ giáo cổ đại.",
+        "best_travel_seasons": ["10", "11", "12", "01", "02", "03"],
+        "is_featured": False,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-02-10",
+        "data_source": "UNESCO World Heritage Centre (#252) & Archaeological Survey of India",
+        "media": [
+            {
+                "id": "media_taj_1",
+                "image_url": "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Nhiếp ảnh gia di sản",
+                "source_name": "Unsplash",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Taj Mahal Explorer on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ]
+    },
+
+    # =========================================================================
+    # 7. QUỐC TẾ: CHÂU ÂU (Europe)
+    # =========================================================================
+    {
+        "id": "intl_tour_du_mont_blanc",
+        "slug": "tour-du-mont-blanc-alps",
+        "name": "Tour du Mont Blanc (Dãy Alps)",
+        "local_name": "Tour du Mont-Blanc (TMB)",
+        "province": "Haute-Savoie, Aosta, Valais",
+        "country_name": "Pháp • Ý • Thụy Sĩ",
+        "country_ids": ["FR", "IT", "CH"],
+        "region_id": "europe",
+        "category_ids": ["trekking", "hiking", "nature", "unesco"],
+        "center_latitude": 45.8326,
+        "center_longitude": 6.8652,
+        "elevation_meters": 2537,
+        "editorial_summary": "Tuyến đường đi bộ đường dài xuyên biên giới kinh điển nhất Châu Âu, lượn quanh khối núi Mont Blanc 4.810m qua 3 quốc gia Pháp, Ý và Thụy Sĩ.",
+        "editorial_content": "Hành trình dài 170km chiêm ngưỡng những dòng sông băng khổng lồ, thung lũng hoa chuông tuyết nở rộ và các ngôi làng cổ tích trên dãy Alps.",
+        "best_travel_seasons": ["06", "07", "08", "09"],
+        "is_featured": True,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-02-25",
+        "data_source": "Club Alpin Français & Swiss Alpine Club (SAC)",
+        "media": [
+            {
+                "id": "media_tmb_1",
+                "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Alps Explorer",
+                "source_name": "Unsplash",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Mont Blanc Trail on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ],
+        "route": {
+            "id": "route_tmb_highlight",
+            "name": "Chặng Cổ Điển Chamonix - Courmayeur - Champex",
+            "distance_km": 170.0,
+            "elevation_gain_meters": 10000,
+            "difficulty_level": 4,
+            "estimated_duration_days": 10,
+            "is_verified": True,
+            "stages": [
+                {
+                    "stage_number": 1,
+                    "title": "Les Houches (Pháp) đến Refuge de Miage",
+                    "description": "Vượt đèo Col de Voza ngắm sông Bionnassay.",
+                    "distance_km": 16.0,
+                    "elevation_gain_meters": 950,
+                    "terrain_type": "Đường mòn núi cao & thảm cỏ Alps"
+                },
+                {
+                    "stage_number": 2,
+                    "title": "Val Veny sang Courmayeur (Ý)",
+                    "description": "Chiêm ngưỡng sườn nam hiểm trở dựng đứng của đỉnh Mont Blanc.",
+                    "distance_km": 18.0,
+                    "elevation_gain_meters": 1100,
+                    "terrain_type": "Đèo đá băng tuyết & đường thông xanh"
+                },
+                {
+                    "stage_number": 3,
+                    "title": "Champex-Lac (Thụy Sĩ) về Trient",
+                    "description": "Men theo hồ nước trong như pha lê và các xóm làng gỗ Thụy Sĩ.",
+                    "distance_km": 15.0,
+                    "elevation_gain_meters": 800,
+                    "terrain_type": "Lối mòn rừng linh sam"
+                }
+            ],
+            "safety": {
+                "water_advice": "Các trạm refuge phục vụ nước sạch uống an toàn; suối tự nhiên cần lọc khử trùng.",
+                "mobile_coverage_summary": "Phủ sóng EU Roaming tốt ở các thung lũng; mất sóng ở đèo cao Col de la Seigne.",
+                "primary_hazards": ["Tuyết lở sớm đầu mùa (tháng 6)", "Bão tuyết bất chợt ở độ cao trên 2.400m"],
+                "required_gear": ["Giày đinh viền bám băng (Microspikes)", "Áo khoác gió tuyết chuyên dụng", "Bản đồ IGN 1:25.000"],
+                "emergency_contact_info": "Pháp: 112 | Ý: 118 | Thụy Sĩ Cứu hộ Núi (REGA): 1414",
+                "verification_date": "2026-02-25",
+                "verified_by": "Chamonix Mountain Guides Company"
+            }
+        }
+    },
+    {
+        "id": "intl_lofoten_islands",
+        "slug": "quan-dao-lofoten-na-uy",
+        "name": "Quần Đảo Lofoten (Bắc Cực)",
+        "local_name": "Lofoten, Nordland",
+        "province": "Nordland",
+        "country_name": "Na Uy",
+        "country_ids": ["NO"],
+        "region_id": "europe",
+        "category_ids": ["hiking", "beach", "camping", "nature"],
+        "center_latitude": 68.2000,
+        "center_longitude": 13.6000,
+        "elevation_meters": 1161,
+        "editorial_summary": "Vùng đất huyền thoại trong Vòng Bắc Cực với những bức tường đá granit dựng đứng mọc thẳng từ vịnh hẹp Na Uy và ánh cực quang phương Bắc.",
+        "editorial_content": "Chiêm ngưỡng các làng chài nhà gỗ đỏ rorbu bên bờ vịnh hẹp Reinefjorden, leo đỉnh Reinebringen ngắm toàn cảnh đảo đá và trải nghiệm đêm trắng mặt trời không lặn giữa mùa hè.",
+        "best_travel_seasons": ["06", "07", "08", "09", "12", "01", "02"],
+        "is_featured": False,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-01-10",
+        "data_source": "Visit Norway & DNT (Den Norske Turistforening)",
+        "media": [
+            {
+                "id": "media_lofoten_1",
+                "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Bắc Âu Explorer",
+                "source_name": "Unsplash",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Lofoten Norway on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ]
+    },
+
+    # =========================================================================
+    # 8. QUỐC TẾ: BẮC MỸ (North America)
+    # =========================================================================
+    {
+        "id": "intl_banff_rockies",
+        "slug": "vuon-quoc-gia-banff-day-rockies-canada",
+        "name": "Vườn Quốc Gia Banff & Dãy Rockies",
+        "local_name": "Banff National Park, Alberta",
+        "province": "Alberta",
+        "country_name": "Canada",
+        "country_ids": ["CA"],
+        "region_id": "north_america",
+        "category_ids": ["unesco", "nature", "hiking", "camping"],
+        "center_latitude": 51.1784,
+        "center_longitude": -115.5708,
+        "elevation_meters": 1400,
+        "editorial_summary": "Vườn quốc gia đầu tiên của Canada và Di sản Thế giới UNESCO Dãy Rockies, nổi tiếng với Hồ Moraine và Hồ Louise xanh ngọc lam.",
+        "editorial_content": "Trái tim của dãy núi Rockies Bắc Mỹ với những hồ băng đổi màu diệu kỳ dưới bóng đỉnh núi phủ tuyết trắng, rừng thông bạt ngàn và gấu xám grizzly hoang dã.",
+        "best_travel_seasons": ["06", "07", "08", "09", "10"],
+        "is_featured": True,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-02-01",
+        "data_source": "UNESCO World Heritage Centre (#304) & Parks Canada",
+        "media": [
+            {
+                "id": "media_banff_1",
+                "image_url": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Parks Canada Explorer",
+                "source_name": "Unsplash",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Banff National Park on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ]
+    },
+
+    # =========================================================================
+    # 9. QUỐC TẾ: CHÂU ĐẠI DƯƠNG (Oceania)
+    # =========================================================================
+    {
+        "id": "intl_milford_track",
+        "slug": "milford-track-fiordland-new-zealand",
+        "name": "Milford Track (Vịnh Fiordland)",
+        "local_name": "Milford Track, Te Wahipounamu",
+        "province": "Southland",
+        "country_name": "New Zealand",
+        "country_ids": ["NZ"],
+        "region_id": "oceania",
+        "category_ids": ["unesco", "trekking", "nature"],
+        "center_latitude": -44.7833,
+        "center_longitude": 167.7833,
+        "elevation_meters": 1073,
+        "editorial_summary": "Tuyến đi bộ vĩ đại bậc nhất thế giới (Great Walk) nằm trọn trong Di sản Thế giới Te Wahipounamu của New Zealand.",
+        "editorial_content": "Hành trình 53,5km băng qua những thung lũng sông băng chạm khắc từ kỷ băng hà, rừng mưa ôn đới rêu phong và thác nước Sutherland cao 580m đổ ầm ầm giữa mây trời.",
+        "best_travel_seasons": ["11", "12", "01", "02", "03", "04"],
+        "is_featured": False,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-01-28",
+        "data_source": "UNESCO World Heritage Centre (#551) & Department of Conservation (DOC NZ)",
+        "media": [
+            {
+                "id": "media_milford_1",
+                "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "New Zealand DOC",
+                "source_name": "Unsplash",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Milford Track NZ on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ]
+    },
+
+    # =========================================================================
+    # 10. QUỐC TẾ: NAM MỸ (South America)
+    # =========================================================================
+    {
+        "id": "intl_machu_picchu",
+        "slug": "thanh-pho-co-machu-picchu-peru",
+        "name": "Thành Phố Cổ Machu Picchu",
+        "local_name": "Machu Picchu, Cusco",
+        "province": "Cusco",
+        "country_name": "Peru",
+        "country_ids": ["PE"],
+        "region_id": "south_america",
+        "category_ids": ["unesco", "hiking", "trekking", "nature"],
+        "center_latitude": -13.1631,
+        "center_longitude": -72.5450,
+        "elevation_meters": 2430,
+        "editorial_summary": "Di sản Thế giới Hỗn hợp UNESCO và Kỳ quan Thế giới mới ẩn mình trên đỉnh mây của dãy Andes hùng vĩ.",
+        "editorial_content": "Kiệt tác thành trì đá cổ của nền văn minh Inca được xây dựng từ thế kỷ 15, nằm giữa rừng mây nhiệt đới và thung lũng sông Urubamba cuồn cuộn.",
+        "best_travel_seasons": ["05", "06", "07", "08", "09", "10"],
+        "is_featured": True,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-02-14",
+        "data_source": "UNESCO World Heritage Centre (#274) & SERNANP Peru",
+        "media": [
+            {
+                "id": "media_machu_1",
+                "image_url": "https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "Andes Explorer",
+                "source_name": "Unsplash",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Machu Picchu Explorer on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ]
+    },
+
+    # =========================================================================
+    # 11. QUỐC TẾ: CHÂU PHI (Africa)
+    # =========================================================================
+    {
+        "id": "intl_kilimanjaro",
+        "slug": "nui-kilimanjaro-tanzania",
+        "name": "Núi Kilimanjaro & Vườn Quốc Gia",
+        "local_name": "Kilimanjaro National Park",
+        "province": "Kilimanjaro Region",
+        "country_name": "Tanzania",
+        "country_ids": ["TZ"],
+        "region_id": "africa",
+        "category_ids": ["unesco", "trekking", "nature"],
+        "center_latitude": -3.0674,
+        "center_longitude": 37.3556,
+        "elevation_meters": 5895,
+        "editorial_summary": "Nóc nhà Châu Phi và Di sản Thế giới UNESCO - Núi đứng độc lập cao nhất thế giới với vương miện tuyết vĩnh cửu giữa xích đạo.",
+        "editorial_content": "Chinh phục đỉnh Uhuru 5.895m là chuyến hành trình kỳ thú qua 5 vùng khí hậu riêng biệt: từ rừng nhiệt đới trù phú, đồng cỏ thảo nguyên đến sa mạc núi cao và vùng băng giá cực địa.",
+        "best_travel_seasons": ["01", "02", "07", "08", "09", "10"],
+        "is_featured": True,
+        "is_popular": True,
+        "is_verified": True,
+        "verification_date": "2026-01-15",
+        "data_source": "UNESCO World Heritage Centre (#403) & TANAPA Tanzania",
+        "media": [
+            {
+                "id": "media_kili_1",
+                "image_url": "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=1400&q=80",
+                "photographer": "African Safari",
+                "source_name": "Unsplash",
+                "license": "Unsplash Free License",
+                "attribution": "Photo by Kilimanjaro Trekker on Unsplash",
+                "aspect_ratio": 1.77,
+                "is_hero": True
+            }
+        ]
+    }
+]
+
+output_path = r"c:\Users\DELL\Downloads\AI Coding\Gemini Code\TRAVEL_APP\mobile_flutter\assets\data\destinations_seed.json"
+os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+with open(output_path, "w", encoding="utf-8") as f:
+    json.dump({"destinations": destinations}, f, ensure_ascii=False, indent=2)
+
+print(f"Successfully generated {len(destinations)} rich destinations to {output_path}")
+domestic_count = sum(1 for d in destinations if "VN" in d["country_ids"])
+intl_count = sum(1 for d in destinations if "VN" not in d["country_ids"])
+print(f"Domestic (VN): {domestic_count}, International: {intl_count}")
+

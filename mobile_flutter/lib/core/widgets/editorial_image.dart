@@ -30,9 +30,30 @@ class EditorialImage extends StatelessWidget {
 
     Widget imageContent;
 
-    // Trên Web: Sử dụng Image.network native của trình duyệt để tận dụng HTTP cache,
-    // tránh triệt để lỗi XHR CORS của flutter_cache_manager và canvas texture blackout khi route pop.
-    if (kIsWeb) {
+    // Ưu tiên nạp từ local asset nếu có (đặc biệt là bộ ảnh thật của từng địa danh được lưu tại assets/images/destinations/)
+    // Giúp ảnh hiển thị tức thì 0ms, không phụ thuộc mạng, 100% không bị lỗi CORS hay màn hình đen (blackout) khi pop route.
+    final bool hasLocalAsset = image.localAsset.isNotEmpty &&
+        image.localAsset.startsWith('assets/');
+
+    if (hasLocalAsset) {
+      imageContent = Image.asset(
+        image.localAsset,
+        key: ValueKey('asset_${image.localAsset}'),
+        width: width,
+        height: height,
+        fit: fit,
+        alignment: image.focalPoint,
+        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+          if (wasSynchronouslyLoaded || frame != null) return child;
+          return SkeletonShimmer(
+            width: width ?? double.infinity,
+            height: height ?? 200,
+            borderRadius: radius,
+          );
+        },
+        errorBuilder: (context, error, stackTrace) => _buildNetworkFallback(radius),
+      );
+    } else if (kIsWeb) {
       imageContent = Image.network(
         image.url,
         key: ValueKey('web_img_${image.url}'),
@@ -48,10 +69,10 @@ class EditorialImage extends StatelessWidget {
             borderRadius: radius,
           );
         },
-        errorBuilder: (context, error, stackTrace) => _buildLocalFallback(),
+        errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
       );
     } else {
-      // Trên Mobile Native (Android / iOS): Sử dụng CachedNetworkImage cho Disk Storage Cache
+      // Trên Mobile Native (Android / iOS): Sử dụng CachedNetworkImage
       imageContent = CachedNetworkImage(
         key: ValueKey('native_img_${image.url}'),
         imageUrl: image.url,
@@ -65,7 +86,7 @@ class EditorialImage extends StatelessWidget {
           height: height ?? 200,
           borderRadius: radius,
         ),
-        errorWidget: (context, url, error) => _buildLocalFallback(),
+        errorWidget: (context, url, error) => _buildPlaceholder(),
       );
     }
 
@@ -106,21 +127,36 @@ class EditorialImage extends StatelessWidget {
     );
   }
 
-  Widget _buildLocalFallback() {
-    return Image.asset(
-      image.localAsset,
-      key: ValueKey('asset_${image.localAsset}'),
+  Widget _buildNetworkFallback(BorderRadius radius) {
+    if (kIsWeb) {
+      return Image.network(
+        image.url,
+        key: ValueKey('fb_web_${image.url}'),
+        width: width,
+        height: height,
+        fit: fit,
+        alignment: image.focalPoint,
+        errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+      );
+    }
+    return CachedNetworkImage(
+      key: ValueKey('fb_native_${image.url}'),
+      imageUrl: image.url,
       width: width,
       height: height,
       fit: fit,
       alignment: image.focalPoint,
-      errorBuilder: (context, error, stackTrace) => Container(
-        width: width,
-        height: height,
-        color: const Color(0xFFE2E8F0),
-        child: const Center(
-          child: Icon(Icons.landscape_outlined, size: 36, color: Color(0xFF94A3B8)),
-        ),
+      errorWidget: (context, url, error) => _buildPlaceholder(),
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      width: width,
+      height: height,
+      color: const Color(0xFFE2E8F0),
+      child: const Center(
+        child: Icon(Icons.landscape_outlined, size: 36, color: Color(0xFF94A3B8)),
       ),
     );
   }

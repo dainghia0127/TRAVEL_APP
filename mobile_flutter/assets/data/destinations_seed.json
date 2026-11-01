@@ -45,7 +45,7 @@
           "attribution": "Ảnh: Khánh Hmoong (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/hero_ta_nang.jpg"
+          "local_asset_path": "assets/images/destinations/dest_vn_ma_pi_leng.jpg"
         }
       ],
       "route": {
@@ -159,7 +159,7 @@
           "attribution": "Ảnh: Kiếm Anh (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/pass_o_quy_ho.jpg"
+          "local_asset_path": "assets/images/destinations/dest_vn_o_quy_ho.jpg"
         }
       ],
       "route": {
@@ -270,7 +270,7 @@
           "attribution": "Ảnh: Adam Jones (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/fall_k50.jpg"
+          "local_asset_path": "assets/images/destinations/dest_vn_ban_gioc.jpg"
         }
       ],
       "route": {
@@ -380,7 +380,7 @@
           "attribution": "Ảnh: Vyacheslav Argenberg (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/fall_k50.jpg"
+          "local_asset_path": "assets/images/destinations/dest_vn_ha_long_bay.jpg"
         }
       ],
       "route": {
@@ -493,7 +493,7 @@
           "attribution": "Ảnh: Wikimedia Commons (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/pass_o_quy_ho.jpg"
+          "local_asset_path": "assets/images/destinations/dest_vn_lao_than.jpg"
         }
       ],
       "route": {
@@ -605,7 +605,7 @@
           "attribution": "Ảnh: Tycho (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/fall_k50.jpg"
+          "local_asset_path": "assets/images/destinations/dest_vn_phong_nha.jpg"
         }
       ],
       "route": {
@@ -716,7 +716,7 @@
           "attribution": "Ảnh: Jakub Hałun (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/fall_k50.jpg"
+          "local_asset_path": "assets/images/destinations/dest_vn_trang_an.jpg"
         }
       ],
       "route": {
@@ -827,7 +827,7 @@
           "attribution": "Ảnh: Steffen Schmitz (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/pass_o_quy_ho.jpg"
+          "local_asset_path": "assets/images/destinations/dest_vn_hai_van.jpg"
         }
       ],
       "local_specialties": [
@@ -895,7 +895,7 @@
           "attribution": "Ảnh: VinhNguyen.1257 (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/hero_ta_nang.jpg"
+          "local_asset_path": "assets/images/destinations/dest_vn_ta_nang_phan_dung.jpg"
         }
       ],
       "route": {
@@ -1016,7 +1016,7 @@
           "attribution": "Ảnh: Wikimedia Commons (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/mang_den.jpg"
+          "local_asset_path": "assets/images/destinations/dest_vn_langbiang.jpg"
         }
       ],
       "local_specialties": [
@@ -1084,7 +1084,7 @@
           "attribution": "Ảnh: Vyacheslav Argenberg (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/lake_tuyen_lam.jpg"
+          "local_asset_path": "assets/images/destinations/dest_vn_cat_tien.jpg"
         }
       ],
       "route": {
@@ -1194,7 +1194,7 @@
           "attribution": "Ảnh: Vivu Vietnam (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/mang_den.jpg"
+          "local_asset_path": "assets/images/destinations/dest_vn_ba_den.jpg"
         }
       ],
       "local_specialties": [
@@ -1262,7 +1262,7 @@
           "attribution": "Ảnh: Wikimedia Commons (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/lake_tuyen_lam.jpg"
+          "local_asset_path": "assets/images/destinations/dest_vn_con_dao.jpg"
         }
       ],
       "local_specialties": [
@@ -1329,7 +1329,7 @@
           "attribution": "Ảnh: Prince Roy (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/lake_tuyen_lam.jpg"
+          "local_asset_path": "assets/images/destinations/dest_vn_phu_quoc.jpg"
         }
       ],
       "local_specialties": [
@@ -1392,7 +1392,7 @@
           "attribution": "Ảnh: Midori (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/pass_o_quy_ho.jpg"
+          "local_asset_path": "assets/images/destinations/intl_mount_fuji.jpg"
         }
       ],
       "route": {
@@ -1500,7 +1500,7 @@
           "attribution": "Ảnh: Nepal Trek Adventures (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/pass_o_quy_ho.jpg"
+          "local_asset_path": "assets/images/destinations/intl_everest_base_camp.jpg"
         }
       ],
       "local_specialties": [
@@ -1565,7 +1565,7 @@
           "attribution": "Ảnh: Antrix3 (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/lake_tuyen_lam.jpg"
+          "local_asset_path": "assets/images/destinations/intl_taj_mahal.jpg"
         }
       ],
       "local_specialties": [
@@ -1632,7 +1632,7 @@
           "attribution": "Ảnh: Ximonic (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/pass_o_quy_ho.jpg"
+          "local_asset_path": "assets/images/destinations/intl_tour_du_mont_blanc.jpg"
         }
       ],
       "route": {
@@ -1751,7 +1751,7 @@
           "attribution": "Ảnh: Jörg Hempel (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/lake_tuyen_lam.jpg"
+          "local_asset_path": "assets/images/destinations/intl_lofoten_islands.jpg"
         }
       ],
       "local_specialties": [
@@ -1817,7 +1817,7 @@
           "attribution": "Ảnh: Jay Huang (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/hero_ta_nang.jpg"
+          "local_asset_path": "assets/images/destinations/intl_banff_rockies.jpg"
         }
       ],
       "local_specialties": [
@@ -1883,7 +1883,7 @@
           "attribution": "Ảnh: Ingolfson (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/hero_ta_nang.jpg"
+          "local_asset_path": "assets/images/destinations/intl_milford_track.jpg"
         }
       ],
       "local_specialties": [
@@ -1950,7 +1950,7 @@
           "attribution": "Ảnh: Martin St-Amant (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/hero_ta_nang.jpg"
+          "local_asset_path": "assets/images/destinations/intl_machu_picchu.jpg"
         }
       ],
       "local_specialties": [
@@ -2016,7 +2016,7 @@
           "attribution": "Ảnh: Lafleursauvage (Wikimedia Commons)",
           "aspect_ratio": 1.77,
           "is_hero": true,
-          "local_asset_path": "assets/images/mang_den.jpg"
+          "local_asset_path": "assets/images/destinations/intl_kilimanjaro.jpg"
         }
       ],
       "local_specialties": [
@@ -2093,7 +2093,7 @@
         {
           "id": "media_hcm_bach_dang",
           "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Bach%20Dang%20Wharf%20-%20panoramio.jpg?width=1280",
-          "local_asset_path": "assets/images/lake_tuyen_lam.jpg",
+          "local_asset_path": "assets/images/destinations/trend_hcm_bach_dang_waterbus.jpg",
           "photographer": "Wikimedia Commons",
           "source_name": "Wikimedia Commons",
           "license": "CC-BY-SA 3.0",
@@ -2157,7 +2157,7 @@
         {
           "id": "media_hcm_thu_thiem",
           "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Thu%20Thiem%202%20Bridge%20at%20night.jpg?width=1280",
-          "local_asset_path": "assets/images/hero_ta_nang.jpg",
+          "local_asset_path": "assets/images/destinations/trend_hcm_thu_thiem_park.jpg",
           "photographer": "Wikimedia Commons",
           "source_name": "Wikimedia Commons",
           "license": "CC-BY-SA 4.0",
@@ -2221,7 +2221,7 @@
         {
           "id": "media_hcm_42_nguyen_hue",
           "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Nguyen%20Hue%20Street%20at%20night%20view%20from%2042%20Nguyen%20Hue.jpg?width=1280",
-          "local_asset_path": "assets/images/mang_den.jpg",
+          "local_asset_path": "assets/images/destinations/trend_hcm_42_nguyen_hue.jpg",
           "photographer": "Wikimedia Commons",
           "source_name": "Wikimedia Commons",
           "license": "CC-BY-SA 4.0",
@@ -2285,7 +2285,7 @@
         {
           "id": "media_hcm_ho_con_rua",
           "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/H%E1%BB%93%20Con%20R%C3%B9a%2C%20TP.HCM.jpg?width=1280",
-          "local_asset_path": "assets/images/lake_tuyen_lam.jpg",
+          "local_asset_path": "assets/images/destinations/trend_hcm_ho_con_rua.jpg",
           "photographer": "Wikimedia Commons",
           "source_name": "Wikimedia Commons",
           "license": "CC-BY-SA 3.0",
@@ -2348,7 +2348,7 @@
         {
           "id": "media_hcm_cau_anh_sao",
           "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/C%E1%BA%A7u%20%C3%81nh%20Sao%20-%20Starlight%20Bridge.jpg?width=1280",
-          "local_asset_path": "assets/images/lake_tuyen_lam.jpg",
+          "local_asset_path": "assets/images/destinations/trend_hcm_cau_anh_sao.jpg",
           "photographer": "Wikimedia Commons",
           "source_name": "Wikimedia Commons",
           "license": "CC-BY-SA 4.0",
@@ -2412,7 +2412,7 @@
         {
           "id": "media_hcm_can_gio",
           "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Can%20Gio%20mangrove%20forest.jpg?width=1280",
-          "local_asset_path": "assets/images/hero_ta_nang.jpg",
+          "local_asset_path": "assets/images/destinations/trend_hcm_can_gio.jpg",
           "photographer": "Wikimedia Commons",
           "source_name": "Wikimedia Commons",
           "license": "CC-BY-SA 3.0",
@@ -2474,7 +2474,7 @@
         {
           "id": "media_dl_thung_lung_den",
           "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Da%20Lat%20Flower%20Park%20-%20lake.jpg?width=1280",
-          "local_asset_path": "assets/images/mang_den.jpg",
+          "local_asset_path": "assets/images/destinations/trend_dl_thung_lung_den.jpg",
           "photographer": "Wikimedia Commons",
           "source_name": "Wikimedia Commons",
           "license": "CC-BY-SA 4.0",
@@ -2536,7 +2536,7 @@
         {
           "id": "media_hn_train_street",
           "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Vietnam-Sapa-Y%20Linh%20Ho%20village-P1070238.jpg?width=1280",
-          "local_asset_path": "assets/images/pass_o_quy_ho.jpg",
+          "local_asset_path": "assets/images/destinations/trend_hn_train_street.jpg",
           "photographer": "Wikimedia Commons",
           "source_name": "Wikimedia Commons",
           "license": "CC-BY-SA 4.0",
@@ -2599,7 +2599,7 @@
         {
           "id": "media_dn_cau_vang",
           "image_url": "https://commons.wikimedia.org/wiki/Special:FilePath/L%C4%83ng%20C%C3%B4%2C%20H%E1%BA%A3i%20V%C3%A2n%20Pass%2C%202020-01%20CN-02.jpg?width=1280",
-          "local_asset_path": "assets/images/pass_o_quy_ho.jpg",
+          "local_asset_path": "assets/images/destinations/trend_dn_cau_vang.jpg",
           "photographer": "Wikimedia Commons",
           "source_name": "Wikimedia Commons",
           "license": "CC-BY-SA 4.0",

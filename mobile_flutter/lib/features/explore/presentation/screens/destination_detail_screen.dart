@@ -176,6 +176,7 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
   List<String> get _mustTryActivities => widget.destination?.mustTryActivities ?? [];
   List<String> get _culturalHighlights => widget.destination?.culturalHighlights ?? [];
   String? get _gettingThereAdvice => widget.destination?.gettingThereAdvice;
+  String? get _photoSpotTip => widget.destination?.photoSpotTip ?? widget.spot?['photoSpotTip'] as String?;
 
   /// Tính toán khoảng cách thực tế từ vị trí người dùng đến địa điểm
   String get _computedDistance {
@@ -202,6 +203,64 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
       return spotDist;
     }
     return '94 km';
+  }
+
+  void _openImagePreview(BuildContext context, OutdoorImage img) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.9),
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    _title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  onPressed: () => Navigator.of(ctx).pop(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: InteractiveViewer(
+                minScale: 0.8,
+                maxScale: 3.5,
+                child: EditorialImage(
+                  image: img,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            if (img.photographer != null || img.source != null) ...[
+              const SizedBox(height: 10),
+              Text(
+                'Nguồn: ${img.source ?? 'Wikimedia Commons'} • Tác giả: ${img.photographer ?? 'Nhiếp ảnh thực địa'}',
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -420,6 +479,117 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                           _content ?? _summary,
                           style: const TextStyle(fontSize: 14, color: AppColors.editorialInk, height: 1.6),
                         ),
+
+                        // Hình ảnh thực tế địa danh & Điểm check-in
+                        const SizedBox(height: 22),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Row(
+                              children: [
+                                Icon(Icons.photo_library_outlined, size: 18, color: AppColors.editorialPine),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Hình ảnh thực tế địa danh',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.editorialInk,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: AppColors.editorialPine.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.verified, size: 12, color: AppColors.editorialPine),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Ảnh thực tế 100%',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.editorialPine,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        GestureDetector(
+                          onTap: () => _openImagePreview(context, img),
+                          child: Container(
+                            height: 220,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: AppColors.editorialBorder),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x0A000000),
+                                  blurRadius: 10,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                EditorialImage(
+                                  image: img,
+                                  fit: BoxFit.cover,
+                                  showAttribution: true,
+                                ),
+                                Positioned(
+                                  top: 10,
+                                  right: 10,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withValues(alpha: 0.55),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.fullscreen, color: Colors.white, size: 20),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        if (_photoSpotTip != null && _photoSpotTip!.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFFBEB),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: const Color(0xFFFDE68A)),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.camera_alt_outlined, size: 16, color: Color(0xFFD97706)),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'Góc chụp đẹp: $_photoSpotTip',
+                                    style: const TextStyle(
+                                      fontSize: 12.5,
+                                      color: Color(0xFF92400E),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
 
                         // Chỉ dẫn di chuyển & Phương tiện
                         if (_gettingThereAdvice != null && _gettingThereAdvice!.isNotEmpty) ...[
