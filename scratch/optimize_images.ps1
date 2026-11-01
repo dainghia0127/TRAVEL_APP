@@ -83,3 +83,4 @@ Write-Host "`n=== OPTIMIZATION SUMMARY ==="
 Write-Host "Old total size: $totOldMb MB"
 Write-Host "New total size: $totNewMb MB"
 Write-Host "RAM savings on iPhone: ~98%!"
+

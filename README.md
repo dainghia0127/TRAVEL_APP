@@ -39,5 +39,6 @@ TRAVEL_APP/
 - [**01. Kiến Trúc Kỹ Thuật (Architecture & Tech Stack)**](file:///e:/AI%20Code/Gemini%20Code/TRAVEL_APP/docs/01_ARCHITECTURE.md)
 - [**02. Đặc Tả Tính Năng (Functional Specifications)**](file:///e:/AI%20Code/Gemini%20Code/TRAVEL_APP/docs/02_FUNCTIONAL_SPECS.md)
 - [**03. Lộ Trình Triển Khai (Roadmap)**](file:///e:/AI%20Code/Gemini%20Code/TRAVEL_APP/docs/03_ROADMAP.md)
+- [**04. Hướng Dẫn Cài Đặt Native App iOS (.ipa) Lên iPhone**](docs/IOS_NATIVE_APP_INSTALLATION_GUIDE.md)
 - [**Kế Hoạch Ban Đầu Gốc (Original Plan)**](file:///e:/AI%20Code/Gemini%20Code/TRAVEL_APP/TRAVEL_APP_PLAN.md)
 
