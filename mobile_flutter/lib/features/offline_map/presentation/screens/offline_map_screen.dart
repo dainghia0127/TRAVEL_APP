@@ -180,10 +180,13 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
       _mapController.move(targetLoc, 13.0);
     }
 
-    // Lấy tuyến đường thực tế qua OSRM bám sát mạng lưới đường bộ
+    final isDomestic = dest.isDomestic('VN') || dest.countryIds.contains('vn') || dest.countryIds.contains('VN');
+
+    // Lấy tuyến đường thực tế qua OSRM (đảm bảo 100% nằm trong lãnh thổ Việt Nam nếu là điểm nội địa)
     final routeResult = await RoutingService.getActualRoute(
       start: _currentLocation,
       end: targetLoc,
+      isDomestic: isDomestic,
     );
 
     if (mounted && _selectedTripDestination?.id == dest.id) {
@@ -216,9 +219,11 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
       // Cập nhật lại tuyến đường thực tế từ vị trí GPS mới
       if (_selectedTripDestination != null) {
         final targetLoc = _getDestLatLng(_selectedTripDestination!);
+        final isDomestic = _selectedTripDestination!.isDomestic('VN') || _selectedTripDestination!.countryIds.contains('VN');
         final routeResult = await RoutingService.getActualRoute(
           start: pos,
           end: targetLoc,
+          isDomestic: isDomestic,
         );
         if (mounted) {
           setState(() {

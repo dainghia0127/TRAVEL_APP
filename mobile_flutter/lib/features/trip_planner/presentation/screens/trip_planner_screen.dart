@@ -117,10 +117,12 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
       _loadChecklistForDestination(dest);
     }
 
-    // Tải cự ly đường bộ thực tế qua OSRM Routing
+    // Tải cự ly đường bộ thực tế qua OSRM Routing (đảm bảo trong lãnh thổ quốc gia nếu nội địa)
+    final isDomestic = dest.isDomestic('VN') || dest.countryIds.contains('vn') || dest.countryIds.contains('VN');
     final routeResult = await RoutingService.getActualRoute(
       start: _userLocation,
       end: target,
+      isDomestic: isDomestic,
     );
     if (mounted && _selectedDestination?.id == dest.id) {
       setState(() {
