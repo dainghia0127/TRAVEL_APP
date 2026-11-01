@@ -10,6 +10,7 @@ import 'package:mobile_flutter/features/home/presentation/screens/main_navigatio
 import 'package:mobile_flutter/features/offline_map/services/location_service.dart';
 import 'package:mobile_flutter/features/offline_map/services/routing_service.dart';
 import 'package:mobile_flutter/features/weather_safety/services/weather_service.dart';
+import '../../services/itinerary_engine.dart';
 
 class TripPlannerScreen extends StatefulWidget {
   const TripPlannerScreen({super.key});
@@ -94,21 +95,22 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
 
   Future<void> _selectDestination(Destination dest, {bool updateChecklist = true}) async {
     final target = LatLng(dest.centerLatitude ?? 11.6420, dest.centerLongitude ?? 108.4230);
-    final dist = const Distance().as(LengthUnit.Kilometer, _userLocation, target);
+    final directDist = const Distance().as(LengthUnit.Kilometer, _userLocation, target);
 
-    // Tính số ngày dự kiến theo cung đường
-    int days = dest.route?.estimatedDurationDays ?? 2;
-    if (days < 1) days = 1;
-    if (days > 3) days = 3;
-
-    final itinerary = _generateItinerary(dest, days);
+    // Tính số ngày đề xuất sơ bộ qua ItineraryEngine
+    final suggestedDays = ItineraryEngine.calculateSuggestedDays(directDist, dest.route?.estimatedDurationDays);
+    final initialItinerary = ItineraryEngine.generateDynamicItinerary(
+      dest: dest,
+      distKm: directDist,
+      totalDays: suggestedDays,
+    );
 
     setState(() {
       _selectedDestination = dest;
-      _distanceFromUserKm = dist;
-      _maxDays = days;
+      _distanceFromUserKm = directDist;
+      _maxDays = suggestedDays;
       _selectedDay = 1;
-      _daysItinerary = itinerary;
+      _daysItinerary = initialItinerary;
     });
 
     StorageService.setSelectedTripDestination(dest.id);
@@ -125,107 +127,23 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
       isDomestic: isDomestic,
     );
     if (mounted && _selectedDestination?.id == dest.id) {
+      // Cập nhật lại số ngày và lộ trình chi tiết theo cự ly thực tế chính xác qua ItineraryEngine
+      final actualDays = ItineraryEngine.calculateSuggestedDays(routeResult.distanceKm, dest.route?.estimatedDurationDays);
+      final dynamicItinerary = ItineraryEngine.generateDynamicItinerary(
+        dest: dest,
+        distKm: routeResult.distanceKm,
+        totalDays: actualDays,
+      );
+
       setState(() {
         _distanceFromUserKm = routeResult.distanceKm;
+        _maxDays = actualDays;
+        _daysItinerary = dynamicItinerary;
+        if (_selectedDay > actualDays) {
+          _selectedDay = 1;
+        }
       });
     }
-  }
-
-  Map<int, List<Map<String, dynamic>>> _generateItinerary(Destination dest, int days) {
-    final Map<int, List<Map<String, dynamic>>> result = {};
-    for (int i = 1; i <= days; i++) {
-      result[i] = [];
-    }
-
-    // Nếu điểm đến có các chặng trekking thực tế (route.stages)
-    if (dest.route != null && dest.route!.stages.isNotEmpty) {
-      final stages = dest.route!.stages;
-      for (int i = 0; i < stages.length; i++) {
-        final stage = stages[i];
-        final dayIndex = ((i / stages.length) * days).floor() + 1;
-        final targetDay = dayIndex.clamp(1, days);
-
-        result[targetDay]?.add({
-          'id': 'stage_${dest.id}_${stage.stageNumber}',
-          'time': i == 0 ? '07:30' : (i == stages.length - 1 ? '16:00' : '11:45'),
-          'title': stage.title,
-          'location': stage.description,
-          'type': i == 0 ? 'start' : (i == stages.length - 1 ? 'finish' : 'checkpoint'),
-          'distance': stage.distanceKm != null ? '+ ${stage.distanceKm} km' : '+ 6 km',
-          'elevation': stage.elevationGainMeters != null ? '+${stage.elevationGainMeters}m' : '--',
-        });
-      }
-    } else {
-      // Nếu là điểm dã ngoại tự do, sinh các mốc hợp lý
-      result[1]?.addAll([
-        {
-          'id': 'd1_start_${dest.id}',
-          'time': '06:00',
-          'title': 'Khởi hành tới ${dest.name}',
-          'location': 'Tập kết đoàn dã ngoại & kiểm tra xe cộ',
-          'type': 'start',
-          'distance': '0 km',
-          'elevation': '0m',
-        },
-        {
-          'id': 'd1_mid_${dest.id}',
-          'time': '12:00',
-          'title': 'Đến trạm trung chuyển ${dest.name}',
-          'location': 'Ăn trưa đặc sản vùng miền & chuẩn bị đồ',
-          'type': 'checkpoint',
-          'distance': '+ ${_distanceFromUserKm.toStringAsFixed(0)} km',
-          'elevation': dest.elevationDisplay,
-        },
-        {
-          'id': 'd1_camp_${dest.id}',
-          'time': '16:30',
-          'title': 'Hạ trại & ngắm hoàng hôn',
-          'location': 'Dựng lều, nổi lửa và trải nghiệm thiên nhiên',
-          'type': 'camp',
-          'distance': '+ 5 km',
-          'elevation': dest.elevationDisplay,
-        },
-      ]);
-
-      if (days >= 2) {
-        result[2]?.addAll([
-          {
-            'id': 'd2_sun_${dest.id}',
-            'time': '05:30',
-            'title': 'Đón bình minh & săn mây',
-            'location': 'Điểm ngắm cảnh đẹp nhất tại ${dest.name}',
-            'type': 'highlight',
-            'distance': '+ 3 km',
-            'elevation': dest.elevationDisplay,
-          },
-          {
-            'id': 'd2_back_${dest.id}',
-            'time': '14:00',
-            'title': 'Thu dọn hành trang & hạ sơn',
-            'location': 'Dọn sạch rác, bảo vệ cảnh quan tự nhiên',
-            'type': 'finish',
-            'distance': '+ 10 km',
-            'elevation': '0m',
-          },
-        ]);
-      }
-
-      if (days >= 3) {
-        result[3]?.addAll([
-          {
-            'id': 'd3_fin_${dest.id}',
-            'time': '11:00',
-            'title': 'Hoàn thành hành trình khám phá',
-            'location': 'Trở về điểm xuất phát an toàn',
-            'type': 'finish',
-            'distance': '+ 0 km',
-            'elevation': '0m',
-          },
-        ]);
-      }
-    }
-
-    return result;
   }
 
   Future<void> _loadChecklistForDestination(Destination dest) async {
@@ -776,62 +694,76 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space16, vertical: 8),
       children: [
-        // Day Selector Ribbon
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: availableDays.map((day) {
-            final isSelected = _selectedDay == day;
-            return Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: BouncingButton(
-                  onTap: () => setState(() => _selectedDay = day),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isSelected ? AppColors.editorialSurface : AppColors.editorialBg,
-                      borderRadius: AppRadius.roundedMd,
-                      border: Border.all(
-                        color: isSelected ? AppColors.editorialPine : AppColors.editorialBorder,
-                        width: isSelected ? 1.5 : 1,
+        // Day Selector Ribbon (Co giãn mượt mà theo số ngày đề xuất động)
+        SizedBox(
+          height: 52,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            itemCount: availableDays.length,
+            separatorBuilder: (context, _) => const SizedBox(width: 8),
+            itemBuilder: (context, idx) {
+              final day = availableDays[idx];
+              final isSelected = _selectedDay == day;
+              final String daySublabel = day == 1
+                  ? 'Khởi hành'
+                  : (day == _maxDays
+                      ? 'Hồi hương'
+                      : (_maxDays <= 3 ? 'Khám phá' : 'Chặng 0${day - 1}'));
+
+              return BouncingButton(
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  setState(() => _selectedDay = day);
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  constraints: const BoxConstraints(minWidth: 86),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppColors.editorialPine : AppColors.editorialSurface,
+                    borderRadius: AppRadius.roundedMd,
+                    border: Border.all(
+                      color: isSelected ? AppColors.editorialPine : AppColors.editorialBorder,
+                      width: isSelected ? 1.5 : 1,
+                    ),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: AppColors.editorialPine.withValues(alpha: 0.25),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'NGÀY ${day < 10 ? '0$day' : '$day'}',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          color: isSelected ? Colors.white : AppColors.editorialPine,
+                          letterSpacing: 0.4,
+                        ),
                       ),
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              )
-                            ]
-                          : null,
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          'NGÀY 0$day',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
-                            color: isSelected ? AppColors.editorialPine : AppColors.editorialMuted,
-                          ),
+                      const SizedBox(height: 2),
+                      Text(
+                        daySublabel,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                          color: isSelected ? Colors.white : AppColors.editorialInk,
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          day == 1 ? 'Khởi hành' : (day == 2 ? 'Khám phá' : 'Hạ sơn'),
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                            color: AppColors.editorialInk,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            );
-          }).toList(),
+              );
+            },
+          ),
         ),
 
         const SizedBox(height: 16),
