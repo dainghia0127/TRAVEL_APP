@@ -1,0 +1,53 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    name: Build Native iOS IPA
+    runs-on: macos-14
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter Environment
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Verify Flutter & CocoaPods
+        run: |
+          flutter --version
+          pod --version
+
+      - name: Install Flutter Dependencies
+        run: |
+          cd mobile_flutter
+          flutter pub get
+
+      - name: Build iOS Application (Release)
+        run: |
+          cd mobile_flutter
+          flutter build ios --release --no-codesign
+
+      - name: Package Payload into .ipa
+        run: |
+          cd mobile_flutter
+          mkdir -p Payload
+          cp -r build/ios/iphoneos/Runner.app Payload/
+          zip -r -q TravelOutdoorApp.ipa Payload
+          echo "=== IPA PACKAGE CREATED ==="
+          ls -lh TravelOutdoorApp.ipa
+
+      - name: Upload IPA Artifact to GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: TravelOutdoorApp-iOS-Native
+          path: mobile_flutter/TravelOutdoorApp.ipa
+          retention-days: 14
