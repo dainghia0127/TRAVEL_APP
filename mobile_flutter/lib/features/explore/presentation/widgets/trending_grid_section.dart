@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:animations/animations.dart';
+import 'package:flutter/services.dart';
 import 'package:mobile_flutter/core/models/outdoor_image.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
@@ -19,6 +19,26 @@ class TrendingGridSection extends StatelessWidget {
     required this.favoriteIds,
     required this.onToggleFavorite,
   });
+
+  void _openDetail(BuildContext context, Destination dest, bool isFav) {
+    HapticFeedback.lightImpact();
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => DestinationDetailScreen(
+          destination: dest,
+          isFavorite: isFav,
+          onToggleFavorite: () => onToggleFavorite(dest.id),
+        ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 250),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,18 +84,9 @@ class TrendingGridSection extends StatelessWidget {
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
-                child: OpenContainer(
-                  closedElevation: 0,
-                  openElevation: 0,
-                  closedColor: Colors.transparent,
-                  openColor: AppColors.editorialBg,
-                  transitionDuration: const Duration(milliseconds: 360),
-                  openBuilder: (context, action) => DestinationDetailScreen(
-                    destination: dest,
-                    isFavorite: isFav,
-                    onToggleFavorite: () => onToggleFavorite(dest.id),
-                  ),
-                  closedBuilder: (context, action) => Container(
+                child: BouncingButton(
+                  onTap: () => _openDetail(context, dest, isFav),
+                  child: Container(
                     decoration: BoxDecoration(
                       color: AppColors.editorialSurface,
                       borderRadius: BorderRadius.circular(16),
@@ -142,7 +153,7 @@ class TrendingGridSection extends StatelessWidget {
                                         ),
                                       ),
                                     ),
-                                    BouncingButton(
+                                    GestureDetector(
                                       onTap: () => onToggleFavorite(dest.id),
                                       child: Icon(
                                         isFav ? Icons.favorite : Icons.favorite_border,
@@ -207,4 +218,3 @@ class TrendingGridSection extends StatelessWidget {
     );
   }
 }
-

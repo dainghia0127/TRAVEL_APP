@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_flutter/core/models/outdoor_image.dart';
-import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/skeleton_shimmer.dart';
 
 class EditorialImage extends StatelessWidget {
@@ -85,9 +84,9 @@ class EditorialImage extends StatelessWidget {
       errorBuilder: (context, error, stackTrace) => Container(
         width: width,
         height: height,
-        color: AppColors.surfaceHigh,
+        color: const Color(0xFFE2E8F0),
         child: const Center(
-          child: Icon(Icons.landscape_outlined, size: 36, color: AppColors.textMuted),
+          child: Icon(Icons.landscape_outlined, size: 36, color: Color(0xFF94A3B8)),
         ),
       ),
     );

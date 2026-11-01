@@ -93,4 +93,10 @@ class Destination {
     }
     return '-- m';
   }
+
+  /// Nhãn danh mục chính hiển thị
+  String get categoryLabel => categoryIds.isNotEmpty ? categoryIds.first : 'Dã ngoại';
+
+  /// Vị trí hiển thị (Tỉnh/Thành phố hoặc Quốc gia)
+  String get regionDisplay => province ?? countryName ?? '';
 }

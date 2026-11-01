@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:animations/animations.dart';
+import 'package:flutter/services.dart';
 import 'package:mobile_flutter/core/models/outdoor_image.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
@@ -32,6 +32,26 @@ class _FeaturedCarouselState extends State<FeaturedCarousel> {
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  void _openDetail(BuildContext context, Destination dest, bool isFav) {
+    HapticFeedback.lightImpact();
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => DestinationDetailScreen(
+          destination: dest,
+          isFavorite: isFav,
+          onToggleFavorite: () => widget.onToggleFavorite(dest.id),
+        ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 250),
+      ),
+    );
   }
 
   @override
@@ -95,18 +115,9 @@ class _FeaturedCarouselState extends State<FeaturedCarousel> {
 
               return Padding(
                 padding: const EdgeInsets.only(right: 10),
-                child: OpenContainer(
-                  closedElevation: 0,
-                  openElevation: 0,
-                  closedColor: Colors.transparent,
-                  openColor: AppColors.editorialBg,
-                  transitionDuration: const Duration(milliseconds: 360),
-                  openBuilder: (context, action) => DestinationDetailScreen(
-                    destination: dest,
-                    isFavorite: isFav,
-                    onToggleFavorite: () => widget.onToggleFavorite(dest.id),
-                  ),
-                  closedBuilder: (context, action) => Container(
+                child: BouncingButton(
+                  onTap: () => _openDetail(context, dest, isFav),
+                  child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(18),
                       boxShadow: const [
@@ -186,7 +197,7 @@ class _FeaturedCarouselState extends State<FeaturedCarousel> {
                                       style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white),
                                     ),
                                   ),
-                                BouncingButton(
+                                GestureDetector(
                                   onTap: () => widget.onToggleFavorite(dest.id),
                                   child: Container(
                                     padding: const EdgeInsets.all(7),
@@ -274,4 +285,3 @@ class _FeaturedCarouselState extends State<FeaturedCarousel> {
     );
   }
 }
-

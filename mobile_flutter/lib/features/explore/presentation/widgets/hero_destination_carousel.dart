@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:animations/animations.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
 import 'package:mobile_flutter/core/widgets/tactical_badge.dart';
@@ -82,19 +81,25 @@ class _HeroDestinationCarouselState extends State<HeroDestinationCarousel> {
 
               return Padding(
                 padding: const EdgeInsets.only(right: 10),
-                child: OpenContainer(
-                  closedElevation: 0,
-                  openElevation: 0,
-                  closedColor: Colors.transparent,
-                  openColor: AppColors.bgDark,
-                  transitionType: ContainerTransitionType.fadeThrough,
-                  transitionDuration: const Duration(milliseconds: 380),
-                  openBuilder: (context, action) => DestinationDetailScreen(
-                    spot: spot,
-                    isFavorite: isFav,
-                    onToggleFavorite: () => widget.onToggleFavorite(spot['id'] as String),
-                  ),
-                  closedBuilder: (context, action) => Container(
+                child: BouncingButton(
+                  scaleLower: 0.98,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      PageRouteBuilder(
+                        transitionDuration: const Duration(milliseconds: 280),
+                        reverseTransitionDuration: const Duration(milliseconds: 240),
+                        pageBuilder: (context, animation, secondaryAnimation) => DestinationDetailScreen(
+                          spot: spot,
+                          isFavorite: isFav,
+                          onToggleFavorite: () => widget.onToggleFavorite(spot['id'] as String),
+                        ),
+                        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                          return FadeTransition(opacity: animation, child: child);
+                        },
+                      ),
+                    );
+                  },
+                  child: Container(
                     decoration: BoxDecoration(
                       borderRadius: AppRadius.roundedXl,
                       border: Border.all(color: AppColors.borderSubtle),
@@ -116,14 +121,14 @@ class _HeroDestinationCarouselState extends State<HeroDestinationCarousel> {
                             imageUrl,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) => Container(
-                              color: AppColors.surfaceHigh,
-                              child: const Icon(Icons.landscape, size: 50, color: Colors.white24),
+                              color: const Color(0xFFE2E8F0),
+                              child: const Icon(Icons.landscape, size: 50, color: Color(0xFF94A3B8)),
                             ),
                           )
                         else
                           Container(
-                            color: AppColors.surfaceHigh,
-                            child: const Icon(Icons.landscape, size: 50, color: Colors.white24),
+                            color: const Color(0xFFE2E8F0),
+                            child: const Icon(Icons.landscape, size: 50, color: Color(0xFF94A3B8)),
                           ),
 
                         // Gradient Scrim

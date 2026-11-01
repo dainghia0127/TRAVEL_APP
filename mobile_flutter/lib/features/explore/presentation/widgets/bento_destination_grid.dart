@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:animations/animations.dart';
 import 'package:mobile_flutter/core/models/outdoor_image.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
@@ -21,6 +20,23 @@ class BentoDestinationGrid extends StatelessWidget {
 
   OutdoorImage _resolveImage(Destination dest) {
     return OutdoorImage.fromMedia(dest.heroMedia, caption: dest.name);
+  }
+
+  void _navigateToDetail(BuildContext context, Destination dest, bool isFav) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 280),
+        reverseTransitionDuration: const Duration(milliseconds: 240),
+        pageBuilder: (context, animation, secondaryAnimation) => DestinationDetailScreen(
+          destination: dest,
+          isFavorite: isFav,
+          onToggleFavorite: () => onToggleFavorite(dest.id),
+        ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
   }
 
   @override
@@ -63,7 +79,7 @@ class BentoDestinationGrid extends StatelessWidget {
           const SizedBox(height: 12),
 
           // 1. Large Hero Spotlight Card
-          _buildSpotlightCard(spotlight),
+          _buildSpotlightCard(context, spotlight),
 
           const SizedBox(height: 12),
 
@@ -71,9 +87,9 @@ class BentoDestinationGrid extends StatelessWidget {
           if (sub1 != null && sub2 != null)
             Row(
               children: [
-                Expanded(child: _buildSatelliteCard(sub1)),
+                Expanded(child: _buildSatelliteCard(context, sub1)),
                 const SizedBox(width: 12),
-                Expanded(child: _buildSatelliteCard(sub2)),
+                Expanded(child: _buildSatelliteCard(context, sub2)),
               ],
             ),
         ],
@@ -81,23 +97,14 @@ class BentoDestinationGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildSpotlightCard(Destination dest) {
+  Widget _buildSpotlightCard(BuildContext context, Destination dest) {
     final isFav = favoriteIds.contains(dest.id);
     final img = _resolveImage(dest);
 
-    return OpenContainer(
-      closedElevation: 0,
-      openElevation: 0,
-      closedColor: Colors.transparent,
-      openColor: AppColors.editorialBg,
-      transitionType: ContainerTransitionType.fadeThrough,
-      transitionDuration: const Duration(milliseconds: 320),
-      openBuilder: (context, action) => DestinationDetailScreen(
-        destination: dest,
-        isFavorite: isFav,
-        onToggleFavorite: () => onToggleFavorite(dest.id),
-      ),
-      closedBuilder: (context, action) => Container(
+    return BouncingButton(
+      scaleLower: 0.98,
+      onTap: () => _navigateToDetail(context, dest, isFav),
+      child: Container(
         height: 220,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
@@ -140,7 +147,7 @@ class BentoDestinationGrid extends StatelessWidget {
                 onTap: () => onToggleFavorite(dest.id),
                 child: CircleAvatar(
                   radius: 18,
-                  backgroundColor: Colors.black.withValues(alpha: 0.45),
+                  backgroundColor: Colors.black.withValues(alpha: 0.4),
                   child: Icon(
                     isFav ? Icons.favorite : Icons.favorite_border,
                     color: isFav ? AppColors.emergencyRed : Colors.white,
@@ -150,12 +157,29 @@ class BentoDestinationGrid extends StatelessWidget {
               ),
             ),
             Positioned(
-              bottom: 16,
               left: 16,
+              bottom: 16,
               right: 16,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.editorialPine,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      dest.categoryLabel.toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
                   Text(
                     dest.name,
                     style: const TextStyle(
@@ -164,39 +188,30 @@ class BentoDestinationGrid extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.3,
                     ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    dest.editorialSummary,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 11,
-                      height: 1.3,
-                    ),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
                   Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          '${dest.distanceDisplay} • ${dest.elevationDisplay}',
-                          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600),
+                      const Icon(Icons.location_on_outlined, color: Colors.white70, size: 13),
+                      const SizedBox(width: 3),
+                      Text(
+                        dest.regionDisplay,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       const Spacer(),
-                      const Row(
-                        children: [
-                          Text('Khám phá', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
-                          SizedBox(width: 3),
-                          Icon(Icons.arrow_forward, color: Colors.white, size: 12),
-                        ],
+                      Text(
+                        '${dest.distanceDisplay} • ${dest.elevationDisplay}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ],
                   ),
@@ -209,23 +224,14 @@ class BentoDestinationGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildSatelliteCard(Destination dest) {
+  Widget _buildSatelliteCard(BuildContext context, Destination dest) {
     final isFav = favoriteIds.contains(dest.id);
     final img = _resolveImage(dest);
 
-    return OpenContainer(
-      closedElevation: 0,
-      openElevation: 0,
-      closedColor: Colors.transparent,
-      openColor: AppColors.editorialBg,
-      transitionType: ContainerTransitionType.fadeThrough,
-      transitionDuration: const Duration(milliseconds: 320),
-      openBuilder: (context, action) => DestinationDetailScreen(
-        destination: dest,
-        isFavorite: isFav,
-        onToggleFavorite: () => onToggleFavorite(dest.id),
-      ),
-      closedBuilder: (context, action) => Container(
+    return BouncingButton(
+      scaleLower: 0.98,
+      onTap: () => _navigateToDetail(context, dest, isFav),
+      child: Container(
         height: 160,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),

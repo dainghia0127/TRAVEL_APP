@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:animations/animations.dart';
 import 'package:mobile_flutter/core/models/outdoor_image.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
@@ -29,6 +28,23 @@ class DestinationCard extends StatelessWidget {
     );
   }
 
+  void _openDetail(BuildContext context) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 280),
+        reverseTransitionDuration: const Duration(milliseconds: 240),
+        pageBuilder: (context, animation, secondaryAnimation) => DestinationDetailScreen(
+          spot: spot,
+          isFavorite: isFavorite,
+          onToggleFavorite: onToggleFavorite,
+        ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final img = _resolveImage();
@@ -36,19 +52,10 @@ class DestinationCard extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space20),
-      child: OpenContainer(
-        closedElevation: 0,
-        openElevation: 0,
-        closedColor: Colors.transparent,
-        openColor: AppColors.editorialBg,
-        transitionType: ContainerTransitionType.fadeThrough,
-        transitionDuration: const Duration(milliseconds: 340),
-        openBuilder: (context, action) => DestinationDetailScreen(
-          spot: spot,
-          isFavorite: isFavorite,
-          onToggleFavorite: onToggleFavorite,
-        ),
-        closedBuilder: (context, action) => Container(
+      child: BouncingButton(
+        scaleLower: 0.98,
+        onTap: () => _openDetail(context),
+        child: Container(
           decoration: BoxDecoration(
             color: AppColors.editorialSurface,
             borderRadius: BorderRadius.circular(16),

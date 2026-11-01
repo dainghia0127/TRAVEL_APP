@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:animations/animations.dart';
+import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mobile_flutter/core/models/outdoor_image.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
@@ -22,6 +22,26 @@ class NearbySection extends StatelessWidget {
     required this.favoriteIds,
     required this.onToggleFavorite,
   });
+
+  void _openDetail(BuildContext context, Destination dest, bool isFav) {
+    HapticFeedback.lightImpact();
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => DestinationDetailScreen(
+          destination: dest,
+          isFavorite: isFav,
+          onToggleFavorite: () => onToggleFavorite(dest.id),
+        ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 250),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,18 +108,9 @@ class NearbySection extends StatelessWidget {
                 padding: const EdgeInsets.only(right: 12),
                 child: SizedBox(
                   width: 200,
-                  child: OpenContainer(
-                    closedElevation: 0,
-                    openElevation: 0,
-                    closedColor: Colors.transparent,
-                    openColor: AppColors.editorialBg,
-                    transitionDuration: const Duration(milliseconds: 360),
-                    openBuilder: (context, action) => DestinationDetailScreen(
-                      destination: dest,
-                      isFavorite: isFav,
-                      onToggleFavorite: () => onToggleFavorite(dest.id),
-                    ),
-                    closedBuilder: (context, action) => Container(
+                  child: BouncingButton(
+                    onTap: () => _openDetail(context, dest, isFav),
+                    child: Container(
                       decoration: BoxDecoration(
                         color: AppColors.editorialSurface,
                         borderRadius: BorderRadius.circular(16),
@@ -155,7 +166,7 @@ class NearbySection extends StatelessWidget {
                                   Positioned(
                                     top: 8,
                                     right: 8,
-                                    child: BouncingButton(
+                                    child: GestureDetector(
                                       onTap: () => onToggleFavorite(dest.id),
                                       child: Container(
                                         padding: const EdgeInsets.all(5),
@@ -225,4 +236,3 @@ class NearbySection extends StatelessWidget {
     );
   }
 }
-
