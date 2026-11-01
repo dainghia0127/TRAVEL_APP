@@ -4,39 +4,32 @@ import 'package:mobile_flutter/core/models/outdoor_image.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
 import 'package:mobile_flutter/core/widgets/editorial_image.dart';
+import 'package:mobile_flutter/features/explore/domain/entities/destination.dart';
 import 'package:mobile_flutter/features/explore/presentation/screens/destination_detail_screen.dart';
 
 class BentoDestinationGrid extends StatelessWidget {
-  final List<Map<String, dynamic>> spots;
-  final Set<String> favoriteSpots;
+  final List<Destination> destinations;
+  final Set<String> favoriteIds;
   final Function(String) onToggleFavorite;
 
   const BentoDestinationGrid({
     super.key,
-    required this.spots,
-    required this.favoriteSpots,
+    required this.destinations,
+    required this.favoriteIds,
     required this.onToggleFavorite,
   });
 
-  OutdoorImage _resolveImage(Map<String, dynamic> spot) {
-    if (spot['outdoorImage'] is OutdoorImage) {
-      return spot['outdoorImage'] as OutdoorImage;
-    }
-    final url = spot['imageUrl'] as String? ?? '';
-    return OutdoorImage(
-      url: url.isNotEmpty ? url : OutdoorImage.defaultNature.url,
-      localAsset: 'assets/images/default_nature.jpg',
-      photographer: 'Tác giả dã ngoại',
-    );
+  OutdoorImage _resolveImage(Destination dest) {
+    return OutdoorImage.fromMedia(dest.heroMedia, caption: dest.name);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (spots.isEmpty) return const SizedBox.shrink();
+    if (destinations.isEmpty) return const SizedBox.shrink();
 
-    final spotlight = spots[0];
-    final sub1 = spots.length > 1 ? spots[1] : null;
-    final sub2 = spots.length > 2 ? spots[2] : null;
+    final spotlight = destinations[0];
+    final sub1 = destinations.length > 1 ? destinations[1] : null;
+    final sub2 = destinations.length > 2 ? destinations[2] : null;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space16),
@@ -49,7 +42,7 @@ class BentoDestinationGrid extends StatelessWidget {
             textBaseline: TextBaseline.alphabetic,
             children: [
               const Text(
-                'Cung Đường Nổi Bật',
+                'Điểm Đến Tiêu Biểu',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
@@ -58,7 +51,7 @@ class BentoDestinationGrid extends StatelessWidget {
                 ),
               ),
               Text(
-                'Xem thêm (${spots.length})',
+                'Tất cả (${destinations.length})',
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -88,9 +81,9 @@ class BentoDestinationGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildSpotlightCard(Map<String, dynamic> spot) {
-    final isFav = favoriteSpots.contains(spot['id']);
-    final img = _resolveImage(spot);
+  Widget _buildSpotlightCard(Destination dest) {
+    final isFav = favoriteIds.contains(dest.id);
+    final img = _resolveImage(dest);
 
     return OpenContainer(
       closedElevation: 0,
@@ -98,20 +91,20 @@ class BentoDestinationGrid extends StatelessWidget {
       closedColor: Colors.transparent,
       openColor: AppColors.editorialBg,
       transitionType: ContainerTransitionType.fadeThrough,
-      transitionDuration: const Duration(milliseconds: 340),
+      transitionDuration: const Duration(milliseconds: 320),
       openBuilder: (context, action) => DestinationDetailScreen(
-        spot: spot,
+        destination: dest,
         isFavorite: isFav,
-        onToggleFavorite: () => onToggleFavorite(spot['id'] as String),
+        onToggleFavorite: () => onToggleFavorite(dest.id),
       ),
       closedBuilder: (context, action) => Container(
-        height: 230,
+        height: 220,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: const [
             BoxShadow(
-              color: Color(0x18000000),
-              blurRadius: 16,
+              color: Color(0x0C000000),
+              blurRadius: 14,
               offset: Offset(0, 4),
             ),
           ],
@@ -122,74 +115,40 @@ class BentoDestinationGrid extends StatelessWidget {
           children: [
             EditorialImage(
               image: img,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(20),
               showAttribution: true,
             ),
-
-            // Subtle gradient overlay for editorial readability
             Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color(0x30000000),
+                    Color(0x20000000),
                     Colors.transparent,
-                    Color(0x90000000),
-                    Color(0xDF000000),
+                    Color(0x80000000),
+                    Color(0xD0000000),
                   ],
-                  stops: [0.0, 0.35, 0.65, 1.0],
+                  stops: [0.0, 0.35, 0.7, 1.0],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
               ),
             ),
-
-            // Top Badges
             Positioned(
-              top: 14,
-              left: 14,
-              right: 14,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.6),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.star, color: Color(0xFFFBBF24), size: 14),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${spot['rating']} (${spot['reviews']})',
-                          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
-                        ),
-                      ],
-                    ),
+              top: 12,
+              right: 12,
+              child: BouncingButton(
+                onTap: () => onToggleFavorite(dest.id),
+                child: CircleAvatar(
+                  radius: 18,
+                  backgroundColor: Colors.black.withValues(alpha: 0.45),
+                  child: Icon(
+                    isFav ? Icons.favorite : Icons.favorite_border,
+                    color: isFav ? AppColors.emergencyRed : Colors.white,
+                    size: 18,
                   ),
-                  BouncingButton(
-                    onTap: () => onToggleFavorite(spot['id'] as String),
-                    child: Container(
-                      width: 34,
-                      height: 34,
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        isFav ? Icons.favorite : Icons.favorite_border,
-                        color: isFav ? AppColors.emergencyRed : Colors.white,
-                        size: 18,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-
-            // Bottom Content
             Positioned(
               bottom: 16,
               left: 16,
@@ -197,34 +156,48 @@ class BentoDestinationGrid extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.place_outlined, color: Colors.white70, size: 13),
-                      const SizedBox(width: 4),
-                      Text(
-                        spot['location'] as String,
-                        style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
                   Text(
-                    spot['title'] as String,
+                    dest.name,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 19,
+                      fontSize: 18,
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.3,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 3),
+                  Text(
+                    dest.editorialSummary,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11,
+                      height: 1.3,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
-                      _buildMiniBadge(Icons.straighten, spot['distance'] as String),
-                      const SizedBox(width: 8),
-                      _buildMiniBadge(Icons.landscape, spot['elevation'] as String),
-                      const SizedBox(width: 8),
-                      _buildMiniBadge(Icons.hiking, spot['difficulty'] as String),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          '${dest.distanceDisplay} • ${dest.elevationDisplay}',
+                          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      const Spacer(),
+                      const Row(
+                        children: [
+                          Text('Khám phá', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                          SizedBox(width: 3),
+                          Icon(Icons.arrow_forward, color: Colors.white, size: 12),
+                        ],
+                      ),
                     ],
                   ),
                 ],
@@ -236,9 +209,9 @@ class BentoDestinationGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildSatelliteCard(Map<String, dynamic> spot) {
-    final isFav = favoriteSpots.contains(spot['id']);
-    final img = _resolveImage(spot);
+  Widget _buildSatelliteCard(Destination dest) {
+    final isFav = favoriteIds.contains(dest.id);
+    final img = _resolveImage(dest);
 
     return OpenContainer(
       closedElevation: 0,
@@ -248,9 +221,9 @@ class BentoDestinationGrid extends StatelessWidget {
       transitionType: ContainerTransitionType.fadeThrough,
       transitionDuration: const Duration(milliseconds: 320),
       openBuilder: (context, action) => DestinationDetailScreen(
-        spot: spot,
+        destination: dest,
         isFavorite: isFav,
-        onToggleFavorite: () => onToggleFavorite(spot['id'] as String),
+        onToggleFavorite: () => onToggleFavorite(dest.id),
       ),
       closedBuilder: (context, action) => Container(
         height: 160,
@@ -258,8 +231,8 @@ class BentoDestinationGrid extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
             BoxShadow(
-              color: Color(0x12000000),
-              blurRadius: 12,
+              color: Color(0x0A000000),
+              blurRadius: 10,
               offset: Offset(0, 3),
             ),
           ],
@@ -271,31 +244,30 @@ class BentoDestinationGrid extends StatelessWidget {
             EditorialImage(
               image: img,
               borderRadius: BorderRadius.circular(16),
+              showAttribution: false,
             ),
-
             Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.transparent, Color(0xB5000000), Color(0xEB000000)],
-                  stops: [0.3, 0.7, 1.0],
+                  colors: [
+                    Colors.transparent,
+                    Color(0x60000000),
+                    Color(0xCC000000),
+                  ],
+                  stops: [0.3, 0.65, 1.0],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
               ),
             ),
-
             Positioned(
-              top: 10,
-              right: 10,
+              top: 8,
+              right: 8,
               child: BouncingButton(
-                onTap: () => onToggleFavorite(spot['id'] as String),
-                child: Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.5),
-                    shape: BoxShape.circle,
-                  ),
+                onTap: () => onToggleFavorite(dest.id),
+                child: CircleAvatar(
+                  radius: 14,
+                  backgroundColor: Colors.black.withValues(alpha: 0.4),
                   child: Icon(
                     isFav ? Icons.favorite : Icons.favorite_border,
                     color: isFav ? AppColors.emergencyRed : Colors.white,
@@ -304,7 +276,6 @@ class BentoDestinationGrid extends StatelessWidget {
                 ),
               ),
             ),
-
             Positioned(
               bottom: 12,
               left: 12,
@@ -313,48 +284,30 @@ class BentoDestinationGrid extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    spot['category'] as String,
-                    style: const TextStyle(color: Color(0xFFFBBF24), fontSize: 10, fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    spot['title'] as String,
+                    dest.name,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.w800,
+                      letterSpacing: -0.2,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${spot['distance']} • ${spot['elevation']}',
-                    style: const TextStyle(color: Colors.white70, fontSize: 10),
+                    dest.distanceDisplay,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildMiniBadge(IconData icon, String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 11, color: Colors.white70),
-          const SizedBox(width: 3),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500)),
-        ],
       ),
     );
   }

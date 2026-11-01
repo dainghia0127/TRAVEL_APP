@@ -28,5 +28,18 @@ class OutdoorImage {
     photographer: 'Sasha Freemind',
     caption: 'Vùng đồi hoang sơ dã ngoại',
   );
+
+  /// Factory chuyển đổi từ DestinationMedia
+  factory OutdoorImage.fromMedia(dynamic media, {String? caption}) {
+    if (media == null) return defaultNature;
+    return OutdoorImage(
+      url: media.imageUrl as String? ?? defaultNature.url,
+      localAsset: (media.localAssetPath as String?) ?? defaultNature.localAsset,
+      aspectRatio: (media.aspectRatio as num?)?.toDouble() ?? 16 / 9,
+      photographer: media.photographer as String?,
+      source: media.sourceName as String?,
+      caption: caption ?? media.attribution as String?,
+    );
+  }
 }
 

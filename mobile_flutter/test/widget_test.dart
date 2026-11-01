@@ -10,12 +10,26 @@ void main() {
     // Verify app starts and displays the Explore screen title
     expect(find.text('Khám Phá & Dã Ngoại'), findsOneWidget);
 
+    // Verify segmented tabs exist for Domestic and International
+    expect(find.text('TRONG NƯỚC'), findsOneWidget);
+    expect(find.text('QUỐC TẾ'), findsOneWidget);
+
     // Verify bottom navigation bar has all 5 sections
     expect(find.text('Khám phá'), findsOneWidget);
     expect(find.text('Bản đồ'), findsOneWidget);
     expect(find.text('Lịch trình'), findsOneWidget);
     expect(find.text('Cẩm nang'), findsOneWidget);
     expect(find.text('SOS Cứu hộ'), findsOneWidget);
+
+    // Tap on 'QUỐC TẾ'
+    await tester.tap(find.text('QUỐC TẾ'));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Thế Giới'), findsOneWidget);
+
+    // Tap on 'TRONG NƯỚC'
+    await tester.tap(find.text('TRONG NƯỚC'));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Việt Nam'), findsOneWidget);
 
     // Tap on 'SOS Cứu hộ'
     await tester.tap(find.text('SOS Cứu hộ'));

@@ -3,16 +3,23 @@ import 'package:flutter/services.dart';
 import 'package:animations/animations.dart';
 import 'package:mobile_flutter/core/models/outdoor_image.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
-import 'package:mobile_flutter/core/services/storage_service.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
 import 'package:mobile_flutter/core/widgets/editorial_image.dart';
+import 'package:mobile_flutter/core/widgets/skeleton_shimmer.dart';
 import 'package:mobile_flutter/features/offline_map/services/location_service.dart';
+import 'package:mobile_flutter/features/weather_safety/services/weather_service.dart';
+import 'package:mobile_flutter/features/explore/data/datasources/explore_local_datasource.dart';
+import 'package:mobile_flutter/features/explore/data/repositories/explore_repository_impl.dart';
+import 'package:mobile_flutter/features/explore/domain/entities/destination.dart';
+import 'package:mobile_flutter/features/explore/presentation/controllers/explore_controller.dart';
 import 'package:mobile_flutter/features/explore/presentation/screens/destination_detail_screen.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/bento_destination_grid.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/category_selector.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/trail_compact_row.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/search_filter_bar.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/empty_filter_state.dart';
+import 'package:mobile_flutter/features/explore/presentation/widgets/explore_tab_bar.dart';
+import 'package:mobile_flutter/features/explore/presentation/widgets/region_chip_filter.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -23,10 +30,7 @@ class ExploreScreen extends StatefulWidget {
 
 class _ExploreScreenState extends State<ExploreScreen> {
   final TextEditingController _searchController = TextEditingController();
-  String _selectedCategory = 'Tất cả';
-  String _searchQuery = '';
-  int? _selectedDifficulty;
-  Set<String> _favoriteSpots = {};
+  late final ExploreController _controller;
 
   String _currentLocationName = 'Quận 9, TP. Hồ Chí Minh • 14m';
   String _currentWeatherBrief = '31°C Nắng ráo';
@@ -36,13 +40,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
     {
       'name': 'Quận 9, TP. Hồ Chí Minh • 14m',
       'weather': '31°C Nắng ráo',
-      'desc': 'Vị trí hiện tại của bạn (TP. Thủ Đức, TP.HCM)',
+      'desc': 'Vị trí hiện tại (TP. Thủ Đức, TP.HCM)',
       'isGps': 'true',
     },
     {
       'name': 'Tây Nguyên (Tà Năng) • 1,485m',
       'weather': '18°C Ít mây',
-      'desc': 'Khu vực dã ngoại cao nguyên Lâm Đồng',
+      'desc': 'Cao nguyên Lâm Đồng',
       'isGps': 'false',
     },
     {
@@ -54,7 +58,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     {
       'name': 'Rừng Nam Cát Tiên • 120m',
       'weather': '28°C Râm mát',
-      'desc': 'Rừng mưa nhiệt đới Đồng Nai',
+      'desc': 'Rừng nhiệt đới Đồng Nai',
       'isGps': 'false',
     },
   ];
@@ -65,137 +69,31 @@ class _ExploreScreenState extends State<ExploreScreen> {
     CategoryItem(title: 'Camping / Cắm trại', icon: Icons.holiday_village),
     CategoryItem(title: 'Suối / Thác nước', icon: Icons.water),
     CategoryItem(title: 'Cung đường đèo', icon: Icons.two_wheeler),
-    CategoryItem(title: 'Bãi biển hoang sơ', icon: Icons.beach_access),
-  ];
-
-  final List<Map<String, dynamic>> _spots = [
-    {
-      'id': 'spot_1',
-      'title': 'Cung Tà Năng - Phan Dũng',
-      'category': 'Trekking / Leo núi',
-      'difficulty': 'Khó (55km)',
-      'difficultyLevel': 3,
-      'elevation': '1,100 m',
-      'distance': '55 km',
-      'water': 'Suối cạn theo mùa',
-      'signal': 'Mất sóng 70%',
-      'location': 'Lâm Đồng - Bình Thuận',
-      'rating': '4.9',
-      'reviews': '284',
-      'imageUrl': 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=900&q=80',
-      'outdoorImage': const OutdoorImage(
-        url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=900&q=80',
-        localAsset: 'assets/images/hero_ta_nang.jpg',
-        photographer: 'Bailey Zindel',
-        caption: 'Đỉnh Tà Năng - Phan Dũng',
-      ),
-      'description': 'Cung trekking đẹp nhất miền Nam qua sống lưng khủng long, đồi cỏ bạt ngàn và rừng khộp hoang dã.',
-      'highlights': ['Đồi cỏ mênh mông', 'Ngắm bình minh sống lưng', 'Off-grid 100%'],
-      'isFeatured': true,
-    },
-    {
-      'id': 'spot_2',
-      'title': 'Hồ Tuyền Lâm & Rừng Thông',
-      'category': 'Camping / Cắm trại',
-      'difficulty': 'Dễ',
-      'difficultyLevel': 1,
-      'elevation': '1,500 m',
-      'distance': '12 km',
-      'water': 'Có nguồn nước sạch',
-      'signal': '4G ổn định',
-      'location': 'Đà Lạt, Lâm Đồng',
-      'rating': '4.8',
-      'reviews': '512',
-      'imageUrl': 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=900&q=80',
-      'outdoorImage': const OutdoorImage(
-        url: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=900&q=80',
-        localAsset: 'assets/images/lake_tuyen_lam.jpg',
-        photographer: 'Kalina Sak',
-        caption: 'Hồ Tuyền Lâm & Rừng Thông',
-      ),
-      'description': 'Bãi cắm trại ven hồ yên bình, sương mây lãng đãng quanh rừng thông, cực kỳ thích hợp chèo SUP dã ngoại.',
-      'highlights': ['Chèo SUP mặt hồ', 'Nước ngọt dồi dào', 'Phù hợp người mới'],
-      'isFeatured': true,
-    },
-    {
-      'id': 'spot_3',
-      'title': 'Đại Thác K50 (Hang Én)',
-      'category': 'Suối / Thác nước',
-      'difficulty': 'Khó (Vượt rừng)',
-      'difficultyLevel': 3,
-      'elevation': '820 m',
-      'distance': '24 km',
-      'water': 'Nước suối dồi dào',
-      'signal': 'Không có sóng (0%)',
-      'location': 'Khu BTTN Kon Chư Răng, Gia Lai',
-      'rating': '5.0',
-      'reviews': '142',
-      'imageUrl': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=900&q=80',
-      'outdoorImage': const OutdoorImage(
-        url: 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=900&q=80',
-        localAsset: 'assets/images/fall_k50.jpg',
-        photographer: 'Adam K.',
-        caption: 'Thác K50 - Hang Én',
-      ),
-      'description': 'Dải lụa bạc hùng vĩ ẩn sâu giữa rừng nguyên sinh Tây Nguyên, tiếng nước ầm vang cả một góc thung lũng.',
-      'highlights': ['Thác nước tráng lệ', 'Tổ chim én tự nhiên', 'Rừng nguyên sinh'],
-      'isFeatured': true,
-    },
-    {
-      'id': 'spot_4',
-      'title': 'Đỉnh Bidoup Núi Bà',
-      'category': 'Trekking / Leo núi',
-      'difficulty': 'Thách thức (2,287m)',
-      'difficultyLevel': 3,
-      'elevation': '2,287 m',
-      'distance': '28 km',
-      'water': 'Có trạm kiểm lâm',
-      'signal': 'Sóng chập chờn',
-      'location': 'Vườn Quốc Gia Bidoup Núi Bà',
-      'rating': '4.9',
-      'reviews': '189',
-      'imageUrl': 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=900&q=80',
-      'outdoorImage': const OutdoorImage(
-        url: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=900&q=80',
-        localAsset: 'assets/images/mang_den.jpg',
-        photographer: 'Nguyên Vũ',
-        caption: 'Rừng Rêu Bidoup Núi Bà',
-      ),
-      'description': 'Nóc nhà tỉnh Lâm Đồng với thảm rừng rêu ma mị, cây thông 2 lá dẹt ngàn năm tuổi và không khí lạnh 10°C.',
-      'highlights': ['Rừng rêu ma thuật', 'Nóc nhà Lâm Đồng', 'Hệ sinh vật đa dạng'],
-      'isFeatured': false,
-    },
-    {
-      'id': 'spot_5',
-      'title': 'Cung Đèo Ô Quy Hồ — Cổng Trời',
-      'category': 'Cung đường đèo',
-      'difficulty': 'Trung bình (Đèo dốc)',
-      'difficultyLevel': 2,
-      'elevation': '2,003 m',
-      'distance': '50 km',
-      'water': 'Có điểm dừng chân',
-      'signal': '4G tốt',
-      'location': 'Lào Cai - Lai Châu',
-      'rating': '4.9',
-      'reviews': '680',
-      'imageUrl': 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=900&q=80',
-      'outdoorImage': const OutdoorImage(
-        url: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=900&q=80',
-        localAsset: 'assets/images/pass_o_quy_ho.jpg',
-        photographer: 'Lê Hoàng',
-        caption: 'Đèo Ô Quy Hồ',
-      ),
-      'description': 'Một trong tứ đại đỉnh đèo hiểm trở và ngoạn mục nhất Tây Bắc, nơi săn mây bồng bềnh và hoàng hôn tráng lệ.',
-      'highlights': ['Săn biển mây cuồn cuộn', 'Cung đường uốn lượn', 'Hoàng hôn rực rỡ'],
-      'isFeatured': false,
-    },
+    CategoryItem(title: 'Vườn quốc gia', icon: Icons.forest),
   ];
 
   @override
   void initState() {
     super.initState();
-    _loadFavorites();
+    final localDataSource = ExploreLocalDataSource();
+    final repository = ExploreRepositoryImpl(localDataSource: localDataSource);
+    _controller = ExploreController(repository: repository);
+    _controller.addListener(_onControllerUpdate);
+    _controller.initialize();
+
     _autoDetectGpsLocation();
+  }
+
+  void _onControllerUpdate() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_onControllerUpdate);
+    _controller.dispose();
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _autoDetectGpsLocation() async {
@@ -203,10 +101,19 @@ class _ExploreScreenState extends State<ExploreScreen> {
     try {
       final pos = await LocationService.getCurrentLocation();
       if (pos != null && mounted) {
+        // Lấy thời tiết vi khí hậu thời gian thực từ Open-Meteo
+        try {
+          final forecast = await WeatherService.getForecast(pos.latitude, pos.longitude);
+          if (mounted) {
+            setState(() {
+              _currentWeatherBrief = '${forecast.temperature.round()}°C ${forecast.weatherDescription}';
+            });
+          }
+        } catch (_) {}
+
         if (pos.latitude >= 10.3 && pos.latitude <= 11.2 && pos.longitude >= 106.3 && pos.longitude <= 107.1) {
           setState(() {
             _currentLocationName = 'Quận 9, TP. Hồ Chí Minh • 14m';
-            _currentWeatherBrief = '31°C Nắng ráo';
           });
         } else {
           setState(() {
@@ -215,7 +122,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
         }
       }
     } catch (_) {
-      // Default stays: Quận 9, TP. Hồ Chí Minh
     } finally {
       if (mounted) setState(() => _isDetectingGps = false);
     }
@@ -251,7 +157,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Vị Trí & Điểm Dã Ngoại',
+                    'Vị Trí & Tọa Độ Dã Ngoại',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
                   ),
                   if (_isDetectingGps)
@@ -329,48 +235,45 @@ class _ExploreScreenState extends State<ExploreScreen> {
     );
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _loadFavorites() async {
-    final favs = await StorageService.getFavorites();
-    if (mounted) {
-      setState(() => _favoriteSpots = favs.toSet());
+  String _mapCategoryToId(String title) {
+    switch (title) {
+      case 'Trekking / Leo núi':
+        return 'trekking';
+      case 'Camping / Cắm trại':
+        return 'camping';
+      case 'Suối / Thác nước':
+        return 'waterfalls';
+      case 'Cung đường đèo':
+        return 'passes';
+      case 'Vườn quốc gia':
+        return 'national_parks';
+      default:
+        return 'all';
     }
   }
 
-  void _toggleFavorite(String id) {
-    setState(() {
-      if (_favoriteSpots.contains(id)) {
-        _favoriteSpots.remove(id);
-      } else {
-        _favoriteSpots.add(id);
-      }
-    });
-    StorageService.toggleFavorite(id);
-  }
-
-  List<Map<String, dynamic>> get _filteredSpots {
-    return _spots.where((spot) {
-      final matchesCategory = _selectedCategory == 'Tất cả' || spot['category'] == _selectedCategory;
-      final matchesSearch = _searchQuery.isEmpty ||
-          (spot['title'] as String).toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          (spot['location'] as String).toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          (spot['description'] as String).toLowerCase().contains(_searchQuery.toLowerCase());
-      final matchesDifficulty = _selectedDifficulty == null || spot['difficultyLevel'] == _selectedDifficulty;
-
-      return matchesCategory && matchesSearch && matchesDifficulty;
-    }).toList();
+  String _mapIdToCategoryTitle(String id) {
+    switch (id) {
+      case 'trekking':
+        return 'Trekking / Leo núi';
+      case 'camping':
+        return 'Camping / Cắm trại';
+      case 'waterfalls':
+        return 'Suối / Thác nước';
+      case 'passes':
+        return 'Cung đường đèo';
+      case 'national_parks':
+        return 'Vườn quốc gia';
+      default:
+        return 'Tất cả';
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _filteredSpots;
-    final isFiltering = _searchQuery.isNotEmpty || _selectedDifficulty != null || _selectedCategory != 'Tất cả';
-    final heroSpot = _spots[0];
+    final destinations = _controller.destinations;
+    final isFiltering = _controller.isFiltering;
+    final heroDest = destinations.isNotEmpty ? destinations[0] : null;
 
     return Scaffold(
       backgroundColor: AppColors.editorialBg,
@@ -378,14 +281,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            // Top App Bar & Editorial Header
+            // 1. Top App Bar & Editorial Header
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Location & Weather Pill Header
+                    // Location & Weather Live Pill Header
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -439,7 +342,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 16),
 
                     // Editorial Headline
                     const Text(
@@ -447,71 +350,94 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       style: AppTypography.editorialHero,
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'Những cung đường trekking hùng vĩ và bãi cắm trại hoang sơ nhất Việt Nam',
-                      style: TextStyle(
-                        fontSize: 14,
+                    Text(
+                      _controller.isDomestic
+                          ? 'Những cung đường trekking hùng vĩ và bãi cắm trại hoang sơ nhất Việt Nam'
+                          : 'Các cung đường dã ngoại và vườn quốc gia tráng lệ khắp 6 châu lục',
+                      style: const TextStyle(
+                        fontSize: 13,
                         color: AppColors.editorialMuted,
                         height: 1.4,
                       ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // 2. Segmented Navigation Bar: TRONG NƯỚC / QUỐC TẾ
+                    ExploreTabBar(
+                      isDomestic: _controller.isDomestic,
+                      onTabChanged: (val) => _controller.switchArea(val),
                     ),
                   ],
                 ),
               ),
             ),
 
-            // Destination-Led Inspirational Hero (Shown when not actively searching)
-            if (!isFiltering)
+            // 3. Region Filter Chips (5 Miền VN hoặc 6 Châu Lục)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 14),
+                child: RegionChipFilter(
+                  regions: _controller.currentRegions,
+                  selectedRegion: _controller.selectedRegion,
+                  onSelectRegion: (reg) => _controller.selectRegion(reg),
+                ),
+              ),
+            ),
+
+            // 4. Hero Card (Shown when not actively filtering)
+            if (!isFiltering && heroDest != null)
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
-                  child: _buildHeroInspirationalCard(heroSpot),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: _buildHeroCard(heroDest),
                 ),
               ),
 
-            // Search & Filter Interface
+            // 5. Search & Filter Interface
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: SearchFilterBar(
                   controller: _searchController,
-                  selectedDifficulty: _selectedDifficulty,
-                  onChanged: (val) => setState(() => _searchQuery = val),
-                  onClear: () => setState(() {
+                  selectedDifficulty: _controller.selectedDifficulty,
+                  onChanged: (val) => _controller.setSearchQuery(val),
+                  onClear: () {
                     _searchController.clear();
-                    _searchQuery = '';
-                  }),
-                  onSelectDifficulty: (lvl) => setState(() => _selectedDifficulty = lvl),
+                    _controller.setSearchQuery('');
+                  },
+                  onSelectDifficulty: (lvl) => _controller.selectDifficulty(lvl),
                 ),
               ),
             ),
 
-            const SliverToBoxAdapter(child: SizedBox(height: 14)),
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
-            // Horizontal Categories Selector
+            // 6. Categories Selector
             SliverToBoxAdapter(
               child: CategorySelector(
                 categories: _categories,
-                selectedCategory: _selectedCategory,
-                onSelectCategory: (cat) => setState(() => _selectedCategory = cat),
+                selectedCategory: _mapIdToCategoryTitle(_controller.selectedCategory),
+                onSelectCategory: (catTitle) {
+                  _controller.selectCategory(_mapCategoryToId(catTitle));
+                },
               ),
             ),
 
             const SliverToBoxAdapter(child: SizedBox(height: 18)),
 
-            // 1. Bento Grid Spotlight (When in Discovery mode)
-            if (!isFiltering) ...[
+            // 7. Bento Grid Spotlight (When in Discovery mode)
+            if (!isFiltering && destinations.length >= 3) ...[
               SliverToBoxAdapter(
                 child: BentoDestinationGrid(
-                  spots: _spots,
-                  favoriteSpots: _favoriteSpots,
-                  onToggleFavorite: _toggleFavorite,
+                  destinations: destinations,
+                  favoriteIds: _controller.favoriteIds,
+                  onToggleFavorite: (id) => _controller.toggleFavorite(id),
                 ),
               ),
               const SliverToBoxAdapter(child: SizedBox(height: 24)),
             ],
 
-            // Section 2: Header for curated lists
+            // 8. Section Header for destination list
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -521,7 +447,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   textBaseline: TextBaseline.alphabetic,
                   children: [
                     Text(
-                      isFiltering ? 'Kết Quả Tìm Kiếm' : 'Gợi Ý Cho Bạn',
+                      isFiltering ? 'Kết Quả Tìm Kiếm' : 'Gợi Ý Khám Phá',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
@@ -530,7 +456,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       ),
                     ),
                     Text(
-                      '${filtered.length} cung đường',
+                      '${destinations.length} điểm đến',
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -544,36 +470,48 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
-            // Empty State
-            if (filtered.isEmpty)
+            // 9. Loading State / Empty State / Destination List
+            if (_controller.isLoading)
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: SkeletonShimmer(
+                        width: double.infinity,
+                        height: 90,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    childCount: 4,
+                  ),
+                ),
+              )
+            else if (destinations.isEmpty)
               SliverToBoxAdapter(
                 child: EmptyFilterState(
                   onReset: () {
-                    setState(() {
-                      _searchController.clear();
-                      _searchQuery = '';
-                      _selectedDifficulty = null;
-                      _selectedCategory = 'Tất cả';
-                    });
+                    _searchController.clear();
+                    _controller.resetFilters();
                   },
                 ),
               )
             else
-              // Compact Editorial Rows
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final spot = filtered[index];
-                      final isFav = _favoriteSpots.contains(spot['id']);
+                      final dest = destinations[index];
+                      final isFav = _controller.isFavorite(dest.id);
                       return TrailCompactRow(
-                        spot: spot,
+                        destination: dest,
                         isFavorite: isFav,
-                        onToggleFavorite: () => _toggleFavorite(spot['id'] as String),
+                        onToggleFavorite: () => _controller.toggleFavorite(dest.id),
                       );
                     },
-                    childCount: filtered.length,
+                    childCount: destinations.length,
                   ),
                 ),
               ),
@@ -585,9 +523,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
     );
   }
 
-  Widget _buildHeroInspirationalCard(Map<String, dynamic> spot) {
-    final isFav = _favoriteSpots.contains(spot['id']);
-    final OutdoorImage img = spot['outdoorImage'] as OutdoorImage;
+  Widget _buildHeroCard(Destination dest) {
+    final isFav = _controller.isFavorite(dest.id);
+    final img = OutdoorImage.fromMedia(dest.heroMedia, caption: dest.name);
 
     return OpenContainer(
       closedElevation: 0,
@@ -597,17 +535,17 @@ class _ExploreScreenState extends State<ExploreScreen> {
       transitionType: ContainerTransitionType.fadeThrough,
       transitionDuration: const Duration(milliseconds: 360),
       openBuilder: (context, action) => DestinationDetailScreen(
-        spot: spot,
+        destination: dest,
         isFavorite: isFav,
-        onToggleFavorite: () => _toggleFavorite(spot['id'] as String),
+        onToggleFavorite: () => _controller.toggleFavorite(dest.id),
       ),
       closedBuilder: (context, action) => Container(
-        height: 260,
+        height: 250,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           boxShadow: const [
             BoxShadow(
-              color: Color(0x1A000000),
+              color: Color(0x18000000),
               blurRadius: 18,
               offset: Offset(0, 6),
             ),
@@ -617,14 +555,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Full photograph with local bundled fallback & caching
             EditorialImage(
               image: img,
               borderRadius: BorderRadius.circular(20),
               showAttribution: true,
             ),
-
-            // Gradient scrim for editorial readability
             Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
@@ -640,8 +575,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 ),
               ),
             ),
-
-            // Top Badge
             Positioned(
               top: 14,
               left: 14,
@@ -657,15 +590,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     Icon(Icons.auto_awesome, color: Color(0xFFFBBF24), size: 12),
                     SizedBox(width: 5),
                     Text(
-                      'ĐIỂM ĐẾN NỔI BẬT THÁNG NÀY',
+                      'ĐIỂM ĐẾN NỔI BẬT',
                       style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.4),
                     ),
                   ],
                 ),
               ),
             ),
-
-            // Bottom Content
             Positioned(
               bottom: 18,
               left: 16,
@@ -674,7 +605,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    spot['title'] as String,
+                    dest.name,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 22,
@@ -684,7 +615,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    spot['description'] as String,
+                    dest.editorialSummary,
                     style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 12,
@@ -703,17 +634,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          '${spot['distance']} • ${spot['elevation']}',
+                          '${dest.distanceDisplay} • ${dest.elevationDisplay}',
                           style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
                         ),
                       ),
                       const Spacer(),
                       const Row(
                         children: [
-                          Text(
-                            'Chi tiết',
-                            style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700),
-                          ),
+                          Text('Chi tiết', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
                           SizedBox(width: 4),
                           Icon(Icons.arrow_forward, color: Colors.white, size: 14),
                         ],

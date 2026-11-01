@@ -1,0 +1,1108 @@
+{
+  "version": "2.0.0",
+  "generated_at": "2026-11-01T12:00:00Z",
+  "metadata": {
+    "total_destinations": 16,
+    "domestic_count": 10,
+    "international_count": 6
+  },
+  "destinations": [
+    {
+      "id": "vn_ta_nang_phan_dung",
+      "slug": "ta-nang-phan-dung",
+      "name": "Cung Tà Năng — Phan Dũng",
+      "local_name": "Tà Năng - Phan Dũng",
+      "country_ids": ["VN"],
+      "region_id": "vn_highlands",
+      "category_ids": ["trekking"],
+      "center_latitude": 11.5542,
+      "center_longitude": 108.5283,
+      "elevation_meters": 1100,
+      "editorial_summary": "Cung trekking đẹp nhất miền Nam qua sống lưng khủng long, đồi cỏ bạt ngàn và rừng khộp hoang dã.",
+      "editorial_content": "Cung đường nối liền cao nguyên Lâm Đồng với đồng bằng duyên hải Bình Thuận. Điểm nhấn là những triền đồi cỏ chuyển màu theo mùa (xanh mướt mùa mưa, vàng óng mùa khô) và đường mòn sống lưng khủng long lộng gió.",
+      "best_travel_seasons": ["Tháng 10 - Tháng 12 (Mùa cỏ xanh)", "Tháng 1 - Tháng 3 (Mùa cỏ cháy)"],
+      "is_featured": true,
+      "is_verified": true,
+      "verification_date": "2026-10-15",
+      "media": [
+        {
+          "id": "media_tn_1",
+          "image_url": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=900&q=80",
+          "local_asset_path": "assets/images/hero_ta_nang.jpg",
+          "photographer": "Bailey Zindel",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Bailey Zindel / Unsplash",
+          "aspect_ratio": 1.777,
+          "is_hero": true
+        }
+      ],
+      "route": {
+        "id": "route_tn_pd",
+        "name": "Tuyến đồi lính vượt dốc Dầu",
+        "distance_km": 55.0,
+        "elevation_gain_meters": 850,
+        "difficulty_level": 3,
+        "estimated_duration_days": 3,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Bìa rừng Tà Năng đến Đồi Hai Cây Thông",
+            "description": "Băng qua nương rẫy đồng bào Chu Ru, bắt đầu lên các triền đồi dốc thoai thoải.",
+            "distance_km": 14.0,
+            "elevation_gain_meters": 320,
+            "terrain_type": "Đồi cỏ đất đỏ"
+          },
+          {
+            "stage_number": 2,
+            "title": "Sống lưng khủng long đến Đồi Lính",
+            "description": "Đoạn đẹp nhất với tầm nhìn 360 độ ngắm mây trời, lộng gió và không có bóng râm.",
+            "distance_km": 18.0,
+            "elevation_gain_meters": 410,
+            "terrain_type": "Sống đồi hẹp lộng gió"
+          },
+          {
+            "stage_number": 3,
+            "title": "Hạ dốc Dầu về rừng khộp Phan Dũng",
+            "description": "Đoạn dốc Dầu trơn trượt đổ đứng, sau đó lội suối đá và rừng khộp nóng khô.",
+            "distance_km": 23.0,
+            "elevation_gain_meters": 120,
+            "terrain_type": "Dốc đá trượt & Rừng khộp khô"
+          }
+        ],
+        "safety": {
+          "water_advice": "Đoạn sống lưng 12km từ Đồi Lính đến dốc Dầu không có nguồn nước. Mùa khô (tháng 2-4) các con suối cạn đáy. Bắt buộc mang tối thiểu 3 Lít nước/người/ngày.",
+          "mobile_coverage_summary": "Mất sóng 70% toàn tuyến. Chỉ có sóng chập chờn tại Đồi Lính và đỉnh mốc ranh giới hai tỉnh.",
+          "primary_hazards": ["Lạc đường vào mùa sương mù", "Mất nước do gió khô", "Trơn trượt tại Dốc Dầu", "Lũ quét suối Phan Dũng mùa mưa"],
+          "required_gear": ["Bản đồ offline / GPS", "Còi sinh tồn SOS", "Lều trại chịu gió cấp 6", "Túi ngủ 15°C", "Thuốc khử trùng nước"],
+          "emergency_contact_info": "Kiểm lâm Đức Trọng: 0263.3843.123 • Cứu hộ Phan Dũng: 0252.3860.114",
+          "verification_date": "2026-10-15",
+          "verified_by": "Đội Khảo sát Dã ngoại Nam Tây Nguyên"
+        }
+      }
+    },
+    {
+      "id": "vn_lake_tuyen_lam",
+      "slug": "ho-tuyen-lam",
+      "name": "Hồ Tuyền Lâm & Rừng Thông",
+      "local_name": "Hồ Tuyền Lâm, Đà Lạt",
+      "country_ids": ["VN"],
+      "region_id": "vn_highlands",
+      "category_ids": ["camping"],
+      "center_latitude": 11.8906,
+      "center_longitude": 108.4358,
+      "elevation_meters": 1500,
+      "editorial_summary": "Bãi cắm trại ven hồ yên bình, sương mây lãng đãng quanh rừng thông, cực kỳ thích hợp chèo SUP dã ngoại.",
+      "editorial_content": "Hồ nước ngọt nhân tạo lớn nhất Đà Lạt được bao bọc bởi những cánh rừng thông ba lá cổ thụ. Khí hậu mát lạnh quanh năm với sương mờ sáng sớm.",
+      "best_travel_seasons": ["Tháng 11 - Tháng 4 (Mùa khô trời trong, hoa mai anh đào)"],
+      "is_featured": true,
+      "is_verified": true,
+      "verification_date": "2026-09-20",
+      "media": [
+        {
+          "id": "media_tl_1",
+          "image_url": "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=900&q=80",
+          "local_asset_path": "assets/images/lake_tuyen_lam.jpg",
+          "photographer": "Kalina Sak",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Kalina Sak / Unsplash",
+          "aspect_ratio": 1.777,
+          "is_hero": true
+        }
+      ],
+      "route": {
+        "id": "route_tuyen_lam_loop",
+        "name": "Đường mòn ven hồ & Đồi thông Suối Tía",
+        "distance_km": 12.0,
+        "elevation_gain_meters": 150,
+        "difficulty_level": 1,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Bến thuyền đập Tuyền Lâm",
+            "description": "Điểm xuất phát, gửi xe và bắt đầu chèo SUP hoặc đi bộ ven bờ hồ râm mát.",
+            "distance_km": 4.0,
+            "elevation_gain_meters": 40,
+            "terrain_type": "Đường nhựa & Đường mòn thông"
+          },
+          {
+            "stage_number": 2,
+            "title": "Bãi hạ trại ngã ba Suối Tía",
+            "description": "Khu vực rừng ngập nước tuyệt đẹp, bãi cỏ phẳng ven hồ thích hợp dựng lều ngắm hoàng hôn.",
+            "distance_km": 8.0,
+            "elevation_gain_meters": 110,
+            "terrain_type": "Bãi cỏ ven hồ"
+          }
+        ],
+        "safety": {
+          "water_advice": "Khu vực có các điểm dịch vụ cung cấp nước ngọt. Nếu lấy nước hồ cần lọc và đun sôi kỹ.",
+          "mobile_coverage_summary": "Phủ sóng 4G Viettel và VinaPhone ổn định 95% quanh hồ.",
+          "primary_hazards": ["Hạ thân nhiệt ban đêm (nhiệt độ xuống 11-13°C)", "Đuối nước khi chèo SUP không mặc áo phao"],
+          "required_gear": ["Áo phao cá nhân bắt buộc khi xuống nước", "Túi ngủ ấm 10°C", "Thuốc chống muỗi và côn trùng"],
+          "emergency_contact_info": "Cứu thương Lâm Đồng: 115 • Công an TP. Đà Lạt: 0263.3822.016",
+          "verification_date": "2026-09-20",
+          "verified_by": "Ban Quản lý Khu Du lịch Quốc gia Hồ Tuyền Lâm"
+        }
+      }
+    },
+    {
+      "id": "vn_fall_k50",
+      "slug": "thac-k50-hang-en",
+      "name": "Đại Thác K50 (Hang Én)",
+      "local_name": "Thác K50, Khu BTTN Kon Chư Răng",
+      "country_ids": ["VN"],
+      "region_id": "vn_highlands",
+      "category_ids": ["waterfalls", "trekking"],
+      "center_latitude": 14.5125,
+      "center_longitude": 108.5714,
+      "elevation_meters": 820,
+      "editorial_summary": "Dải lụa bạc hùng vĩ ẩn sâu giữa rừng nguyên sinh Tây Nguyên, tiếng nước ầm vang cả một góc thung lũng.",
+      "editorial_content": "Thác nước cao hơn 50 mét đổ từ vòm hang đá cổ xưa xuống dòng sông Côn. Nơi đây là tổ ấm tự nhiên của hàng ngàn chim én rừng và hệ sinh thái rừng già nguyên sơ bậc nhất Gia Lai.",
+      "best_travel_seasons": ["Tháng 1 - Tháng 5 (Mùa khô, nước trong vắt, đường rừng ít vắt)"],
+      "is_featured": true,
+      "is_verified": true,
+      "verification_date": "2026-08-10",
+      "media": [
+        {
+          "id": "media_k50_1",
+          "image_url": "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=900&q=80",
+          "local_asset_path": "assets/images/fall_k50.jpg",
+          "photographer": "Adam K.",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Adam K. / Unsplash (Minh họa dòng thác)",
+          "aspect_ratio": 1.777,
+          "is_hero": true
+        }
+      ],
+      "route": {
+        "id": "route_k50_trek",
+        "name": "Tuyến băng rừng Trại Bò đến chân thác",
+        "distance_km": 24.0,
+        "elevation_gain_meters": 520,
+        "difficulty_level": 3,
+        "estimated_duration_days": 2,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Trạm kiểm lâm Kon Chư Răng đến Trại Bò",
+            "description": "Đi xe chuyên dụng hoặc đi bộ qua cánh rừng le và các thung lũng bùn đất đỏ.",
+            "distance_km": 14.0,
+            "elevation_gain_meters": 180,
+            "terrain_type": "Đường đất rừng & Rừng le"
+          },
+          {
+            "stage_number": 2,
+            "title": "Vượt suối đá vào lòng thác K50",
+            "description": "Băng qua rừng già rậm rạp, lội suối đá trơn trượt để tiến vào vòm hang đá sau thác.",
+            "distance_km": 10.0,
+            "elevation_gain_meters": 340,
+            "terrain_type": "Đá tảng trơn & Dốc đất rừng"
+          }
+        ],
+        "safety": {
+          "water_advice": "Nước suối dồi dào nhưng cần lấy ở thượng nguồn hoặc lọc sạch qua màng lọc vi sinh.",
+          "mobile_coverage_summary": "Hoàn toàn mất sóng di động 100% khi qua trạm kiểm lâm.",
+          "primary_hazards": ["Lũ quét bất ngờ nếu đầu nguồn mưa lớn", "Đá trơn trượt vách thác", "Rắn lục đuôi đỏ và vắt rừng"],
+          "required_gear": ["Gậy trekking", "Tất chống vắt cao cổ", "Giày lội nước có gai bám đá", "Đèn pin chống nước"],
+          "emergency_contact_info": "Kiểm lâm Kon Chư Răng: 0269.3837.210 • Công an huyện Kbang: 0269.3834.113",
+          "verification_date": "2026-08-10",
+          "verified_by": "Ban Quản lý Khu Bảo tồn Thiên nhiên Kon Chư Răng"
+        }
+      }
+    },
+    {
+      "id": "vn_bidoup_nui_ba",
+      "slug": "dinh-bidoup-nui-ba",
+      "name": "Đỉnh Bidoup Núi Bà",
+      "local_name": "Đỉnh Bidoup, VQG Bidoup Núi Bà",
+      "country_ids": ["VN"],
+      "region_id": "vn_highlands",
+      "category_ids": ["trekking"],
+      "center_latitude": 12.0911,
+      "center_longitude": 108.6575,
+      "elevation_meters": 2287,
+      "editorial_summary": "Nóc nhà tỉnh Lâm Đồng với thảm rừng rêu ma mị, cây thông 2 lá dẹt ngàn năm tuổi và không khí lạnh 10°C.",
+      "editorial_content": "Đỉnh núi cao nhất cao nguyên Lâm Viên. Đường trekking đưa bạn qua hệ sinh thái chuyển đổi ngoạn mục từ thông ba lá sang rừng hỗn giao lá rộng, rừng đỗ quyên và thảm rừng rêu ẩm ướt kỳ bí.",
+      "best_travel_seasons": ["Tháng 12 - Tháng 4 (Mùa khô, trời lạnh se sắt, ít mưa rào)"],
+      "is_featured": false,
+      "is_verified": true,
+      "verification_date": "2026-07-15",
+      "media": [
+        {
+          "id": "media_bd_1",
+          "image_url": "https://images.unsplash.com/photo-1448375240586-882707db888b?w=900&q=80",
+          "local_asset_path": "assets/images/mang_den.jpg",
+          "photographer": "Nguyên Vũ",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Nguyên Vũ / Unsplash (Minh họa rừng rêu)",
+          "aspect_ratio": 1.777,
+          "is_hero": true
+        }
+      ],
+      "route": {
+        "id": "route_bidoup_standard",
+        "name": "Tuyến Trạm Đa Nhim lên đỉnh Bidoup",
+        "distance_km": 28.0,
+        "elevation_gain_meters": 1150,
+        "difficulty_level": 3,
+        "estimated_duration_days": 2,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Đu dây qua sông Đa Nhim đến trạm dừng chân",
+            "description": "Kéo phà dây qua dòng sông Đa Nhim chảy xiết, bắt đầu leo dốc xuyên rừng thông.",
+            "distance_km": 15.0,
+            "elevation_gain_meters": 620,
+            "terrain_type": "Đường dốc thông & Đất rừng ẩm"
+          },
+          {
+            "stage_number": 2,
+            "title": "Trạm dừng chân lên đỉnh rừng rêu 2,287m",
+            "description": "Chinh phục đoạn dốc đứng qua cây Pơ mu ngàn năm tuổi và thung lũng rừng rêu huyền ảo.",
+            "distance_km": 13.0,
+            "elevation_gain_meters": 530,
+            "terrain_type": "Bậc rễ cây & Thảm rêu trơn"
+          }
+        ],
+        "safety": {
+          "water_advice": "Có nguồn nước sạch tại bãi cắm trại cạnh trạm dừng chân km15. Cần lấy trước khi lên đỉnh chót.",
+          "mobile_coverage_summary": "Sóng chập chờn (30%). Mất sóng hoàn toàn tại đoạn rừng rêu ngàn năm.",
+          "primary_hazards": ["Hạ thân nhiệt về đêm (nhiệt độ có thể dưới 8°C)", "Trơn trượt trên rễ cây rừng rêu"],
+          "required_gear": ["Găng tay dã ngoại", "Áo ấm giữ nhiệt", "Áo mưa bộ", "Gậy trekking"],
+          "emergency_contact_info": "Trung tâm Du lịch Sinh thái VQG Bidoup: 0263.3747.449",
+          "verification_date": "2026-07-15",
+          "verified_by": "Kiểm lâm Vườn Quốc Gia Bidoup Núi Bà"
+        }
+      }
+    },
+    {
+      "id": "vn_pass_o_quy_ho",
+      "slug": "deo-o-quy-ho",
+      "name": "Cung Đèo Ô Quy Hồ — Cổng Trời",
+      "local_name": "Đèo Ô Quy Hồ (Đèo Hoàng Liên Sơn)",
+      "country_ids": ["VN"],
+      "region_id": "vn_north",
+      "category_ids": ["passes"],
+      "center_latitude": 22.3524,
+      "center_longitude": 103.7741,
+      "elevation_meters": 2003,
+      "editorial_summary": "Một trong tứ đại đỉnh đèo hiểm trở và ngoạn mục nhất Tây Bắc, nơi săn mây bồng bềnh và hoàng hôn tráng lệ.",
+      "editorial_content": "Vắt ngang qua dãy Hoàng Liên Sơn hùng vĩ nối liền Lào Cai và Lai Châu. Đèo có sự phân hóa khí hậu rõ rệt giữa hai sườn đông và tây.",
+      "best_travel_seasons": ["Tháng 9 - Tháng 11 (Mùa lúa chín & săn mây biển)", "Tháng 12 - Tháng 2 (Mùa lạnh, ngắm băng tuyết)"],
+      "is_featured": false,
+      "is_verified": true,
+      "verification_date": "2026-09-05",
+      "media": [
+        {
+          "id": "media_oqh_1",
+          "image_url": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=900&q=80",
+          "local_asset_path": "assets/images/pass_o_quy_ho.jpg",
+          "photographer": "Lê Hoàng",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Lê Hoàng / Unsplash",
+          "aspect_ratio": 1.777,
+          "is_hero": true
+        }
+      ],
+      "route": {
+        "id": "route_o_quy_ho_ride",
+        "name": "Tuyến vượt đèo từ Sa Pa sang Tam Đường",
+        "distance_km": 50.0,
+        "elevation_gain_meters": 980,
+        "difficulty_level": 2,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Thị xã Sa Pa lên Đỉnh đèo Cổng Trời",
+            "description": "Chạy xe qua Thác Bạc, Thác Tình Yêu và leo dốc liên tục lên đỉnh đèo cao 2,003m.",
+            "distance_km": 18.0,
+            "elevation_gain_meters": 550,
+            "terrain_type": "Đường nhựa đèo dốc uốn lượn"
+          },
+          {
+            "stage_number": 2,
+            "title": "Cổng Trời đổ đèo về Tam Đường",
+            "description": "Đoạn đổ dốc dài với tầm nhìn bao quát thung lũng Lai Châu và các vách núi sừng sững.",
+            "distance_km": 32.0,
+            "elevation_gain_meters": 430,
+            "terrain_type": "Cua tay áo liên tục"
+          }
+        ],
+        "safety": {
+          "water_advice": "Có nhiều trạm dừng chân và quán nước địa phương trên dọc tuyến đèo.",
+          "mobile_coverage_summary": "Sóng 4G ổn định 85% dọc tuyến quốc lộ 4D.",
+          "primary_hazards": ["Sương mù dày đặc che khuất tầm nhìn", "Gió giật cực mạnh trên đỉnh đèo sau 16h", "Mặt đường trơn ướt sương muối"],
+          "required_gear": ["Đèn sương mù cho xe", "Áo khoác cản gió chống nước", "Găng tay giữ ấm ngón"],
+          "emergency_contact_info": "Cảnh sát Giao thông Sa Pa: 0214.3871.224 • Cứu hộ giao thông Lào Cai: 0214.3830.115",
+          "verification_date": "2026-09-05",
+          "verified_by": "Ban An toàn Giao thông Tỉnh Lào Cai"
+        }
+      }
+    },
+    {
+      "id": "vn_ha_giang_ma_pi_leng",
+      "slug": "ma-pi-leng-ha-giang",
+      "name": "Đèo Mã Pí Lèng & Hẻm Tu Sản",
+      "local_name": "Đèo Mã Pí Lèng, Đồng Văn, Hà Giang",
+      "country_ids": ["VN"],
+      "region_id": "vn_north",
+      "category_ids": ["passes", "trekking"],
+      "center_latitude": 23.2384,
+      "center_longitude": 105.4187,
+      "elevation_meters": 1200,
+      "editorial_summary": "Vua của các con đèo Việt Nam ôm trọn hẻm vực Tu Sản sâu nhất Đông Nam Á cùng dòng Nho Quế xanh ngọc bích.",
+      "editorial_content": "Cung đường Hạnh Phúc được xây dựng bởi hàng vạn thanh niên xung phong vắt mình trên vách đá tai mèo hiểm trở. Nơi đây là kỳ quan địa chất toàn cầu UNESCO Cao nguyên đá Đồng Văn.",
+      "best_travel_seasons": ["Tháng 9 - Tháng 11 (Mùa hoa tam giác mạch và lúa vàng)", "Tháng 3 - Tháng 4 (Mùa hoa đào, lê nở rộ)"],
+      "is_featured": true,
+      "is_verified": true,
+      "verification_date": "2026-09-18",
+      "media": [
+        {
+          "id": "media_mpl_1",
+          "image_url": "https://images.unsplash.com/photo-1528127269322-539801943592?w=900&q=80",
+          "local_asset_path": "assets/images/default_nature.jpg",
+          "photographer": "Minh Khôi",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Minh Khôi / Unsplash",
+          "aspect_ratio": 1.777,
+          "is_hero": true
+        }
+      ],
+      "route": {
+        "id": "route_ma_pi_leng_skywalk",
+        "name": "Đường đi bộ vách đá trắng Mã Pí Lèng",
+        "distance_km": 14.0,
+        "elevation_gain_meters": 460,
+        "difficulty_level": 2,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Tượng đài Thanh Niên Xung Phong lên Vách Đá Trắng",
+            "description": "Men theo lối mòn đá tai mèo cổ xưa của người Mông nhìn thẳng xuống hẻm vực sâu thăm thẳm.",
+            "distance_km": 6.0,
+            "elevation_gain_meters": 280,
+            "terrain_type": "Đá tai mèo vách đứng"
+          },
+          {
+            "stage_number": 2,
+            "title": "Vách Đá Trắng xuống bến thuyền sông Nho Quế",
+            "description": "Điểm hạ trại ngắm trọn vẹn dòng sông xanh biếc uốn lượn dưới đáy vực.",
+            "distance_km": 8.0,
+            "elevation_gain_meters": 180,
+            "terrain_type": "Lối mòn sườn núi dốc"
+          }
+        ],
+        "safety": {
+          "water_advice": "Trên vách đá trắng không có nguồn nước. Bắt buộc chuẩn bị nước từ Đồng Văn hoặc Mèo Vạc.",
+          "mobile_coverage_summary": "Sóng 4G khá tốt (80%) trên đỉnh vách, mất sóng dưới hẻm sông hẹp.",
+          "primary_hazards": ["Vực sâu không có lan can bảo vệ", "Gió lốc thung lũng", "Đá dăm trơn trượt"],
+          "required_gear": ["Giày có đế bám cao su chuyên dụng", "Mũ che nắng", "Gậy đi bộ"],
+          "emergency_contact_info": "Công an huyện Mèo Vạc: 0219.3871.113 • Bệnh viện Mèo Vạc: 0219.3871.115",
+          "verification_date": "2026-09-18",
+          "verified_by": "Ban Quản lý Công viên Địa chất Cao nguyên đá Đồng Văn"
+        }
+      }
+    },
+    {
+      "id": "vn_phong_nha_ke_bang",
+      "slug": "phong-nha-ke-bang",
+      "name": "Vườn Quốc Gia Phong Nha — Kẻ Bàng",
+      "local_name": "Phong Nha - Kẻ Bàng, Quảng Bình",
+      "country_ids": ["VN"],
+      "region_id": "vn_central",
+      "category_ids": ["national_parks", "trekking"],
+      "center_latitude": 17.5905,
+      "center_longitude": 106.2831,
+      "elevation_meters": 350,
+      "editorial_summary": "Di sản thiên nhiên thế giới UNESCO, vương quốc hang động karst cổ xưa và những dòng sông ngầm kỳ bí.",
+      "editorial_content": "Khu vực núi đá vôi cổ nhất châu Á hình thành hơn 400 triệu năm. Nơi sở hữu các hang động khổng lồ bậc nhất thế giới cùng thảm thực vật rừng nhiệt đới nguyên sinh bạt ngàn.",
+      "best_travel_seasons": ["Tháng 2 - Tháng 8 (Mùa khô ráo, nước trong xanh, điều kiện thám hiểm hang tốt nhất)"],
+      "is_featured": true,
+      "is_verified": true,
+      "verification_date": "2026-07-28",
+      "media": [
+        {
+          "id": "media_pn_1",
+          "image_url": "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=900&q=80",
+          "local_asset_path": "assets/images/default_nature.jpg",
+          "photographer": "Thế Vinh",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Thế Vinh / Unsplash",
+          "aspect_ratio": 1.777,
+          "is_hero": true
+        }
+      ],
+      "route": {
+        "id": "route_phong_nha_jungle",
+        "name": "Tuyến lội suối thung lũng Sinh Tồn",
+        "distance_km": 16.0,
+        "elevation_gain_meters": 310,
+        "difficulty_level": 3,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Bìa rừng Km17 đường 20 Quyết Thắng",
+            "description": "Bắt đầu lội rừng nguyên sinh trên nền đá tai mèo sắc nhọn.",
+            "distance_km": 7.0,
+            "elevation_gain_meters": 190,
+            "terrain_type": "Rừng đá vôi ẩm ướt"
+          },
+          {
+            "stage_number": 2,
+            "title": "Thung lũng Sinh Tồn và Hang Thủy Cung",
+            "description": "Bơi qua dòng sông ngầm màu ngọc bích kỳ ảo bên trong vòm hang đá vôi nguyên thủy.",
+            "distance_km": 9.0,
+            "elevation_gain_meters": 120,
+            "terrain_type": "Sông ngầm & Bùn hang động"
+          }
+        ],
+        "safety": {
+          "water_advice": "Dòng sông ngầm có nước mát lành nhưng bắt buộc dùng thiết bị lọc trước khi uống.",
+          "mobile_coverage_summary": "Mất sóng hoàn toàn 100% trong thung lũng karst.",
+          "primary_hazards": ["Đá tai mèo cứa rách tay chân", "Nước dâng nhanh trong hang nếu mưa lớn", "Đỉa và vắt rừng mùa ẩm"],
+          "required_gear": ["Mũ bảo hộ chuyên dụng có đèn", "Áo phao bắt buộc", "Găng tay bảo hộ", "Giày ráo nước nhanh"],
+          "emergency_contact_info": "Trung tâm Cứu hộ Động vật hoang dã & Ban quản lý VQG: 0232.3677.021",
+          "verification_date": "2026-07-28",
+          "verified_by": "Ban Quản lý Vườn Quốc Gia Phong Nha - Kẻ Bàng"
+        }
+      }
+    },
+    {
+      "id": "vn_nam_cat_tien",
+      "slug": "rung-nam-cat-tien",
+      "name": "Vườn Quốc Gia Nam Cát Tiên",
+      "local_name": "VQG Cát Tiên (Đồng Nai - Lâm Đồng - Bình Phước)",
+      "country_ids": ["VN"],
+      "region_id": "vn_south",
+      "category_ids": ["national_parks", "camping"],
+      "center_latitude": 11.4241,
+      "center_longitude": 107.4278,
+      "elevation_meters": 120,
+      "editorial_summary": "Khu dự trữ sinh quyển thế giới với rừng cây tung đại thụ, Bàu Sấu hoang dã và thế giới thú đêm kỳ thú.",
+      "editorial_content": "Lá phổi xanh nguyên sinh lớn nhất miền Nam. Địa bàn cư trú của cá sấu Xiêm, voi châu Á, bò tót và hàng trăm loài chim quý hiếm.",
+      "best_travel_seasons": ["Tháng 12 - Tháng 5 (Mùa khô, đường rừng ráo bùn, dễ xem thú)"],
+      "is_featured": false,
+      "is_verified": true,
+      "verification_date": "2026-08-02",
+      "media": [
+        {
+          "id": "media_nct_1",
+          "image_url": "https://images.unsplash.com/photo-1511497584788-87676104235f?w=900&q=80",
+          "local_asset_path": "assets/images/default_nature.jpg",
+          "photographer": "Anh Tú",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Anh Tú / Unsplash",
+          "aspect_ratio": 1.777,
+          "is_hero": true
+        }
+      ],
+      "route": {
+        "id": "route_cat_tien_bau_sau",
+        "name": "Tuyến trekking Bàu Sấu hoang dã",
+        "distance_km": 14.0,
+        "elevation_gain_meters": 80,
+        "difficulty_level": 1,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Trung tâm vườn đến bìa rừng Km9",
+            "description": "Đi xe đạp hoặc xe mui trần ngắm rừng cây gõ, cây bằng lăng đại thụ.",
+            "distance_km": 9.0,
+            "elevation_gain_meters": 30,
+            "terrain_type": "Đường cấp phối rừng"
+          },
+          {
+            "stage_number": 2,
+            "title": "Đi bộ 5km xuyên rừng già vào Trạm Bàu Sấu",
+            "description": "Lối mòn đất rợp bóng đại thụ, nơi đàn cá sấu bơi tự nhiên dưới đầm nước.",
+            "distance_km": 5.0,
+            "elevation_gain_meters": 50,
+            "terrain_type": "Lối mòn đất rừng râm mát"
+          }
+        ],
+        "safety": {
+          "water_advice": "Tại Trạm Kiểm lâm Bàu Sấu có nước sạch sinh hoạt và dịch vụ nấu ăn của kiểm lâm.",
+          "mobile_coverage_summary": "Sóng yếu tại Bàu Sấu (chỉ có Viettel thoại cơ bản).",
+          "primary_hazards": ["Cá sấu trong đầm (tuyệt đối không thò tay chân xuống mép nước)", "Côn trùng và muỗi rừng"],
+          "required_gear": ["Thuốc chống côn trùng deet", "Đèn pin xem thú đêm", "Áo dài tay"],
+          "emergency_contact_info": "Ban Quản lý VQG Cát Tiên: 0251.3669.228 • Kiểm lâm trạm Bàu Sấu: 0251.3669.230",
+          "verification_date": "2026-08-02",
+          "verified_by": "Ban Quản lý Vườn Quốc Gia Cát Tiên"
+        }
+      }
+    },
+    {
+      "id": "vn_nui_ba_den",
+      "slug": "nui-ba-den",
+      "name": "Đỉnh Núi Bà Đen Tây Ninh",
+      "local_name": "Núi Bà Đen (Nóc nhà Nam Bộ)",
+      "country_ids": ["VN"],
+      "region_id": "vn_south",
+      "category_ids": ["trekking"],
+      "center_latitude": 11.3789,
+      "center_longitude": 106.1683,
+      "elevation_meters": 986,
+      "editorial_summary": "Ngọn núi lửa đã tắt cao nhất Đông Nam Bộ, nơi thử thách sức bền leo dốc đá và săn biển mây sáng sớm.",
+      "editorial_content": "Đứng sừng sững giữa đồng bằng bạt ngàn Tây Ninh. Cung trekking mang tính biểu tượng cho người yêu vận động dã ngoại phương Nam với các cung đường Cột Điện, Ma Thiên Lãnh và Dốc Đá Trắng.",
+      "best_travel_seasons": ["Tháng 11 - Tháng 5 (Mùa nắng ráo, dốc đá không bị trơn trượt)"],
+      "is_featured": false,
+      "is_verified": true,
+      "verification_date": "2026-08-25",
+      "media": [
+        {
+          "id": "media_nbd_1",
+          "image_url": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=900&q=80",
+          "local_asset_path": "assets/images/default_nature.jpg",
+          "photographer": "Duy Hậu",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Duy Hậu / Unsplash",
+          "aspect_ratio": 1.777,
+          "is_hero": true
+        }
+      ],
+      "route": {
+        "id": "route_ba_den_cot_dien",
+        "name": "Cung đường Cột Điện 117 bậc",
+        "distance_km": 7.5,
+        "elevation_gain_meters": 940,
+        "difficulty_level": 2,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Chân núi (Cột số 1) đến Trạm tiếp nước (Cột 55)",
+            "description": "Vượt dốc đá liên tục qua các vườn xoài và tán rừng chuối rậm rạp.",
+            "distance_km": 3.5,
+            "elevation_gain_meters": 450,
+            "terrain_type": "Bậc đá dốc thoai thoải"
+          },
+          {
+            "stage_number": 2,
+            "title": "Cột 55 leo đỉnh chóp 986m",
+            "description": "Đoạn dốc đứng đá tảng lớn đòi hỏi bám rễ cây và leo dốc đá tảng kiên trì.",
+            "distance_km": 4.0,
+            "elevation_gain_meters": 490,
+            "terrain_type": "Đá tảng dốc đứng"
+          }
+        ],
+        "safety": {
+          "water_advice": "Có bình nước tiếp tế từ thiện tại cột mốc số 55. Khuyến cáo vẫn mang tối thiểu 2 Lít nước điện giải.",
+          "mobile_coverage_summary": "Phủ sóng 4G rất mạnh toàn tuyến leo núi.",
+          "primary_hazards": ["Chuột rút và say nắng sốc nhiệt do dốc đứng", "Mưa dông chiều gây trơn trượt đá"],
+          "required_gear": ["Găng tay leo đá", "Bó gối", "Giày có độ bám cao", "Bột điện giải bù khoáng"],
+          "emergency_contact_info": "Cứu hộ KDL Núi Bà Đen: 0276.3535.353 • Cứu thương Tây Ninh: 115",
+          "verification_date": "2026-08-25",
+          "verified_by": "Ban Quản lý Khu Di tích Lịch sử Văn hóa Núi Bà Đen"
+        }
+      }
+    },
+    {
+      "id": "vn_tra_su_forest",
+      "slug": "rung-tram-tra-su",
+      "name": "Rừng Tràm Trà Sư Mùa Nước Nổi",
+      "local_name": "Rừng Tràm Trà Sư, An Giang",
+      "country_ids": ["VN"],
+      "region_id": "vn_mekong",
+      "category_ids": ["national_parks"],
+      "center_latitude": 10.5519,
+      "center_longitude": 105.0272,
+      "elevation_meters": 15,
+      "editorial_summary": "Thảm bèo cám xanh mướt trải dài vô tận trên mặt nước, thiên đường của chim trời xứ phù sa Tây Nam Bộ.",
+      "editorial_content": "Biểu tượng của vùng đất ngập nước miền Tây. Du khách ngồi tắc ráng len lỏi qua những luồng tràm tĩnh lặng rộn rã tiếng chim cò về tổ khi ráng chiều buông xuống.",
+      "best_travel_seasons": ["Tháng 9 - Tháng 11 (Mùa nước nổi bèo xanh phủ kín mặt nước)"],
+      "is_featured": false,
+      "is_verified": true,
+      "verification_date": "2026-08-14",
+      "media": [
+        {
+          "id": "media_ts_1",
+          "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&q=80",
+          "local_asset_path": "assets/images/default_nature.jpg",
+          "photographer": "Thanh Tùng",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Thanh Tùng / Unsplash",
+          "aspect_ratio": 1.777,
+          "is_hero": true
+        }
+      ],
+      "route": {
+        "id": "route_tra_su_waterway",
+        "name": "Tuyến xuồng ba lá xuyên rừng bèo",
+        "distance_km": 5.0,
+        "elevation_gain_meters": 0,
+        "difficulty_level": 1,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Bến đò trung tâm vào đài quan sát chim",
+            "description": "Đi xuồng chèo tay lướt êm ái trên thảm bèo cám xanh ngắt ngắm tổ chim hoang dã.",
+            "distance_km": 5.0,
+            "elevation_gain_meters": 0,
+            "terrain_type": "Luồng lạch ngập nước"
+          }
+        ],
+        "safety": {
+          "water_advice": "Khu dịch vụ bến đò có đầy đủ nước giải khát và dịch vụ ăn uống.",
+          "mobile_coverage_summary": "Phủ sóng 4G tốt toàn bộ khuôn viên rừng tràm.",
+          "primary_hazards": ["Trượt chân xuống nước khi lên xuống xuồng", "Nắng gắt phản chiếu mặt nước"],
+          "required_gear": ["Áo phao bắt buộc khi ngồi xuồng", "Mũ rộng vành", "Kính râm"],
+          "emergency_contact_info": "Ban Quản lý Du lịch Rừng Tràm Trà Sư: 0296.2215.115",
+          "verification_date": "2026-08-14",
+          "verified_by": "Ban Quản lý Rừng Tràm Trà Sư"
+        }
+      }
+    },
+    {
+      "id": "intl_mount_fuji",
+      "slug": "mount-fuji-japan",
+      "name": "Đỉnh Núi Phú Sĩ (Mount Fuji)",
+      "local_name": "富士山 (Fujisan)",
+      "country_ids": ["JP"],
+      "region_id": "intl_asia",
+      "category_ids": ["trekking"],
+      "center_latitude": 35.3606,
+      "center_longitude": 138.7274,
+      "elevation_meters": 3776,
+      "editorial_summary": "Ngọn núi thiêng biểu tượng của đất nước mặt trời mọc, nơi hành hương đón bình minh rực rỡ trên biển mây.",
+      "editorial_content": "Đỉnh núi lửa hình nón hoàn hảo cao nhất Nhật Bản. Mỗi mùa hè, hàng ngàn người leo núi từ khắp năm châu cùng bước trên con đường mòn đá nham thạch để chạm tay vào cổng trời torii trên đỉnh.",
+      "best_travel_seasons": ["Đầu tháng 7 - Đầu tháng 9 (Mùa leo núi chính thức mở cửa)"],
+      "is_featured": true,
+      "is_verified": true,
+      "verification_date": "2026-06-30",
+      "media": [
+        {
+          "id": "media_fuji_1",
+          "image_url": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=900&q=80",
+          "local_asset_path": "assets/images/default_nature.jpg",
+          "photographer": "Timo Volz",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Timo Volz / Unsplash",
+          "aspect_ratio": 1.777,
+          "is_hero": true
+        }
+      ],
+      "route": {
+        "id": "route_fuji_yoshida",
+        "name": "Tuyến Yoshida Trail từ Trạm số 5",
+        "distance_km": 14.5,
+        "elevation_gain_meters": 1450,
+        "difficulty_level": 3,
+        "estimated_duration_days": 2,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Trạm số 5 (Fuji Subaru) lên Trạm số 7 & 8",
+            "description": "Lối mòn đá cuội thoai thoải dần chuyển sang vách đá nham thạch dốc đứng.",
+            "distance_km": 7.0,
+            "elevation_gain_meters": 800,
+            "terrain_type": "Đá sỏi núi lửa dốc"
+          },
+          {
+            "stage_number": 2,
+            "title": "Trạm số 8 chinh phục đỉnh chóp đón Goraiko",
+            "description": "Hành quân đêm dưới bầu trời sao, lên đỉnh đón bình minh và đi một vòng quanh miệng núi lửa.",
+            "distance_km": 7.5,
+            "elevation_gain_meters": 650,
+            "terrain_type": "Đá nham thạch & Không khí loãng"
+          }
+        ],
+        "safety": {
+          "water_advice": "Các trạm dừng chân bán nước đóng chai (giá tăng dần theo độ cao). Cần mang tiền xu 100 Yên Nhật để dùng nhà vệ sinh sinh thái.",
+          "mobile_coverage_summary": "Phủ sóng mạng di động Nhật Bản (Docomo/Softbank) tốt trên toàn tuyến Yoshida.",
+          "primary_hazards": ["Say độ cao (Altitude Sickness) trên 3,000m", "Hạ thân nhiệt lúc bình minh (nhiệt độ đỉnh 0-5°C)", "Đá lăn"],
+          "required_gear": ["Đèn pin đội đầu cho leo đêm", "Bình oxy mini cá nhân", "Áo khoác ấm mùa đông chống gió", "Gậy leo núi"],
+          "emergency_contact_info": "Cảnh sát Nhật Bản: 110 • Cứu thương / Cứu hỏa: 119 • Đội Cứu hộ Núi Phú Sĩ: +81 555-72-1403",
+          "verification_date": "2026-06-30",
+          "verified_by": "Ủy ban An toàn Leo núi Tỉnh Yamanashi & Shizuoka"
+        }
+      }
+    },
+    {
+      "id": "intl_tour_du_mont_blanc",
+      "slug": "tour-du-mont-blanc",
+      "name": "Cung Tour du Mont Blanc (TMB)",
+      "local_name": "Tour du Mont Blanc (France, Italy, Switzerland)",
+      "country_ids": ["FR", "IT", "CH"],
+      "region_id": "intl_europe",
+      "category_ids": ["trekking"],
+      "center_latitude": 45.8326,
+      "center_longitude": 6.8652,
+      "elevation_meters": 2537,
+      "editorial_summary": "Cung trekking vĩ đại nhất châu Âu vòng quanh khối núi tuyết Mont Blanc qua 3 quốc gia Pháp, Ý và Thụy Sĩ.",
+      "editorial_content": "Trải nghiệm dã ngoại kinh điển băng qua các thung lũng băng hà, đèo núi cao ngút ngàn và những ngôi làng Alpin mộng mơ.",
+      "best_travel_seasons": ["Cuối tháng 6 - Giữa tháng 9 (Tuyết tan trên các đèo cao, các túp lều refuge mở cửa)"],
+      "is_featured": true,
+      "is_verified": true,
+      "verification_date": "2026-06-15",
+      "media": [
+        {
+          "id": "media_tmb_1",
+          "image_url": "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?w=900&q=80",
+          "local_asset_path": "assets/images/default_nature.jpg",
+          "photographer": "Fabrizio Conti",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Fabrizio Conti / Unsplash",
+          "aspect_ratio": 1.777,
+          "is_hero": true
+        }
+      ],
+      "route": {
+        "id": "route_tmb_classic",
+        "name": "Vòng cung TMB Kinh Điển (Les Houches Loop)",
+        "distance_km": 170.0,
+        "elevation_gain_meters": 10000,
+        "difficulty_level": 4,
+        "estimated_duration_days": 10,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Les Houches sang Les Contamines (Pháp)",
+            "description": "Bắt đầu hành trình qua đèo Col de Voza ngắm sông băng Bionnassay tráng lệ.",
+            "distance_km": 16.0,
+            "elevation_gain_meters": 640,
+            "terrain_type": "Đường mòn đồi cỏ Alpin"
+          },
+          {
+            "stage_number": 2,
+            "title": "Vượt biên giới Pháp - Ý qua Col de la Seigne",
+            "description": "Vượt đèo gió lạnh 2,516m sang thung lũng Val Veny dưới chân vách đá dựng đứng của Mont Blanc.",
+            "distance_km": 18.0,
+            "elevation_gain_meters": 1020,
+            "terrain_type": "Đèo đá tuyết cao"
+          },
+          {
+            "stage_number": 3,
+            "title": "Courmayeur (Ý) sang La Fouly (Thụy Sĩ)",
+            "description": "Vượt đèo Grand Col Ferret 2,537m tiến vào vùng đồng cỏ yên bình của Thụy Sĩ.",
+            "distance_km": 20.0,
+            "elevation_gain_meters": 950,
+            "terrain_type": "Đường mòn sỏi đá & Băng giá"
+          }
+        ],
+        "safety": {
+          "water_advice": "Các trạm refuge và làng có nguồn nước uống công cộng an toàn. Khi lấy nước suối băng cần dùng màng lọc.",
+          "mobile_coverage_summary": "Sóng chuyển vùng quốc tế (EU Roaming) tốt gần các làng, mất sóng tại các đèo cao.",
+          "primary_hazards": ["Bão tuyết bất ngờ mùa hè", "Lạc lối khi sương mù dày đặc che phủ dấu vạch sơn TMB", "Chấn thương khớp gối do dốc đứng"],
+          "required_gear": ["Gậy trekking đôi", "Giày leo núi cổ cao chống nước Gore-Tex", "Bảo hiểm cứu hộ trực thăng quốc tế"],
+          "emergency_contact_info": "Cứu hộ Châu Âu chung: 112 • Cứu hộ trực thăng Thụy Sĩ (REGA): 1414 • PGHM Chamonix (Pháp): +33 4 50 53 16 89",
+          "verification_date": "2026-06-15",
+          "verified_by": "Hiệp hội Hướng dẫn viên Leo núi Chamonix & Courmayeur"
+        }
+      }
+    },
+    {
+      "id": "intl_hallstatt_alps",
+      "slug": "hallstatt-dachstein-austria",
+      "name": "Làng Cổ Hallstatt & Dãy Dachstein",
+      "local_name": "Hallstatt, Salzkammergut, Austria",
+      "country_ids": ["AT"],
+      "region_id": "intl_europe",
+      "category_ids": ["national_parks"],
+      "center_latitude": 47.5622,
+      "center_longitude": 13.6493,
+      "elevation_meters": 511,
+      "editorial_summary": "Thị trấn cổ tích di sản thế giới bên hồ nước trong vắt và dãy núi băng đá vôi Dachstein hùng vĩ.",
+      "editorial_content": "Được mệnh danh là ngôi làng bên hồ đẹp nhất thế giới với những ngôi nhà gỗ cổ kính thế kỷ 16 soi bóng xuống làn nước xanh ngắt.",
+      "best_travel_seasons": ["Tháng 5 - Tháng 10 (Trời ấm áp, chèo thuyền trên hồ và leo núi)", "Tháng 12 - Tháng 2 (Làng tuyết cổ tích)"],
+      "is_featured": false,
+      "is_verified": true,
+      "verification_date": "2026-05-18",
+      "media": [
+        {
+          "id": "media_hs_1",
+          "image_url": "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=900&q=80",
+          "local_asset_path": "assets/images/default_nature.jpg",
+          "photographer": "Daniel Plan",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Daniel Plan / Unsplash",
+          "aspect_ratio": 1.777,
+          "is_hero": true
+        }
+      ],
+      "route": {
+        "id": "route_hallstatt_plassen",
+        "name": "Đường mòn mỏ muối cổ và Đỉnh Plassen",
+        "distance_km": 11.0,
+        "elevation_gain_meters": 820,
+        "difficulty_level": 2,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Quảng trường Hallstatt lên Skywalk Mỏ Muối",
+            "description": "Lối đi bộ dốc đứng qua rừng sồi lên đài quan sát vươn ra khoảng không ngắm trọn vẹn hồ.",
+            "distance_km": 4.5,
+            "elevation_gain_meters": 350,
+            "terrain_type": "Bậc thang gỗ & Đường mòn rừng"
+          },
+          {
+            "stage_number": 2,
+            "title": "Skywalk lên thung lũng đá vôi Plassen",
+            "description": "Men theo các vỉa đá vôi cổ xưa lên độ cao gần 1,600m.",
+            "distance_km": 6.5,
+            "elevation_gain_meters": 470,
+            "terrain_type": "Đá vôi dốc thoai thoải"
+          }
+        ],
+        "safety": {
+          "water_advice": "Các vòi nước uống tại làng đều là nước nguồn tinh khiết từ dãy Alps uống trực tiếp an toàn.",
+          "mobile_coverage_summary": "Phủ sóng 5G/4G hoàn hảo trong thị trấn và trên đài quan sát.",
+          "primary_hazards": ["Trơn trượt trên vách đá vào mùa tuyết tan"],
+          "required_gear": ["Giày đi bộ có độ bám", "Áo khoác chống gió"],
+          "emergency_contact_info": "Cứu hộ Châu Âu: 112 • Cứu hộ Núi Áo (Bergrettung): 140",
+          "verification_date": "2026-05-18",
+          "verified_by": "Ban Du lịch Salzkammergut Áo"
+        }
+      }
+    },
+    {
+      "id": "intl_banff_national_park",
+      "slug": "banff-national-park-canada",
+      "name": "Vườn Quốc Gia Banff — Dãy Rockies",
+      "local_name": "Banff National Park, Alberta, Canada",
+      "country_ids": ["CA"],
+      "region_id": "intl_north_america",
+      "category_ids": ["national_parks", "trekking"],
+      "center_latitude": 51.1784,
+      "center_longitude": -115.5708,
+      "elevation_meters": 1383,
+      "editorial_summary": "Viên ngọc của dãy núi Rocky Canada với hồ Moraine và Louise màu ngọc lam soi bóng đỉnh tuyết vĩnh cửu.",
+      "editorial_content": "Vườn quốc gia lâu đời nhất Canada. Nơi bảo tồn những dòng sông băng kỳ vĩ, đàn gấu xám grizzly hoang dã và hệ thống cung đường trekking hàng đầu Bắc Mỹ.",
+      "best_travel_seasons": ["Tháng 6 - Tháng 9 (Mùa hè ấm, các hồ nước tan băng hoàn toàn, rực rỡ sắc xanh)"],
+      "is_featured": true,
+      "is_verified": true,
+      "verification_date": "2026-06-12",
+      "media": [
+        {
+          "id": "media_bf_1",
+          "image_url": "https://images.unsplash.com/photo-1503614472-8c93d56e92ce?w=900&q=80",
+          "local_asset_path": "assets/images/default_nature.jpg",
+          "photographer": "John Lee",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: John Lee / Unsplash",
+          "aspect_ratio": 1.777,
+          "is_hero": true
+        }
+      ],
+      "route": {
+        "id": "route_plain_six_glaciers",
+        "name": "Tuyến Plain of Six Glaciers & Lake Louise",
+        "distance_km": 14.6,
+        "elevation_gain_meters": 588,
+        "difficulty_level": 2,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Bờ hồ Lake Louise đến Tea House",
+            "description": "Men theo bờ hồ xanh ngọc bích rồi leo dần lên thung lũng sông băng cổ.",
+            "distance_km": 7.3,
+            "elevation_gain_meters": 365,
+            "terrain_type": "Đường mòn đất nén ven vách đá"
+          },
+          {
+            "stage_number": 2,
+            "title": "Tea House lên điểm ngắm 6 Dòng Sông Băng",
+            "description": "Tiến sát chân các khối băng tuyết khổng lồ đổ ầm vang từ sườn núi Victoria.",
+            "distance_km": 7.3,
+            "elevation_gain_meters": 223,
+            "terrain_type": "Đá moraine sông băng"
+          }
+        ],
+        "safety": {
+          "water_advice": "Nước sông băng đục chứa nhiều bột đá mịn (rock flour), không uống trực tiếp. Mang nước từ thị trấn Banff.",
+          "mobile_coverage_summary": "Mất sóng khi đi sâu vào thung lũng sông băng (ngoài vùng phủ sóng 50%).",
+          "primary_hazards": ["Gặp gỡ gấu xám (Grizzly Bear) và gấu đen", "Lở đá từ vách núi", "Thời tiết thay đổi cực nhanh"],
+          "required_gear": ["Bình xịt hơi cay đuổi gấu (Bear Spray) bắt buộc", "Áo khoác giữ nhiệt", "Gậy trekking"],
+          "emergency_contact_info": "Cứu hộ Khẩn cấp Canada: 911 • Parks Canada Emergency Dispatch: +1 403-762-1470",
+          "verification_date": "2026-06-12",
+          "verified_by": "Parks Canada Banff Visitor Safety Team"
+        }
+      }
+    },
+    {
+      "id": "intl_torres_del_paine",
+      "slug": "torres-del-paine-chile",
+      "name": "Khu Bảo Tồn Torres del Paine",
+      "local_name": "Parque Nacional Torres del Paine, Patagonia, Chile",
+      "country_ids": ["CL"],
+      "region_id": "intl_south_america",
+      "category_ids": ["national_parks", "trekking"],
+      "center_latitude": -51.2532,
+      "center_longitude": -72.8814,
+      "elevation_meters": 1200,
+      "editorial_summary": "Trái tim hoang dại của vùng Patagonia Nam Mỹ với 3 ngọn tháp đá granite vươn thẳng lên trời xanh giữa gió giật điên cuồng.",
+      "editorial_content": "Vùng đất tận cùng thế giới nơi thiên nhiên giữ nguyên vẻ hoang sơ dữ dội. Băng qua những thảo nguyên lộng gió, những hồ nước màu ngọc bích và các bức tường băng hà đổ sập ngoạn mục.",
+      "best_travel_seasons": ["Tháng 11 - Đầu tháng 3 (Mùa hè bán cầu nam, ngày dài 17 tiếng, nhiệt độ đỡ khắc nghiệt)"],
+      "is_featured": false,
+      "is_verified": true,
+      "verification_date": "2026-05-10",
+      "media": [
+        {
+          "id": "media_tdp_1",
+          "image_url": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=900&q=80",
+          "local_asset_path": "assets/images/default_nature.jpg",
+          "photographer": "Ezequiel Garrido",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Ezequiel Garrido / Unsplash",
+          "aspect_ratio": 1.777,
+          "is_hero": true
+        }
+      ],
+      "route": {
+        "id": "route_w_trek_patagonia",
+        "name": "Cung W-Trek Kinh Điển Patagonia",
+        "distance_km": 76.0,
+        "elevation_gain_meters": 3200,
+        "difficulty_level": 4,
+        "estimated_duration_days": 5,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hồ Grey và Sông Băng Grey",
+            "description": "Chiêm ngưỡng những khối băng trôi màu xanh coban khổng lồ trên mặt hồ.",
+            "distance_km": 11.0,
+            "elevation_gain_meters": 350,
+            "terrain_type": "Đá lộng gió & Thảo nguyên thấp"
+          },
+          {
+            "stage_number": 2,
+            "title": "Thung lũng Valle del Francés",
+            "description": "Tiến sâu vào hẻm núi ngắm các trận tuyết lở tự nhiên rơi từ đỉnh Paine Grande.",
+            "distance_km": 15.0,
+            "elevation_gain_meters": 750,
+            "terrain_type": "Dốc đá tảng gập ghềnh"
+          },
+          {
+            "stage_number": 3,
+            "title": "Chinh phục Mirador Las Torres",
+            "description": "Vượt dốc đá moraine dốc đứng lên hồ băng chân 3 tháp đá granite huyền thoại.",
+            "distance_km": 19.0,
+            "elevation_gain_meters": 850,
+            "terrain_type": "Đá tảng dốc trượt gió bão"
+          }
+        ],
+        "safety": {
+          "water_advice": "Nước suối tự nhiên tại Patagonia là một trong những nguồn nước sạch nhất hành tinh, có thể uống trực tiếp từ các dòng chảy mạnh.",
+          "mobile_coverage_summary": "Mất sóng di động 100% trong toàn bộ cung trekking W-Trek.",
+          "primary_hazards": ["Gió bão Patagonia giật trên 100km/h có thể quật ngã người", "Thời tiết biến đổi 4 mùa trong 1 ngày"],
+          "required_gear": ["Trang bị cản gió 3 lớp chuyên nghiệp", "Túi ngủ 0°C", "Kính bảo hộ chắn cát đá bụi gió"],
+          "emergency_contact_info": "Cảnh sát Chile (Carabineros): 133 • Cứu thương: 131 • CONAF Guardaparques: +56 61 223 8581",
+          "verification_date": "2026-05-10",
+          "verified_by": "Cơ quan Rừng Quốc gia Chile (CONAF)"
+        }
+      }
+    },
+    {
+      "id": "intl_milford_sound",
+      "slug": "milford-sound-new-zealand",
+      "name": "Vịnh Hẹp Milford Sound & Fjordland",
+      "local_name": "Piopiotahi / Milford Sound, New Zealand",
+      "country_ids": ["NZ"],
+      "region_id": "intl_oceania",
+      "category_ids": ["national_parks", "waterfalls"],
+      "center_latitude": -44.6716,
+      "center_longitude": 167.9259,
+      "elevation_meters": 1050,
+      "editorial_summary": "Kỳ quan thứ 8 của thế giới nơi những vách đá dựng đứng cao 1,200m lao thẳng xuống lòng đại dương đen thẳm.",
+      "editorial_content": "Trái tim của Vườn quốc gia Fiordland. Khi những cơn mưa rào trút xuống, hàng ngàn dải thác nước trắng xóa đồng loạt tuôn trào từ đỉnh mây xuống vịnh biển nguyên sơ.",
+      "best_travel_seasons": ["Tháng 11 - Tháng 4 (Mùa hè và thu, khí hậu ôn hòa hơn để chèo kayak và trekking)"],
+      "is_featured": false,
+      "is_verified": true,
+      "verification_date": "2026-06-22",
+      "media": [
+        {
+          "id": "media_ms_1",
+          "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&q=80",
+          "local_asset_path": "assets/images/default_nature.jpg",
+          "photographer": "Sam Ferris",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Sam Ferris / Unsplash",
+          "aspect_ratio": 1.777,
+          "is_hero": true
+        }
+      ],
+      "route": {
+        "id": "route_milford_track",
+        "name": "Cung Milford Track — Đi bộ đẹp nhất hành tinh",
+        "distance_km": 53.5,
+        "elevation_gain_meters": 1070,
+        "difficulty_level": 3,
+        "estimated_duration_days": 4,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Bến hồ Te Anau sang Glade House",
+            "description": "Đi tàu cao tốc sang đầu cung đường và bắt đầu chặng khởi động nhẹ nhàng.",
+            "distance_km": 5.0,
+            "elevation_gain_meters": 50,
+            "terrain_type": "Đường mòn rừng mưa ôn đới"
+          },
+          {
+            "stage_number": 2,
+            "title": "Vượt đèo Mackinnon Pass sang Thác Sutherland",
+            "description": "Chinh phục đỉnh đèo cao nhất 1,070m ngắm biển mây và đại thác nước cao 580m.",
+            "distance_km": 15.0,
+            "elevation_gain_meters": 620,
+            "terrain_type": "Bậc đá đèo dốc ẩm ướt"
+          },
+          {
+            "stage_number": 3,
+            "title": "Thung lũng Arthur về Sandfly Point",
+            "description": "Điểm kết thúc chặng đường, đón tàu ra ngắm vịnh biển Milford Sound hùng vĩ.",
+            "distance_km": 18.0,
+            "elevation_gain_meters": 110,
+            "terrain_type": "Đường mòn rừng bên suối"
+          }
+        ],
+        "safety": {
+          "water_advice": "Nước suối Fiordland rất trong lành nhưng DOC khuyến cáo nên đun sôi hoặc lọc để phòng ngừa vi khuẩn Giardia.",
+          "mobile_coverage_summary": "Hoàn toàn không có sóng di động (0%) trên suốt 53.5km của Milford Track.",
+          "primary_hazards": ["Mưa xối xả gây ngập đường mòn", "Hạ thân nhiệt do ướt mưa kèm gió lạnh", "Muỗi dĩn Sandfly cắn buốt"],
+          "required_gear": ["Áo mưa dã ngoại chuyên dụng chống nước tuyệt đối", "Thuốc bôi chống dĩn Sandfly", "Bộ sơ cứu cá nhân"],
+          "emergency_contact_info": "Cứu hộ Khẩn cấp New Zealand: 111 • Trạm Kiểm lâm DOC Te Anau: +64 3 249 7900",
+          "verification_date": "2026-06-22",
+          "verified_by": "Bộ Bảo tồn New Zealand (Department of Conservation - DOC)"
+        }
+      }
+    }
+  ]
+}
+

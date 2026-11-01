@@ -4,30 +4,43 @@ import 'package:mobile_flutter/core/models/outdoor_image.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
 import 'package:mobile_flutter/core/widgets/editorial_image.dart';
+import 'package:mobile_flutter/features/explore/domain/entities/destination.dart';
 import 'package:mobile_flutter/features/explore/presentation/screens/destination_detail_screen.dart';
 
 class TrailCompactRow extends StatelessWidget {
-  final Map<String, dynamic> spot;
+  final Destination? destination;
+  final Map<String, dynamic>? spot;
   final bool isFavorite;
   final VoidCallback onToggleFavorite;
 
   const TrailCompactRow({
     super.key,
-    required this.spot,
+    this.destination,
+    this.spot,
     required this.isFavorite,
     required this.onToggleFavorite,
-  });
+  }) : assert(destination != null || spot != null);
 
   OutdoorImage _resolveImage() {
-    if (spot['outdoorImage'] is OutdoorImage) {
-      return spot['outdoorImage'] as OutdoorImage;
+    if (destination != null) {
+      final hero = destination!.heroMedia;
+      return OutdoorImage.fromMedia(hero, caption: destination!.name);
     }
-    final url = spot['imageUrl'] as String? ?? '';
+    if (spot?['outdoorImage'] is OutdoorImage) {
+      return spot!['outdoorImage'] as OutdoorImage;
+    }
+    final url = spot?['imageUrl'] as String? ?? '';
     return OutdoorImage(
       url: url.isNotEmpty ? url : OutdoorImage.defaultNature.url,
       localAsset: 'assets/images/default_nature.jpg',
     );
   }
+
+  String get _title => destination?.name ?? spot?['title'] as String? ?? '';
+  String get _summary => destination?.editorialSummary ?? spot?['description'] as String? ?? '';
+  String get _distance => destination?.distanceDisplay ?? spot?['distance'] as String? ?? '--';
+  String get _elevation => destination?.elevationDisplay ?? spot?['elevation'] as String? ?? '--';
+  String get _difficultyLabel => destination?.route?.difficultyLabel ?? spot?['difficulty'] as String? ?? 'Dã ngoại';
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +56,7 @@ class TrailCompactRow extends StatelessWidget {
         transitionType: ContainerTransitionType.fadeThrough,
         transitionDuration: const Duration(milliseconds: 320),
         openBuilder: (context, action) => DestinationDetailScreen(
+          destination: destination,
           spot: spot,
           isFavorite: isFavorite,
           onToggleFavorite: onToggleFavorite,
@@ -63,7 +77,6 @@ class TrailCompactRow extends StatelessWidget {
           ),
           child: Row(
             children: [
-              // Image Thumbnail with caching and local fallback
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: SizedBox(
@@ -76,8 +89,6 @@ class TrailCompactRow extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 14),
-
-              // Content Column
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,7 +98,7 @@ class TrailCompactRow extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            spot['title'] as String,
+                            _title,
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
@@ -100,47 +111,53 @@ class TrailCompactRow extends StatelessWidget {
                         ),
                         BouncingButton(
                           onTap: onToggleFavorite,
-                          child: Icon(
-                            isFavorite ? Icons.favorite : Icons.favorite_border,
-                            color: isFavorite ? AppColors.emergencyRed : AppColors.editorialMuted,
-                            size: 16,
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Icon(
+                              isFavorite ? Icons.favorite : Icons.favorite_border,
+                              color: isFavorite ? AppColors.emergencyRed : AppColors.editorialMuted,
+                              size: 18,
+                            ),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      spot['location'] as String,
+                      _summary,
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontSize: 11,
                         color: AppColors.editorialMuted,
-                        fontWeight: FontWeight.w400,
+                        height: 1.3,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        const Icon(Icons.star, color: Color(0xFFFBBF24), size: 12),
-                        const SizedBox(width: 3),
-                        Text(
-                          spot['rating'] as String,
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          '${spot['distance']} • ${spot['elevation']}',
-                          style: const TextStyle(fontSize: 11, color: AppColors.editorialMuted),
-                        ),
-                        const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: AppColors.editorialSurfaceSubtle,
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            spot['difficulty'] as String,
-                            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.editorialPine),
+                            _difficultyLabel,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.editorialPine,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '$_distance • $_elevation',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.editorialInk,
                           ),
                         ),
                       ],

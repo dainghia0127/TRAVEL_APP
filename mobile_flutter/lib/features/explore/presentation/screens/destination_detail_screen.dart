@@ -5,18 +5,23 @@ import 'package:mobile_flutter/core/models/outdoor_image.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
 import 'package:mobile_flutter/core/widgets/editorial_image.dart';
+import 'package:mobile_flutter/features/explore/domain/entities/destination.dart';
+import 'package:mobile_flutter/features/explore/domain/entities/trekking_route.dart';
+import 'package:mobile_flutter/features/explore/domain/entities/safety_guideline.dart';
 
 class DestinationDetailScreen extends StatefulWidget {
-  final Map<String, dynamic> spot;
+  final Destination? destination;
+  final Map<String, dynamic>? spot;
   final bool isFavorite;
   final VoidCallback onToggleFavorite;
 
   const DestinationDetailScreen({
     super.key,
-    required this.spot,
+    this.destination,
+    this.spot,
     required this.isFavorite,
     required this.onToggleFavorite,
-  });
+  }) : assert(destination != null || spot != null, 'Either destination or spot must be provided');
 
   @override
   State<DestinationDetailScreen> createState() => _DestinationDetailScreenState();
@@ -39,7 +44,11 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
   }
 
   OutdoorImage _resolveImage() {
-    final spot = widget.spot;
+    if (widget.destination != null) {
+      final hero = widget.destination!.heroMedia;
+      return OutdoorImage.fromMedia(hero, caption: widget.destination!.name);
+    }
+    final spot = widget.spot!;
     if (spot['outdoorImage'] is OutdoorImage) {
       return spot['outdoorImage'] as OutdoorImage;
     }
@@ -51,17 +60,25 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
     );
   }
 
+  String get _title => widget.destination?.name ?? widget.spot?['title'] as String? ?? '';
+  String? get _localName => widget.destination?.localName;
+  String get _summary => widget.destination?.editorialSummary ?? widget.spot?['description'] as String? ?? '';
+  String? get _content => widget.destination?.editorialContent;
+  String get _distance => widget.destination?.distanceDisplay ?? widget.spot?['distance'] as String? ?? '--';
+  String get _elevation => widget.destination?.elevationDisplay ?? widget.spot?['elevation'] as String? ?? '--';
+  List<String> get _seasons => widget.destination?.bestTravelSeasons ?? [];
+  bool get _isVerified => widget.destination?.isVerified ?? false;
+  TrekkingRoute? get _route => widget.destination?.route;
+  SafetyGuideline? get _safety => _route?.safety;
+
   @override
   Widget build(BuildContext context) {
-    final spot = widget.spot;
-    final highlights = (spot['highlights'] as List<dynamic>?)?.cast<String>() ?? [];
     final img = _resolveImage();
 
     return Scaffold(
       backgroundColor: AppColors.editorialBg,
       body: Stack(
         children: [
-          // Scrollable Content
           CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
@@ -100,13 +117,10 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                   background: Stack(
                     fit: StackFit.expand,
                     children: [
-                      // Editorial Image with cache and local fallback
                       EditorialImage(
                         image: img,
                         showAttribution: true,
                       ),
-
-                      // Gradient Scrim
                       Container(
                         decoration: const BoxDecoration(
                           gradient: LinearGradient(
@@ -122,8 +136,6 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                           ),
                         ),
                       ),
-
-                      // Floating Category & Rating Badge on bottom of image
                       Positioned(
                         left: 16,
                         bottom: 16,
@@ -137,29 +149,41 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                                 color: Colors.black.withValues(alpha: 0.6),
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: Text(
-                                spot['category'] as String? ?? 'Dã ngoại',
-                                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.6),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(Icons.star, size: 14, color: Color(0xFFFBBF24)),
-                                  const SizedBox(width: 4),
+                                  Icon(
+                                    _route != null ? Icons.hiking : Icons.landscape_outlined,
+                                    color: Colors.white,
+                                    size: 14,
+                                  ),
+                                  const SizedBox(width: 5),
                                   Text(
-                                    '${spot['rating']} (${spot['reviews']} đánh giá)',
+                                    _route?.difficultyLabel ?? 'Điểm dã ngoại',
                                     style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
                                   ),
                                 ],
                               ),
                             ),
+                            if (_isVerified)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: AppColors.editorialPine.withValues(alpha: 0.85),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.verified, size: 14, color: AppColors.summitGold),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Đã kiểm chứng',
+                                      style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
+                                    ),
+                                  ],
+                                ),
+                              ),
                           ],
                         ),
                       ),
@@ -176,7 +200,7 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        spot['title'] as String? ?? '',
+                        _title,
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w800,
@@ -184,17 +208,17 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                           letterSpacing: -0.5,
                         ),
                       ).animate().fadeIn(duration: 250.ms).slideY(begin: 0.08, end: 0),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          const Icon(Icons.place_outlined, size: 15, color: AppColors.editorialPine),
-                          const SizedBox(width: 4),
-                          Text(
-                            spot['location'] as String? ?? '',
-                            style: const TextStyle(fontSize: 13, color: AppColors.editorialMuted),
+                      if (_localName != null && _localName != _title) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          _localName!,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontStyle: FontStyle.italic,
+                            color: AppColors.editorialMuted,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                       const SizedBox(height: 16),
 
                       // 4-Column Restrained Facts Bar
@@ -215,13 +239,23 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _buildFact(Icons.straighten, 'Cự ly', spot['distance'] as String? ?? '--'),
+                            _buildFact(Icons.straighten, 'Cự ly', _distance),
                             _buildDivider(),
-                            _buildFact(Icons.landscape, 'Độ cao', spot['elevation'] as String? ?? '--'),
+                            _buildFact(Icons.landscape, 'Độ cao', _elevation),
                             _buildDivider(),
-                            _buildFact(Icons.water_drop_outlined, 'Nguồn nước', spot['water'] as String? ?? '--'),
+                            _buildFact(
+                              Icons.schedule,
+                              'Thời gian',
+                              _route?.estimatedDurationDays != null
+                                  ? '${_route!.estimatedDurationDays} ngày'
+                                  : '1 ngày',
+                            ),
                             _buildDivider(),
-                            _buildFact(Icons.signal_cellular_alt, 'Sóng 4G', spot['signal'] as String? ?? '--'),
+                            _buildFact(
+                              Icons.verified_user_outlined,
+                              'Kiểm định',
+                              _isVerified ? 'Chuyên gia' : 'Cộng đồng',
+                            ),
                           ],
                         ),
                       ).animate().fadeIn(delay: 80.ms).slideY(begin: 0.08, end: 0),
@@ -243,79 +277,121 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                       // Tab Content
                       if (_selectedTab == 0) ...[
                         const Text(
-                          'Giới thiệu cung đường',
+                          'Giới thiệu địa danh',
                           style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          spot['description'] as String? ?? '',
+                          _content ?? _summary,
                           style: const TextStyle(fontSize: 14, color: AppColors.editorialInk, height: 1.5),
                         ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Điểm nổi bật nhất',
-                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
-                        ),
-                        const SizedBox(height: 10),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: highlights.map((h) => Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: AppColors.editorialSurface,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: AppColors.editorialBorder),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.check, size: 14, color: AppColors.editorialPine),
-                                const SizedBox(width: 6),
-                                Text(h, style: const TextStyle(fontSize: 12, color: AppColors.editorialInk, fontWeight: FontWeight.w500)),
-                              ],
-                            ),
-                          )).toList(),
-                        ),
+                        if (_seasons.isNotEmpty) ...[
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Thời điểm lý tưởng nhất',
+                            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
+                          ),
+                          const SizedBox(height: 10),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: _seasons.map((s) => Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: AppColors.editorialSurface,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: AppColors.editorialBorder),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.wb_sunny_outlined, size: 14, color: AppColors.editorialTerracotta),
+                                  const SizedBox(width: 6),
+                                  Text(s, style: const TextStyle(fontSize: 12, color: AppColors.editorialInk, fontWeight: FontWeight.w500)),
+                                ],
+                              ),
+                            )).toList(),
+                          ),
+                        ],
                       ] else if (_selectedTab == 1) ...[
                         const Text(
-                          'Lộ trình tham khảo',
+                          'Lộ trình các chặng thực tế',
                           style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
                         ),
                         const SizedBox(height: 12),
-                        _buildTrailStep('1', 'Khởi hành tại Cửa rừng', 'Chuẩn bị thể lực, kiểm tra balo và bắt đầu tiến vào bìa rừng.', '0 km'),
-                        _buildTrailStep('2', 'Vượt dốc và sống lưng', 'Cung đường mở ra khung cảnh thung lũng cỏ bạt ngàn tuyệt đẹp.', '15 km'),
-                        _buildTrailStep('3', 'Bãi hạ trại ven suối', 'Nghỉ đêm, dựng lều kín gió, nấu ăn và ngắm bầu trời sao.', '28 km'),
-                        _buildTrailStep('4', 'Đích đến trạm kết thúc', 'Hoàn tất cung đường và tập kết đón xe trung chuyển.', '${spot['distance']}'),
+                        if (_route != null && _route!.stages.isNotEmpty)
+                          ..._route!.stages.map((stage) => _buildTrailStep(
+                                '${stage.stageNumber}',
+                                stage.title,
+                                stage.description,
+                                stage.distanceKm != null ? '${stage.distanceKm} km' : '--',
+                                stage.terrainType,
+                              ))
+                        else
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: AppColors.editorialSurface,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: AppColors.editorialBorder),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.info_outline, color: AppColors.editorialPine, size: 20),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'Điểm đến này không có cung đường trekking cố định. Bạn có thể tự do dã ngoại, chèo SUP hoặc cắm trại.',
+                                    style: TextStyle(fontSize: 13, color: AppColors.editorialInk),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                       ] else ...[
                         const Text(
-                          'Quy tắc an toàn sinh tồn',
+                          'Quy tắc an toàn sinh tồn thực địa',
                           style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
                         ),
                         const SizedBox(height: 12),
-                        _buildSafetyNotice(
-                          Icons.water_drop,
-                          AppColors.editorialPine,
-                          'Mang tối thiểu 2.5 Lít nước',
-                          'Đoạn sống lưng rất nắng gió và không có nguồn nước trong suốt 12km.',
-                        ),
-                        const SizedBox(height: 10),
-                        _buildSafetyNotice(
-                          Icons.warning_amber_rounded,
-                          AppColors.editorialTerracotta,
-                          'Cảnh báo mất sóng di động',
-                          'Khu vực này mất sóng 70%. Luôn tải bản đồ và cẩm nang sơ cứu về máy trước khi đi.',
-                        ),
-                        const SizedBox(height: 10),
-                        _buildSafetyNotice(
-                          Icons.nights_stay,
-                          AppColors.editorialPine,
-                          'Dựng lều trước 16:30',
-                          'Nhiệt độ đêm vùng núi có thể hạ dưới 12°C kèm gió giật mạnh.',
-                        ),
+                        if (_safety != null) ...[
+                          _buildSafetyNotice(
+                            Icons.water_drop,
+                            AppColors.editorialPine,
+                            'Khuyến cáo nguồn nước',
+                            _safety!.waterAdvice,
+                          ),
+                          const SizedBox(height: 10),
+                          _buildSafetyNotice(
+                            Icons.signal_cellular_alt,
+                            AppColors.editorialTerracotta,
+                            'Tình trạng sóng di động',
+                            _safety!.mobileCoverageSummary,
+                          ),
+                          const SizedBox(height: 10),
+                          _buildSafetyNotice(
+                            Icons.warning_amber_rounded,
+                            AppColors.emergencyRed,
+                            'Hiểm họa cần đề phòng',
+                            _safety!.primaryHazards.join(' • '),
+                          ),
+                          const SizedBox(height: 10),
+                          _buildSafetyNotice(
+                            Icons.phone_in_talk,
+                            AppColors.editorialPine,
+                            'Liên hệ cứu hộ khẩn cấp',
+                            _safety!.emergencyContactInfo,
+                          ),
+                        ] else
+                          _buildSafetyNotice(
+                            Icons.shield_outlined,
+                            AppColors.editorialPine,
+                            'An toàn chung',
+                            'Luôn thông báo cho người thân trước khi khởi hành và mang theo bản đồ ngoại tuyến.',
+                          ),
                       ],
 
-                      const SizedBox(height: 110), // Bottom padding for sticky button
+                      const SizedBox(height: 110),
                     ],
                   ),
                 ),
@@ -349,9 +425,11 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                       width: 50,
                       height: 50,
                       decoration: BoxDecoration(
-                        color: AppColors.editorialSurfaceSubtle,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.editorialBorder),
+                        color: _fav ? AppColors.emergencyRed.withValues(alpha: 0.1) : AppColors.editorialSurfaceSubtle,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: _fav ? AppColors.emergencyRed : AppColors.editorialBorder,
+                        ),
                       ),
                       child: Icon(
                         _fav ? Icons.favorite : Icons.favorite_border,
@@ -364,14 +442,12 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                   Expanded(
                     child: BouncingButton(
                       onTap: () {
-                        HapticFeedback.heavyImpact();
+                        HapticFeedback.mediumImpact();
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
+                          SnackBar(
+                            content: Text('Đã thêm $_title vào Kế hoạch Chuyến đi!'),
                             backgroundColor: AppColors.editorialPine,
-                            content: Text(
-                              'Đã lưu cung đường vào kế hoạch dã ngoại của bạn!',
-                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                            ),
+                            duration: const Duration(seconds: 2),
                           ),
                         );
                       },
@@ -379,20 +455,23 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                         height: 50,
                         decoration: BoxDecoration(
                           color: AppColors.editorialPine,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(14),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.editorialPine.withValues(alpha: 0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.add_task, color: Colors.white, size: 18),
+                            Icon(Icons.route, color: Colors.white, size: 20),
                             SizedBox(width: 8),
                             Text(
-                              'Thêm Vào Lịch Trình',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 15,
-                              ),
+                              'Lập Kế Hoạch Chuyến Đi',
+                              style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
                             ),
                           ],
                         ),
@@ -411,41 +490,41 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
   Widget _buildFact(IconData icon, String label, String value) {
     return Column(
       children: [
-        Icon(icon, size: 16, color: AppColors.editorialPine),
+        Icon(icon, size: 18, color: AppColors.editorialPine),
         const SizedBox(height: 4),
-        Text(label, style: const TextStyle(fontSize: 10, color: AppColors.editorialMuted)),
+        Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.editorialInk)),
         const SizedBox(height: 2),
-        Text(value, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.editorialInk)),
+        Text(label, style: const TextStyle(fontSize: 10, color: AppColors.editorialMuted)),
       ],
     );
   }
 
   Widget _buildDivider() {
-    return Container(width: 1, height: 26, color: AppColors.editorialBorder);
+    return Container(width: 1, height: 28, color: AppColors.editorialBorderSubtle);
   }
 
-  Widget _buildTabButton(int index, String label) {
-    final isSelected = _selectedTab == index;
+  Widget _buildTabButton(int index, String title) {
+    final isSel = _selectedTab == index;
     return Expanded(
       child: BouncingButton(
-        onTap: () => setState(() => _selectedTab = index),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 9),
+        onTap: () {
+          HapticFeedback.selectionClick();
+          setState(() => _selectedTab = index);
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.editorialPine : AppColors.editorialSurface,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isSelected ? AppColors.editorialPine : AppColors.editorialBorder,
-            ),
+            color: isSel ? AppColors.editorialPine : AppColors.editorialSurface,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: isSel ? AppColors.editorialPine : AppColors.editorialBorder),
           ),
           child: Center(
             child: Text(
-              label,
+              title,
               style: TextStyle(
                 fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? Colors.white : AppColors.editorialInk,
+                fontWeight: isSel ? FontWeight.w700 : FontWeight.w600,
+                color: isSel ? Colors.white : AppColors.editorialInk,
               ),
             ),
           ),
@@ -454,35 +533,74 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
     );
   }
 
-  Widget _buildTrailStep(String step, String title, String desc, String dist) {
+  Widget _buildTrailStep(String stepNumber, String title, String desc, String distance, [String? terrain]) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(
-            radius: 13,
-            backgroundColor: AppColors.editorialPine,
-            child: Text(step, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white)),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.editorialInk)),
-                    Text(dist, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.editorialPine)),
-                  ],
-                ),
-                const SizedBox(height: 3),
-                Text(desc, style: const TextStyle(fontSize: 12, color: AppColors.editorialMuted, height: 1.4)),
-              ],
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.editorialSurface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.editorialBorder),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              radius: 14,
+              backgroundColor: AppColors.editorialPine,
+              child: Text(
+                stepNumber,
+                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800),
+              ),
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.editorialSurfaceSubtle,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          distance,
+                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.editorialPine),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(desc, style: const TextStyle(fontSize: 12, color: AppColors.editorialMuted, height: 1.4)),
+                  if (terrain != null && terrain.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        const Icon(Icons.terrain_outlined, size: 12, color: AppColors.editorialTerracotta),
+                        const SizedBox(width: 4),
+                        Text(
+                          terrain,
+                          style: const TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: AppColors.editorialTerracotta),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -491,22 +609,28 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withValues(alpha: 0.25)),
+        color: AppColors.editorialSurface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.editorialBorder),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: color),
-          const SizedBox(width: 10),
+          Icon(icon, color: color, size: 20),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color)),
-                const SizedBox(height: 2),
-                Text(desc, style: const TextStyle(fontSize: 12, color: AppColors.editorialInk, height: 1.35)),
+                Text(
+                  title,
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  desc,
+                  style: const TextStyle(fontSize: 12, color: AppColors.editorialMuted, height: 1.4),
+                ),
               ],
             ),
           ),
