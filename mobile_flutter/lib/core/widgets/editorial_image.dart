@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:mobile_flutter/core/models/outdoor_image.dart';
 import 'package:mobile_flutter/core/widgets/skeleton_shimmer.dart';
 
+/// Widget hiển thị hình ảnh biên tập thông minh với kiến trúc 3 lớp:
+/// 1. Dynamic Network + Disk Cache (Trên Mobile Native: nạp động từ API/mạng, tự cache vào máy, KHÔNG CẦN build lại app khi có địa điểm mới)
+/// 2. Bundled Pre-packaged Assets (Ảnh hạt giống có sẵn trong bộ cài app: mở app lần đầu tức thì 0ms, hỗ trợ offline khi đi rừng núi)
+/// 3. Resilient Error Fallback (Tự động fallback an toàn, không bao giờ bị vỡ layout hay màn hình đen)
 class EditorialImage extends StatelessWidget {
   final OutdoorImage image;
   final double? width;
@@ -28,14 +32,49 @@ class EditorialImage extends StatelessWidget {
   Widget build(BuildContext context) {
     final radius = borderRadius ?? BorderRadius.zero;
 
+    // Kiểm tra xem có asset cục bộ riêng biệt của địa danh này hay không (Bundled Seeds)
+    final bool hasSpecificLocalAsset = image.localAsset.isNotEmpty &&
+        image.localAsset.startsWith('assets/images/destinations/');
+
+    // Kiểm tra xem có URL mạng hợp lệ để nạp động hay không
+    final bool hasValidNetworkUrl = image.url.isNotEmpty &&
+        (image.url.startsWith('http://') || image.url.startsWith('https://')) &&
+        image.url != OutdoorImage.defaultNature.url;
+
     Widget imageContent;
 
-    // Ưu tiên nạp từ local asset nếu có (đặc biệt là bộ ảnh thật của từng địa danh được lưu tại assets/images/destinations/)
-    // Giúp ảnh hiển thị tức thì 0ms, không phụ thuộc mạng, 100% không bị lỗi CORS hay màn hình đen (blackout) khi pop route.
-    final bool hasLocalAsset = image.localAsset.isNotEmpty &&
-        image.localAsset.startsWith('assets/');
-
-    if (hasLocalAsset) {
+    if (!kIsWeb && hasValidNetworkUrl) {
+      // =========================================================================
+      // [1] TRÊN APP THẬT NATIVE (Android / iOS):
+      // Ưu tiên nạp ĐỘNG từ Network URL qua CachedNetworkImage.
+      // - Hoàn toàn không bị giới hạn bởi browser CORS.
+      // - Tự động tải từ server/API/Cloudinary/S3 khi hệ thống có địa điểm mới.
+      // - Tự động lưu Disk Cache trên thiết bị người dùng (mở lần sau nạp 0ms, hoạt động offline).
+      // - Khi backend/admin thêm 100 hay 1.000 địa điểm mới, app tự động tải mà KHÔNG CẦN BUILD LẠI APP!
+      // =========================================================================
+      imageContent = CachedNetworkImage(
+        key: ValueKey('native_img_${image.url}'),
+        imageUrl: image.url,
+        width: width,
+        height: height,
+        fit: fit,
+        alignment: image.focalPoint,
+        fadeInDuration: const Duration(milliseconds: 200),
+        placeholder: (context, url) => SkeletonShimmer(
+          width: width ?? double.infinity,
+          height: height ?? 200,
+          borderRadius: radius,
+        ),
+        errorWidget: (context, url, error) => _buildAssetOrPlaceholder(hasSpecificLocalAsset),
+      );
+    } else if (hasSpecificLocalAsset) {
+      // =========================================================================
+      // [2] BUNDLED SEEDS (Bộ ảnh đóng gói sẵn trong App):
+      // Dành cho 32 địa danh hạt giống cốt lõi đã được lưu trữ trong bundle:
+      // - Giúp Web Preview (localhost:8080) render mượt mà, không dính lỗi CORS mạng của trình duyệt.
+      // - Đảm bảo trải nghiệm First-Launch: người dùng vừa tải app về mở lên có ngay ảnh đẹp 0ms.
+      // - Phục vụ chế độ Offline khi đi trekking vào rừng sâu hoàn toàn mất sóng di động.
+      // =========================================================================
       imageContent = Image.asset(
         image.localAsset,
         key: ValueKey('asset_${image.localAsset}'),
@@ -53,7 +92,11 @@ class EditorialImage extends StatelessWidget {
         },
         errorBuilder: (context, error, stackTrace) => _buildNetworkFallback(radius),
       );
-    } else if (kIsWeb) {
+    } else if (hasValidNetworkUrl) {
+      // =========================================================================
+      // [3] ĐỊA ĐIỂM ĐỘNG MỚI TRÊN WEB (Dynamic Web Images):
+      // Khi hệ thống thêm địa điểm mới từ API (chưa có trong asset bundle), Web nạp trực tiếp qua Image.network.
+      // =========================================================================
       imageContent = Image.network(
         image.url,
         key: ValueKey('web_img_${image.url}'),
@@ -69,25 +112,11 @@ class EditorialImage extends StatelessWidget {
             borderRadius: radius,
           );
         },
-        errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+        errorBuilder: (context, error, stackTrace) => _buildAssetOrPlaceholder(hasSpecificLocalAsset),
       );
     } else {
-      // Trên Mobile Native (Android / iOS): Sử dụng CachedNetworkImage
-      imageContent = CachedNetworkImage(
-        key: ValueKey('native_img_${image.url}'),
-        imageUrl: image.url,
-        width: width,
-        height: height,
-        fit: fit,
-        alignment: image.focalPoint,
-        fadeInDuration: const Duration(milliseconds: 200),
-        placeholder: (context, url) => SkeletonShimmer(
-          width: width ?? double.infinity,
-          height: height ?? 200,
-          borderRadius: radius,
-        ),
-        errorWidget: (context, url, error) => _buildPlaceholder(),
-      );
+      // [4] FALLBACK MẶC ĐỊNH
+      imageContent = _buildAssetOrPlaceholder(hasSpecificLocalAsset);
     }
 
     return ClipRRect(
@@ -125,6 +154,21 @@ class EditorialImage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildAssetOrPlaceholder(bool hasSpecificLocalAsset) {
+    if (hasSpecificLocalAsset) {
+      return Image.asset(
+        image.localAsset,
+        key: ValueKey('fb_asset_${image.localAsset}'),
+        width: width,
+        height: height,
+        fit: fit,
+        alignment: image.focalPoint,
+        errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+      );
+    }
+    return _buildPlaceholder();
   }
 
   Widget _buildNetworkFallback(BorderRadius radius) {
