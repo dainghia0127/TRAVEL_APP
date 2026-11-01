@@ -143,6 +143,10 @@ class DestinationModel extends Destination {
     super.mustTryActivities,
     super.culturalHighlights,
     super.gettingThereAdvice,
+    super.isSocialTrend,
+    super.socialPlatform,
+    super.socialViews,
+    super.photoSpotTip,
   });
 
   factory DestinationModel.fromJson(Map<String, dynamic> json) {
@@ -213,6 +217,10 @@ class DestinationModel extends Destination {
       mustTryActivities: activitiesList,
       culturalHighlights: culturalList,
       gettingThereAdvice: json['getting_there_advice'] as String?,
+      isSocialTrend: json['is_social_trend'] as bool? ?? false,
+      socialPlatform: json['social_platform'] as String?,
+      socialViews: json['social_views'] as String?,
+      photoSpotTip: json['photo_spot_tip'] as String?,
     );
   }
 }

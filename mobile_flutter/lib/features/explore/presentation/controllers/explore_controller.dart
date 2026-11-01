@@ -41,6 +41,20 @@ class ExploreController extends ChangeNotifier {
   List<Destination> get destinations => _destinations;
   Set<String> get favoriteIds => _favoriteIds;
 
+  /// Danh sách các địa điểm Hot Trend trên mạng xã hội (TikTok, Facebook)
+  List<Destination> get socialTrendingSpots =>
+      _destinations.where((d) => d.isSocialTrend).toList();
+
+  /// Lọc các địa điểm Hot Trend theo Tỉnh / Thành Phố được chọn
+  List<Destination> getHotTrendsByProvince(String provinceName) {
+    final pNorm = provinceName.toLowerCase();
+    return _destinations.where((d) {
+      if (!d.isSocialTrend) return false;
+      final prov = (d.province ?? '').toLowerCase();
+      return prov.contains(pNorm) || pNorm.contains(prov);
+    }).toList();
+  }
+
   bool get isFiltering =>
       _searchQuery.isNotEmpty ||
       _selectedDifficulty != null ||
@@ -158,6 +172,12 @@ class ExploreController extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  /// Làm mới lại toàn bộ dữ liệu điểm đến thực tế (Xóa cache và fetch lại)
+  Future<void> refresh() async {
+    repository.invalidateCache();
+    await fetchDestinations();
   }
 }
 

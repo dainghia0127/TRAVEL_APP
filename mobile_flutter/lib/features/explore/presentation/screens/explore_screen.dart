@@ -6,6 +6,7 @@ import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
 import 'package:mobile_flutter/core/widgets/skeleton_shimmer.dart';
 import 'package:mobile_flutter/features/offline_map/services/location_service.dart';
 import 'package:mobile_flutter/features/weather_safety/services/weather_service.dart';
+import 'package:mobile_flutter/features/explore/domain/entities/destination.dart';
 import 'package:mobile_flutter/features/explore/data/datasources/explore_local_datasource.dart';
 import 'package:mobile_flutter/features/explore/data/repositories/explore_repository_impl.dart';
 import 'package:mobile_flutter/features/explore/presentation/controllers/explore_controller.dart';
@@ -18,6 +19,7 @@ import 'package:mobile_flutter/features/explore/presentation/widgets/nearby_sect
 import 'package:mobile_flutter/features/explore/presentation/widgets/region_chip_filter.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/search_filter_bar.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/seasonal_section.dart';
+import 'package:mobile_flutter/features/explore/presentation/widgets/social_trending_section.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/trail_compact_row.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/trending_grid_section.dart';
 
@@ -75,6 +77,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   final List<CategoryItem> _categories = const [
     CategoryItem(title: 'Tất cả', icon: Icons.explore),
+    CategoryItem(title: 'Hot Trend TikTok', icon: Icons.local_fire_department_rounded),
     CategoryItem(title: 'Trekking / Leo núi', icon: Icons.hiking),
     CategoryItem(title: 'Camping / Cắm trại', icon: Icons.holiday_village),
     CategoryItem(title: 'Hiking / Đi bộ', icon: Icons.directions_walk),
@@ -83,6 +86,39 @@ class _ExploreScreenState extends State<ExploreScreen> {
     CategoryItem(title: 'Cung đường đèo', icon: Icons.two_wheeler),
     CategoryItem(title: 'Di sản UNESCO', icon: Icons.account_balance),
   ];
+
+  /// Làm mới lại dữ liệu từ nguồn thực tế và cập nhật lại cự ly
+  Future<void> _handleRefresh() async {
+    HapticFeedback.mediumImpact();
+    await _controller.refresh();
+    if (mounted) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 92),
+          backgroundColor: const Color(0xFF141916),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+            side: const BorderSide(color: Color(0xFF2E4537), width: 1.5),
+          ),
+          duration: const Duration(seconds: 3),
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle_rounded, color: AppColors.summitGold, size: 20),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Đã làm mới dữ liệu thực tế (${_controller.destinations.length} địa điểm)',
+                  style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -211,6 +247,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         _currentUserLocation = LatLng(loc['lat'] as double, loc['lon'] as double);
                       });
                       Navigator.pop(context);
+                      _handleRefresh();
                     },
                     child: Container(
                       padding: const EdgeInsets.all(14),
@@ -267,6 +304,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   String _mapCategoryToId(String title) {
     switch (title) {
+      case 'Hot Trend TikTok':
+        return 'social_trend';
       case 'Trekking / Leo núi':
         return 'trekking';
       case 'Camping / Cắm trại':
@@ -288,6 +327,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
   String _mapIdToCategoryTitle(String id) {
     switch (id) {
+      case 'social_trend':
+        return 'Hot Trend TikTok';
       case 'trekking':
         return 'Trekking / Leo núi';
       case 'camping':
@@ -321,10 +362,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
     return Scaffold(
       backgroundColor: AppColors.editorialBg,
       body: SafeArea(
-        child: CustomScrollView(
-          controller: _scrollController,
-          physics: const BouncingScrollPhysics(),
-          slivers: [
+        child: RefreshIndicator(
+          onRefresh: _handleRefresh,
+          color: AppColors.editorialPine,
+          child: CustomScrollView(
+            controller: _scrollController,
+            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+            slivers: [
             // 1. Top App Bar & Live Status Pill
             SliverToBoxAdapter(
               child: Padding(
@@ -366,23 +410,53 @@ class _ExploreScreenState extends State<ExploreScreen> {
                             ),
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: AppColors.editorialSurface,
-                            borderRadius: AppRadius.roundedPill,
-                            border: Border.all(color: AppColors.editorialBorder),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.wb_sunny_outlined, size: 14, color: AppColors.editorialTerracotta),
-                              const SizedBox(width: 5),
-                              Text(
-                                _currentWeatherBrief,
-                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.editorialInk),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: AppColors.editorialSurface,
+                                borderRadius: AppRadius.roundedPill,
+                                border: Border.all(color: AppColors.editorialBorder),
                               ),
-                            ],
-                          ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.wb_sunny_outlined, size: 14, color: AppColors.editorialTerracotta),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    _currentWeatherBrief,
+                                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.editorialInk),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            BouncingButton(
+                              onTap: _handleRefresh,
+                              child: Container(
+                                padding: const EdgeInsets.all(7),
+                                decoration: BoxDecoration(
+                                  color: AppColors.editorialSurface,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.editorialBorder),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Color(0x06000000),
+                                      blurRadius: 4,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                                child: _controller.isLoading
+                                    ? const SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.editorialPine),
+                                      )
+                                    : const Icon(Icons.refresh_rounded, size: 16, color: AppColors.editorialPine),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -598,6 +672,32 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   const SliverToBoxAdapter(child: SizedBox(height: 24)),
                 ],
 
+                // SECTION HOT TREND TIKTOK & FACEBOOK (Nổi bật tại địa phương hoặc toàn quốc)
+                () {
+                  final cityTrends = _controller.isDomestic
+                      ? _controller.getHotTrendsByProvince(_currentLocationName)
+                      : <Destination>[];
+                  final displayTrends = cityTrends.isNotEmpty
+                      ? cityTrends
+                      : (_controller.isDomestic ? _controller.socialTrendingSpots : <Destination>[]);
+
+                  if (displayTrends.isNotEmpty) {
+                    return SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 24),
+                        child: SocialTrendingSection(
+                          destinations: displayTrends,
+                          locationName: _currentLocationName,
+                          userLocation: _currentUserLocation,
+                          favoriteIds: _controller.favoriteIds,
+                          onToggleFavorite: (id) => _controller.toggleFavorite(id),
+                        ),
+                      ),
+                    );
+                  }
+                  return const SliverToBoxAdapter(child: SizedBox.shrink());
+                }(),
+
                 // SECTION 3: ĐỊA ĐIỂM GẦN BẠN NHẤT
                 if (destinations.isNotEmpty) ...[
                   SliverToBoxAdapter(
@@ -628,6 +728,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 }

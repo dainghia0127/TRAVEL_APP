@@ -23,5 +23,7 @@ abstract class IExploreRepository {
     int? difficultyLevel,
     String userCountryCode = 'VN',
   });
-}
 
+  /// Xóa cache trong bộ nhớ để làm mới dữ liệu từ nguồn
+  void invalidateCache();
+}

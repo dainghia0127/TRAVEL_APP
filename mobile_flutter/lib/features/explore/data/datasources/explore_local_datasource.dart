@@ -4,6 +4,7 @@ import 'package:mobile_flutter/features/explore/data/models/destination_model.da
 
 abstract class IExploreLocalDataSource {
   Future<List<DestinationModel>> getSeedDestinations();
+  void invalidateCache();
 }
 
 class ExploreLocalDataSource implements IExploreLocalDataSource {
@@ -35,6 +36,7 @@ class ExploreLocalDataSource implements IExploreLocalDataSource {
   }
 
   /// Cho phép làm mới cache khi cần thiết
+  @override
   void invalidateCache() {
     _cachedDestinations = null;
   }

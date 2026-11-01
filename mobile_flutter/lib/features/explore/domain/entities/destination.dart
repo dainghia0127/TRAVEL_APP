@@ -29,6 +29,10 @@ class Destination {
   final List<String> mustTryActivities; // Trải nghiệm nhất định phải thử
   final List<String> culturalHighlights; // Nét đẹp văn hóa & lịch sử bản địa
   final String? gettingThereAdvice; // Hướng dẫn di chuyển & phương tiện đến
+  final bool isSocialTrend; // Địa điểm check-in viral / hot trend trên TikTok & Facebook
+  final String? socialPlatform; // Nền tảng trend (ví dụ: TikTok & Facebook, Instagram)
+  final String? socialViews; // Lượng tương tác / lượt xem (ví dụ: 3.5M lượt xem)
+  final String? photoSpotTip; // Mẹo góc chụp ảnh sống ảo triệu view
 
   const Destination({
     required this.id,
@@ -57,6 +61,10 @@ class Destination {
     this.mustTryActivities = const [],
     this.culturalHighlights = const [],
     this.gettingThereAdvice,
+    this.isSocialTrend = false,
+    this.socialPlatform,
+    this.socialViews,
+    this.photoSpotTip,
   });
 
   /// Kiểm tra xem điểm đến có thuộc quốc gia ngữ cảnh của người dùng hay không

@@ -82,5 +82,10 @@ class ExploreRepositoryImpl implements IExploreRepository {
       return true;
     }).toList();
   }
+
+  @override
+  void invalidateCache() {
+    localDataSource.invalidateCache();
+  }
 }
 
