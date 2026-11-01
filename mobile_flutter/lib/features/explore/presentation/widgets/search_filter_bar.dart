@@ -23,7 +23,7 @@ class SearchFilterBar extends StatelessWidget {
     HapticFeedback.lightImpact();
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.surfaceElevated,
+      backgroundColor: AppColors.editorialSurface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -41,7 +41,7 @@ class SearchFilterBar extends StatelessWidget {
                       width: 36,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.white24,
+                        color: AppColors.editorialBorder,
                         borderRadius: AppRadius.roundedPill,
                       ),
                     ),
@@ -50,9 +50,9 @@ class SearchFilterBar extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Bộ Lọc Địa Hình & Độ Khó',
-                        style: AppTypography.headlineMedium.copyWith(fontSize: 18),
+                      const Text(
+                        'Bộ Lọc Độ Khó & Địa Hình',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
                       ),
                       if (selectedDifficulty != null)
                         TextButton(
@@ -61,12 +61,12 @@ class SearchFilterBar extends StatelessWidget {
                             setModalState(() {});
                             Navigator.pop(context);
                           },
-                          child: const Text('Đặt lại', style: TextStyle(color: AppColors.emerald)),
+                          child: const Text('Đặt lại', style: TextStyle(color: AppColors.editorialPine, fontWeight: FontWeight.w600)),
                         ),
                     ],
                   ),
                   const SizedBox(height: 14),
-                  const Text('Mức độ thách thức thể lực:', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                  const Text('Mức độ thách thức thể lực:', style: TextStyle(color: AppColors.editorialMuted, fontSize: 13)),
                   const SizedBox(height: 10),
                   Wrap(
                     spacing: 8,
@@ -74,7 +74,7 @@ class SearchFilterBar extends StatelessWidget {
                       _buildDifficultyChip(null, 'Tất cả', setModalState, context),
                       _buildDifficultyChip(1, 'Dễ (Dưới 15km)', setModalState, context),
                       _buildDifficultyChip(2, 'Vừa (15 - 35km)', setModalState, context),
-                      _buildDifficultyChip(3, 'Khó / Thách thức (>35km)', setModalState, context),
+                      _buildDifficultyChip(3, 'Khó (>35km)', setModalState, context),
                     ],
                   ),
                 ],
@@ -88,27 +88,33 @@ class SearchFilterBar extends StatelessWidget {
 
   Widget _buildDifficultyChip(int? level, String label, StateSetter setModalState, BuildContext context) {
     final isSelected = selectedDifficulty == level;
-    return ChoiceChip(
-      label: Text(label),
-      selected: isSelected,
-      selectedColor: AppColors.emerald,
-      backgroundColor: AppColors.surfaceHigh,
-      labelStyle: TextStyle(
-        color: isSelected ? Colors.black : Colors.white,
-        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-        fontSize: 12,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: AppRadius.roundedPill,
-        side: BorderSide(
-          color: isSelected ? AppColors.emerald : AppColors.borderSubtle,
-        ),
-      ),
-      onSelected: (_) {
+    return BouncingButton(
+      onTap: () {
+        HapticFeedback.selectionClick();
         onSelectDifficulty(level);
         setModalState(() {});
         Navigator.pop(context);
       },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.editorialPine : AppColors.editorialSurfaceSubtle,
+          borderRadius: AppRadius.roundedPill,
+          border: Border.all(
+            color: isSelected ? AppColors.editorialPine : AppColors.editorialBorder,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            color: isSelected ? Colors.white : AppColors.editorialInk,
+          ),
+        ),
+      ),
     );
   }
 
@@ -116,58 +122,100 @@ class SearchFilterBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasFilter = selectedDifficulty != null;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceBase,
-        borderRadius: AppRadius.roundedMd,
-        border: Border.all(color: AppColors.borderSubtle),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: TextField(
-        controller: controller,
-        style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
-        decoration: InputDecoration(
-          hintText: 'Tìm đỉnh núi, đại thác, bãi cắm trại, đèo...',
-          hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13),
-          prefixIcon: const Icon(Icons.search, color: AppColors.emerald, size: 20),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          suffixIcon: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (controller.text.isNotEmpty)
-                IconButton(
-                  icon: const Icon(Icons.clear, size: 18, color: AppColors.textMuted),
-                  onPressed: onClear,
+    return Row(
+      children: [
+        // Search Input Field
+        Expanded(
+          child: Container(
+            height: 48,
+            decoration: BoxDecoration(
+              color: AppColors.editorialSurface,
+              borderRadius: AppRadius.roundedMd,
+              border: Border.all(color: AppColors.editorialBorder),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x08000000),
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
                 ),
-              BouncingButton(
-                onTap: () => _showFilterModal(context),
-                child: Container(
-                  margin: const EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.all(7),
-                  decoration: BoxDecoration(
-                    color: hasFilter ? AppColors.emerald : AppColors.surfaceHigh,
-                    borderRadius: AppRadius.roundedSm,
-                  ),
-                  child: Icon(
-                    Icons.tune,
-                    color: hasFilter ? Colors.black : AppColors.textSecondary,
-                    size: 17,
+              ],
+            ),
+            child: Row(
+              children: [
+                const SizedBox(width: 14),
+                const Icon(Icons.search, size: 20, color: AppColors.editorialPine),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    controller: controller,
+                    onChanged: onChanged,
+                    style: const TextStyle(color: AppColors.editorialInk, fontSize: 13, fontWeight: FontWeight.w500),
+                    decoration: const InputDecoration(
+                      hintText: 'Tìm kiếm cung đường, đỉnh núi, thác nước...',
+                      hintStyle: TextStyle(color: AppColors.editorialMuted, fontSize: 13),
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: EdgeInsets.zero,
+                    ),
                   ),
                 ),
-              ),
-            ],
+                if (controller.text.isNotEmpty)
+                  IconButton(
+                    icon: const Icon(Icons.close, size: 18, color: AppColors.editorialMuted),
+                    onPressed: onClear,
+                  ),
+              ],
+            ),
           ),
         ),
-        onChanged: onChanged,
-      ),
+        const SizedBox(width: 10),
+
+        // Filter Button
+        BouncingButton(
+          onTap: () => _showFilterModal(context),
+          child: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: hasFilter ? AppColors.editorialPine : AppColors.editorialSurface,
+              borderRadius: AppRadius.roundedMd,
+              border: Border.all(
+                color: hasFilter ? AppColors.editorialPine : AppColors.editorialBorder,
+              ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x08000000),
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Icon(
+                  Icons.tune,
+                  size: 20,
+                  color: hasFilter ? Colors.white : AppColors.editorialPine,
+                ),
+                if (hasFilter)
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: Container(
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(
+                        color: AppColors.editorialTerracotta,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
-

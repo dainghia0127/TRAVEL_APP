@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
+import 'package:mobile_flutter/core/models/outdoor_image.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
-import 'package:mobile_flutter/core/widgets/tactical_badge.dart';
+import 'package:mobile_flutter/core/widgets/editorial_image.dart';
 import 'package:mobile_flutter/features/explore/presentation/screens/destination_detail_screen.dart';
 
 class DestinationCard extends StatelessWidget {
@@ -17,17 +18,21 @@ class DestinationCard extends StatelessWidget {
     required this.onToggleFavorite,
   });
 
-  Color _getDifficultyColor(int level) {
-    if (level == 1) return AppColors.emerald;
-    if (level == 2) return AppColors.tacticalOrange;
-    return AppColors.emergencyRed;
+  OutdoorImage _resolveImage() {
+    if (spot['outdoorImage'] is OutdoorImage) {
+      return spot['outdoorImage'] as OutdoorImage;
+    }
+    final url = spot['imageUrl'] as String? ?? '';
+    return OutdoorImage(
+      url: url.isNotEmpty ? url : OutdoorImage.defaultNature.url,
+      localAsset: 'assets/images/default_nature.jpg',
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = spot['imageUrl'] as String? ?? '';
-    final difficultyLevel = (spot['difficultyLevel'] as num?)?.toInt() ?? 2;
-    final diffColor = _getDifficultyColor(difficultyLevel);
+    final img = _resolveImage();
+    final highlights = (spot['highlights'] as List<dynamic>?)?.cast<String>() ?? [];
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space20),
@@ -35,9 +40,9 @@ class DestinationCard extends StatelessWidget {
         closedElevation: 0,
         openElevation: 0,
         closedColor: Colors.transparent,
-        openColor: AppColors.bgDark,
+        openColor: AppColors.editorialBg,
         transitionType: ContainerTransitionType.fadeThrough,
-        transitionDuration: const Duration(milliseconds: 360),
+        transitionDuration: const Duration(milliseconds: 340),
         openBuilder: (context, action) => DestinationDetailScreen(
           spot: spot,
           isFavorite: isFavorite,
@@ -45,14 +50,14 @@ class DestinationCard extends StatelessWidget {
         ),
         closedBuilder: (context, action) => Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceBase,
-            borderRadius: AppRadius.roundedLg,
-            border: Border.all(color: AppColors.borderSubtle, width: 1),
-            boxShadow: [
+            color: AppColors.editorialSurface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.editorialBorder),
+            boxShadow: const [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.45),
-                blurRadius: 18,
-                offset: const Offset(0, 6),
+                color: Color(0x0A000000),
+                blurRadius: 12,
+                offset: Offset(0, 3),
               ),
             ],
           ),
@@ -60,102 +65,57 @@ class DestinationCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Hero Image with Aspect Ratio & Badges
+              // Photo Header with Cached Network Image & Local Fallback
               SizedBox(
-                height: 185,
+                height: 190,
                 width: double.infinity,
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    // Real Photography
-                    if (imageUrl.isNotEmpty)
-                      Image.network(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: AppColors.surfaceHigh,
-                          child: const Icon(Icons.terrain, size: 48, color: Colors.white24),
-                        ),
-                      )
-                    else
-                      Container(
-                        color: AppColors.surfaceHigh,
-                        child: const Icon(Icons.terrain, size: 48, color: Colors.white24),
-                      ),
-
-                    // Gradient Scrim for Top & Bottom readability
-                    Container(
-                      decoration: const BoxDecoration(
-                        gradient: AppColors.imageOverlayGradient,
-                      ),
+                    EditorialImage(
+                      image: img,
+                      showAttribution: true,
                     ),
 
-                    // Top Bar: Category Pill & Favorite Button
+                    // Top Rating & Favorite
                     Positioned(
                       top: 12,
-                      left: 14,
-                      right: 14,
+                      left: 12,
+                      right: 12,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          TacticalPill(
-                            text: spot['category'] as String? ?? 'Dã ngoại',
-                            color: Colors.white,
-                            backgroundColor: Colors.black.withValues(alpha: 0.65),
-                          ),
-                          // 44x44 Touch Target for Favorite
-                          BouncingButton(
-                            onTap: onToggleFavorite,
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.65),
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white24, width: 1),
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  isFavorite ? Icons.favorite : Icons.favorite_border,
-                                  color: isFavorite ? AppColors.emergencyRed : Colors.white,
-                                  size: 19,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Bottom of Image: Difficulty & Rating Badge
-                    Positioned(
-                      left: 14,
-                      bottom: 12,
-                      right: 14,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          TacticalPill(
-                            text: spot['difficulty'] as String? ?? 'Vừa phải',
-                            color: diffColor,
-                            backgroundColor: diffColor.withValues(alpha: 0.2),
-                          ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                             decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.7),
-                              borderRadius: AppRadius.roundedPill,
-                              border: Border.all(color: Colors.white24),
+                              color: Colors.black.withValues(alpha: 0.6),
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.star, size: 13, color: AppColors.summitGold),
+                                const Icon(Icons.star, color: Color(0xFFFBBF24), size: 13),
                                 const SizedBox(width: 4),
                                 Text(
                                   '${spot['rating']} (${spot['reviews']})',
-                                  style: AppTypography.captionBadge,
+                                  style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
                                 ),
                               ],
+                            ),
+                          ),
+                          BouncingButton(
+                            onTap: onToggleFavorite,
+                            child: Container(
+                              width: 34,
+                              height: 34,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.5),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                isFavorite ? Icons.favorite : Icons.favorite_border,
+                                color: isFavorite ? AppColors.emergencyRed : Colors.white,
+                                size: 18,
+                              ),
                             ),
                           ),
                         ],
@@ -165,86 +125,86 @@ class DestinationCard extends StatelessWidget {
                 ),
               ),
 
-              // Content Body
+              // Card Body
               Padding(
-                padding: const EdgeInsets.all(AppSpacing.space16),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title
-                    Text(
-                      spot['title'] as String? ?? '',
-                      style: AppTypography.headlineLarge.copyWith(fontSize: 18),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-
-                    // Location
                     Row(
                       children: [
-                        const Icon(Icons.place, size: 14, color: AppColors.emerald),
+                        const Icon(Icons.place_outlined, size: 14, color: AppColors.editorialPine),
                         const SizedBox(width: 4),
-                        Expanded(
+                        Text(
+                          spot['location'] as String,
+                          style: const TextStyle(fontSize: 12, color: AppColors.editorialMuted, fontWeight: FontWeight.w500),
+                        ),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppColors.editorialSurfaceSubtle,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                           child: Text(
-                            spot['location'] as String? ?? '',
-                            style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            spot['difficulty'] as String,
+                            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.editorialPine),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
-
-                    // Description
+                    const SizedBox(height: 6),
                     Text(
-                      spot['description'] as String? ?? '',
-                      style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                      spot['title'] as String,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.editorialInk,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      spot['description'] as String,
+                      style: const TextStyle(fontSize: 13, color: AppColors.editorialMuted, height: 1.4),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: AppSpacing.space16),
 
-                    // 4-Column Tactical Stat Bar
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceHigh,
-                        borderRadius: AppRadius.roundedMd,
-                        border: Border.all(color: AppColors.borderSubtle),
+                    if (highlights.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: highlights.take(3).map((h) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppColors.editorialSurfaceSubtle,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: AppColors.editorialBorder),
+                            ),
+                            child: Text(
+                              h,
+                              style: const TextStyle(fontSize: 11, color: AppColors.editorialInk, fontWeight: FontWeight.w500),
+                            ),
+                          );
+                        }).toList(),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          TacticalBadge(
-                            icon: Icons.straighten,
-                            label: 'Cự ly',
-                            value: spot['distance'] as String? ?? '--',
-                          ),
-                          _buildDivider(),
-                          TacticalBadge(
-                            icon: Icons.terrain,
-                            label: 'Cao độ',
-                            value: spot['elevation'] as String? ?? '--',
-                          ),
-                          _buildDivider(),
-                          TacticalBadge(
-                            icon: Icons.water_drop,
-                            label: 'Nguồn nước',
-                            value: spot['water'] as String? ?? '--',
-                          ),
-                          _buildDivider(),
-                          TacticalBadge(
-                            icon: Icons.signal_cellular_alt,
-                            label: 'Sóng 4G',
-                            value: spot['signal'] as String? ?? '--',
-                            iconColor: (spot['signal'] as String? ?? '').contains('0%')
-                                ? AppColors.emergencyRed
-                                : AppColors.emerald,
-                          ),
-                        ],
-                      ),
+                    ],
+
+                    const SizedBox(height: 14),
+                    const Divider(height: 1, color: AppColors.editorialBorder),
+                    const SizedBox(height: 12),
+
+                    // Metrics Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildMetric(Icons.straighten, 'Cự ly', spot['distance'] as String),
+                        _buildMetric(Icons.landscape, 'Độ cao', spot['elevation'] as String),
+                        _buildMetric(Icons.water_drop_outlined, 'Nguồn nước', spot['water'] as String),
+                      ],
                     ),
                   ],
                 ),
@@ -256,8 +216,19 @@ class DestinationCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDivider() {
-    return Container(width: 1, height: 22, color: AppColors.borderSubtle);
+  Widget _buildMetric(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: AppColors.editorialPine),
+        const SizedBox(width: 5),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: const TextStyle(fontSize: 10, color: AppColors.editorialMuted)),
+            Text(value, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.editorialInk)),
+          ],
+        ),
+      ],
+    );
   }
 }
-

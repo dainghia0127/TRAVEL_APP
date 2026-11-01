@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
-import 'package:mobile_flutter/core/widgets/tactical_badge.dart';
 
 class OutdoorSkillsScreen extends StatefulWidget {
   const OutdoorSkillsScreen({super.key});
@@ -24,201 +22,252 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
       'title': 'Sơ cứu khi bị rắn độc cắn',
       'category': 'Sơ cứu Y tế',
       'categoryIcon': Icons.medical_services_outlined,
-      'readTime': '3 phút',
-      'desc': 'Quy tắc vàng bất động & băng ép bảo toàn tính mạng khi gặp tai nạn rắn cắn trong rừng.',
+      'readTime': '3 phút đọc',
+      'desc': 'Quy tắc vàng bất động & băng ép bảo toàn tính mạng khi gặp tai nạn rắn cắn trong rừng sâu.',
       'priority': 'SỐNG CÒN',
-      'accent': AppColors.emergencyRed,
-      'heroImage': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80',
-      'equipment': ['Cuộn băng thun y tế (hoặc dải vải sạch)', '2 thanh gỗ/cành cây thẳng', 'Dây vải buộc cố định', 'Điện thoại/Còi cứu hộ'],
+      'accent': AppColors.editorialTerracotta,
+      'equipment': [
+        'Cuộn băng thun y tế (hoặc dải vải sạch rộng 10cm)',
+        '2 thanh gỗ/tre thẳng làm nẹp cố định',
+        'Dây vải mềm buộc nẹp',
+        'Còi cứu nạn đa tần số',
+      ],
       'steps': [
         {
-          'title': 'Bước 1: Trấn an & Hạ thấp chi bị cắn',
-          'action': 'Yêu cầu nạn nhân nằm yên bất động TUYỆT ĐỐI. Sự hoảng sợ và tim đập nhanh sẽ bơm nọc độc theo dòng máu đi khắp cơ thể chỉ trong vài phút. Đặt cánh tay hoặc chân bị cắn ở vị trí THẤP HƠN TIM. Tháo ngay nhẫn, vòng tay, đồng hồ hoặc giày dép trước khi vết cắn bắt đầu sưng phù to.',
-          'imageUrl': 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=800&q=80',
-          'tip': 'Chụp ảnh con rắn từ khoảng cách an toàn (để bác sĩ cấp đúng huyết thanh), tuyệt đối KHÔNG đuổi bắt hoặc đập rắn.',
+          'number': '01',
+          'title': 'Trấn an & Hạ thấp chi bị cắn',
+          'diagramType': 'immobilize_limb',
+          'action': 'Yêu cầu nạn nhân nằm yên bất động TUYỆT ĐỐI. Sự hoảng sợ làm tim đập nhanh sẽ thúc đẩy nọc độc theo dòng bạch huyết đi khắp cơ thể. Đặt chân/tay bị cắn ở vị trí THẤP HƠN TIM. Tháo ngay đồng hồ, nhẫn, vòng và giày trước khi chi bắt đầu sưng phù.',
+          'keyRule': 'Tuyệt đối không để nạn nhân tự di chuyển dù chỉ một bước.',
+          'tip': 'Dùng điện thoại chụp ảnh con rắn từ khoảng cách an toàn (trên 2m) để bác sĩ xác định đúng huyết thanh. Không đuổi đánh hoặc cầm nắm rắn.',
         },
         {
-          'title': 'Bước 2: Kỹ thuật băng ép bản rộng (Pressure Immobilization)',
-          'action': 'Dùng cuộn băng thun quấn từ đầu ngón tay/ngón chân hướng ngược dần lên phía gốc chi (vượt qua vết thương 10-15cm). Lực quấn chặt vừa phải như khi quấn sơ cứu bong gân cổ chân. Chú ý ĐỂ HỞ ĐẦU NGÓN TAY/CHÂN để liên tục theo dõi tuần hoàn máu.',
-          'imageUrl': 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&q=80',
-          'tip': 'Kiểm tra mạch ở mu bàn chân hoặc cổ tay: nếu không sờ thấy mạch đập nghĩa là bạn đang quấn quá chặt, cần nới lỏng ra một chút.',
+          'number': '02',
+          'title': 'Kỹ thuật băng ép bản rộng (Pressure Immobilization)',
+          'diagramType': 'pressure_wrap',
+          'action': 'Dùng cuộn băng thun quấn từ đầu ngón tay/ngón chân hướng ngược dần lên phía gốc chi (vượt qua vết cắn 15cm). Lực quấn chặt vừa phải tương đương khi băng sơ cứu bong gân cổ chân. Chú ý ĐỂ HỞ ĐẦU CÁC NGÓN để theo dõi lưu thông máu.',
+          'keyRule': 'Kiểm tra mạch mu chân/cổ tay: nếu không sờ thấy mạch nghĩa là quấn quá chặt, cần nới lỏng nhẹ.',
+          'tip': 'Nếu ngón tay/chân chuyển màu tím tái hoặc lạnh buốt, nới lỏng băng ép ngay lập tức.',
         },
         {
-          'title': 'Bước 3: Nẹp cố định toàn bộ khớp xương',
-          'action': 'Đặt 2 thanh gỗ hoặc cành cây thẳng ở 2 bên chi bị thương (qua cả 2 khớp liền kề, ví dụ qua cả khớp gối và cổ chân). Dùng dải vải buộc cố định nẹp vào chân để nạn nhân dù vô tình cũng không thể co duỗi chân được (cử động cơ bắp là nguyên nhân chính khiến nọc độc lan vào hệ bạch huyết).',
-          'imageUrl': 'https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?w=800&q=80',
-          'tip': 'Lót thêm lớp lá cây mềm hoặc áo thun giữa cành cây và da nạn nhân để tránh trầy xước mô mềm.',
+          'number': '03',
+          'title': 'Nẹp cố định toàn bộ khớp xương',
+          'diagramType': 'splint_joint',
+          'action': 'Đặt 2 thanh nẹp nẹp dọc 2 bên chi bị thương (vượt qua cả 2 khớp liền kề vết thương, ví dụ qua khớp gối và cổ chân). Dùng dây buộc cố định để nạn nhân không thể co gập khớp (cử động cơ bắp là nguyên nhân chính đẩy nọc độc vào tuần hoàn).',
+          'keyRule': 'Khóa bất động cả khớp trên và khớp dưới của vị trí vết cắn.',
+          'tip': 'Chèn thêm lớp cỏ mềm hoặc áo thun giữa cành gỗ và da để tránh trầy xước mô mềm khi vận chuyển.',
         },
         {
-          'title': 'Bước 4: Khiêng cáng di chuyển cấp cứu khẩn cấp',
-          'action': 'Dùng võng, bạt dã ngoại hoặc 2 cây tre dài làm cáng khiêng nạn nhân. Tuyệt đối KHÔNG ĐỂ NẠN NHÂN TỰ ĐI BỘ dù chỉ 1 bước. Vận chuyển khẩn trương đến bệnh viện huyện/tỉnh có huyết thanh kháng độc gần nhất.',
-          'imageUrl': 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=800&q=80',
-          'tip': 'Gọi ngay 115 hoặc đội cứu hộ địa phương thông báo tọa độ GPS và thời gian chính xác nạn nhân bị cắn.',
+          'number': '04',
+          'title': 'Khiêng cáng di chuyển cấp cứu khẩn cấp',
+          'diagramType': 'stretcher_carry',
+          'action': 'Dùng võng dù, bạt dã ngoại hoặc 2 cây tre kết hợp luồn áo khoác làm cáng khiêng nạn nhân. Giữ đầu nạn nhân hơi nâng cao nhẹ. Vận chuyển khẩn trương đến cơ sở y tế huyện hoặc tỉnh có sẵn huyết thanh kháng nọc.',
+          'keyRule': 'Luôn khiêng bằng cáng — nạn nhân đi bộ sẽ tăng tốc độ nhiễm độc lên gấp 5 lần.',
+          'tip': 'Ghi nhớ hoặc viết thời gian bị cắn lên mu bàn tay nạn nhân để bác sĩ theo dõi diễn tiến.',
         },
       ],
       'donts': [
-        'TUYỆT ĐỐI KHÔNG rạch da, trích nặn hoặc dùng miệng hút nọc (làm rách mạch máu khiến nọc ngấm nhanh hơn 10 lần và nhiễm độc cho người cứu).',
-        'TUYỆT ĐỐI KHÔNG dùng garo nghẽn tĩnh mạch (nguyên nhân hàng đầu gây thiếu máu nuôi và hoại tử phải cưa bỏ chi).',
-        'TUYỆT ĐỐI KHÔNG đắp lá cây, bùn đất bừa bãi hoặc chườm đá lạnh (gây bỏng lạnh tế bào và nhiễm trùng uốn ván chết người).',
+        'TUYỆT ĐỐI KHÔNG rạch da, trích nặn máu hoặc dùng miệng hút nọc (làm rách mạch máu khiến độc ngấm nhanh hơn và nhiễm độc người sơ cứu).',
+        'TUYỆT ĐỐI KHÔNG thắt garo nghẽn động mạch (nguyên nhân hàng đầu gây hoại tử thiếu máu nuôi dẫn đến phải cưa cụt chi).',
+        'TUYỆT ĐỐI KHÔNG đắp lá cây, bùn đất hoặc chườm đá lạnh (gây bỏng lạnh mô và nhiễm trùng uốn ván chết người).',
       ],
     },
     {
       'id': 'skill_2',
       'title': 'Xử lý hạ thân nhiệt (Hypothermia)',
       'category': 'Sinh tồn thời tiết',
-      'categoryIcon': Icons.ac_unit,
-      'readTime': '4 phút',
-      'desc': 'Kẻ giết người thầm lặng khi leo núi dầm mưa và gặp gió lạnh về đêm.',
+      'categoryIcon': Icons.ac_unit_outlined,
+      'readTime': '4 phút đọc',
+      'desc': 'Quy trình phục hồi thân nhiệt an toàn khi leo núi gặp mưa dầm, gió rét và hạ nhiệt độ về đêm.',
       'priority': 'NGUY CẤP',
-      'accent': AppColors.tacticalOrange,
-      'heroImage': 'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=800&q=80',
-      'equipment': ['Lều kín gió / bạt cứu sinh tráng bạc', 'Khăn lau khô & quần áo len/nỉ khô', 'Túi ngủ dã ngoại', 'Bình giữ nhiệt nước đường gừng'],
+      'accent': AppColors.editorialPine,
+      'equipment': [
+        'Lều kín gió / bạt nhôm cứu sinh tráng bạc phản xạ nhiệt',
+        'Khăn bông khô & đồ nỉ ấm khô ráo',
+        'Túi ngủ dã ngoại chuyên dụng',
+        'Bình giữ nhiệt nước đường gừng ấm',
+      ],
       'steps': [
         {
-          'title': 'Bước 1: Chuyển ngay vào nơi kín gió tuyệt đối',
-          'action': 'Gió lùa và độ ẩm là nguyên nhân làm mất nhiệt nhanh gấp 25 lần không khí khô. Đưa ngay người bị nạn vào lều khô, hang đá hoặc dùng bạt che kín xung quanh chắn triệt để gió.',
-          'imageUrl': 'https://images.unsplash.com/photo-1510312305653-8ed496efae75?w=800&q=80',
-          'tip': 'Lót thảm cách nhiệt hoặc cành lá khô dày dưới sàn lều, không để nạn nhân nằm trực tiếp lên nền đất lạnh.',
+          'number': '01',
+          'title': 'Di chuyển vào nơi chắn gió tuyệt đối',
+          'diagramType': 'wind_shelter',
+          'action': 'Gió lùa và hơi ẩm làm mất nhiệt cơ thể nhanh gấp 25 lần không khí khô. Đưa ngay người bị nạn vào lều khô ráo, vách đá khuất gió hoặc căng bạt chắn triệt để gió lùa 360 độ.',
+          'keyRule': 'Lót thảm cách nhiệt hoặc cành lá khô dày dưới sàn — không nằm trực tiếp lên nền đất ẩm lạnh.',
+          'tip': 'Đóng kín tất cả các cửa thông gió của lều trong 30 phút đầu tiên.',
         },
         {
-          'title': 'Bước 2: Cởi bỏ toàn bộ quần áo ướt sũng',
-          'action': 'Nhanh chóng lột bỏ toàn bộ quần áo bị ướt. Dùng khăn khô mềm thấm nước trên da (thấm nhẹ nhàng, không chà xát mạnh). Thay ngay quần áo khô ấm và đội mũ len che kín vùng đầu (đầu là nơi thất thoát 40% nhiệt lượng của cơ thể).',
-          'imageUrl': 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&q=80',
-          'tip': 'Nếu không có đồ khô thay thế, hãy bọc kín nạn nhân bằng chăn nhôm cứu sinh tráng bạc phản xạ nhiệt.',
+          'number': '02',
+          'title': 'Cởi bỏ đồ ướt & Bọc chăn nhôm phản xạ',
+          'diagramType': 'strip_wet_cloth',
+          'action': 'Nhanh chóng lột bỏ toàn bộ quần áo ướt sũng. Dùng khăn khô thấm nhẹ nước trên da (không chà xát mạnh). Thay ngay đồ khô ấm và đội mũ len che kín vùng đầu (đầu là nơi thất thoát tới 40% nhiệt lượng của cơ thể). Bọc chăn nhôm cứu sinh ra ngoài cùng.',
+          'keyRule': 'Đội mũ len khô ấm cho nạn nhân ngay khi cởi đồ ướt.',
+          'tip': 'Chăn nhôm phản xạ 90% bức xạ nhiệt cơ thể phát ra trở lại cơ thể.',
         },
         {
-          'title': 'Bước 3: Ủ ấm từ từ vào trung tâm cơ thể',
-          'action': 'Bọc nạn nhân vào túi ngủ dã ngoại. Chườm ấm (bình nước ấm bọc vải) vào 4 vị trí vàng: 2 bên CỔ, NGỰC, 2 HỐ NÁCH và BẸN. Đây là nơi có các động mạch lớn chạy qua giúp đưa máu ấm nuôi tim và não bộ.',
-          'imageUrl': 'https://images.unsplash.com/photo-1516939884455-1445c8652f83?w=800&q=80',
-          'tip': 'TUYỆT ĐỐI KHÔNG chườm ấm trực tiếp vào bàn tay, bàn chân vì sẽ khiến máu lạnh ứ đọng từ chi ùa ngược về tim gây rung thất ngừng tim đột ngột.',
+          'number': '03',
+          'title': 'Ủ ấm trung tâm: 4 điểm vàng mạch máu',
+          'diagramType': 'core_warming',
+          'action': 'Cho nạn nhân vào túi ngủ khô. Dùng các bình nước ấm bọc trong khăn vải (khoảng 40-42°C) áp nhẹ vào 4 vị trí vàng: 2 bên CỔ, NGỰC TRUNG TÂM, 2 HỐ NÁCH và 2 BẸN ĐÙI. Đây là nơi có các động mạch lớn vận chuyển máu ấm nhanh nhất vào tim và não.',
+          'keyRule': 'TUYỆT ĐỐI KHÔNG chườm ấm trực tiếp vào bàn tay/chân (gây sốc hạ nhiệt tim đột ngột do máu lạnh dồn về).',
+          'tip': 'Có thể áp dụng phương pháp da tiếp da (ôm giữ nhiệt) nếu không có đủ đồ sưởi ấm.',
         },
         {
-          'title': 'Bước 4: Bổ sung nước ấm có đường/gừng',
-          'action': 'Nếu nạn nhân còn tỉnh táo và tự nuốt được, cho uống từng ngụm nhỏ nước ấm pha mật ong, đường glucose hoặc trà gừng ấm để cung cấp calo cho cơ thể tự sinh nhiệt lại.',
-          'imageUrl': 'https://images.unsplash.com/photo-1517824806704-9040b037703b?w=800&q=80',
-          'tip': 'Nếu nạn nhân lơ mơ hoặc bất tỉnh, TUYỆT ĐỐI KHÔNG ép uống nước vì nguy cơ sặc nước vào khí quản gây ngạt thở.',
+          'number': '04',
+          'title': 'Bổ sung năng lượng nước đường gừng ấm',
+          'diagramType': 'warm_sip',
+          'action': 'Nếu nạn nhân còn tỉnh táo và có phản xạ nuốt bình thường, cho uống từng ngụm nhỏ nước ấm pha mật ong, đường glucose hoặc trà gừng để bổ sung calo cho cơ thể tự tạo nhiệt.',
+          'keyRule': 'Nếu nạn nhân lơ mơ hoặc bất tỉnh, KHÔNG ĐƯỢC cho uống nước (nguy cơ sặc vào phổi).',
+          'tip': 'Uống ngụm nhỏ cách nhau 2-3 phút để dạ dày hấp thụ từ từ.',
         },
       ],
       'donts': [
-        'TUYỆT ĐỐI KHÔNG cho uống rượu / bia (cồn gây giãn mạch ngoại vi, làm cơ thể mất nhiệt nhanh hơn gấp nhiều lần).',
-        'TUYỆT ĐỐI KHÔNG chà xát mạnh tay chân bị cóng vì tế bào da đang đóng băng rất dễ bị giập nát và hoại tử.',
+        'TUYỆT ĐỐI KHÔNG cho uống rượu / bia (cồn làm giãn mao mạch ngoại vi, tạo cảm giác nóng giả nhưng thực chất làm nhiệt lượng thoát ra môi trường nhanh gấp đôi).',
+        'TUYỆT ĐỐI KHÔNG xoa bóp hoặc hơ lửa trực tiếp lên tay chân bị lạnh cóng (làm tổn thương mô đóng băng và gây bỏng nặng).',
       ],
     },
     {
       'id': 'skill_3',
-      'title': 'Kỹ thuật thắt nút dây dã ngoại',
+      'title': '3 Nút dây dã ngoại căn bản',
       'category': 'Dựng trại & Dây',
-      'categoryIcon': Icons.line_style,
-      'readTime': '5 phút',
-      'desc': 'Các nút dây cơ bản nhưng quyết định độ an toàn khi dựng lều và vượt dốc.',
-      'priority': 'CƠ BẢN',
-      'accent': AppColors.emerald,
-      'heroImage': 'https://images.unsplash.com/photo-1527631746610-bca00a040d60?w=800&q=80',
-      'equipment': ['Dây sinh tồn Paracord 4mm hoặc 7 lõi', 'Dây thừng dù chịu lực', 'Cọc lều dã ngoại'],
+      'categoryIcon': Icons.gesture_outlined,
+      'readTime': '5 phút đọc',
+      'desc': '3 nút dây cốt lõi bảo đảm lều trại vững chãi trước dông bão và neo người an toàn khi vượt suối dốc.',
+      'priority': 'CĂN BẢN',
+      'accent': AppColors.editorialPine,
+      'equipment': [
+        'Dây sinh tồn Paracord 4mm (hoặc dây dù 7 lõi)',
+        'Cọc lều dã ngoại nhôm/thép',
+        'Carabiner chịu tải leo núi',
+      ],
       'steps': [
         {
+          'number': '01',
           'title': 'Nút dẹt (Reef Knot) — Nối 2 đầu dây',
-          'action': 'Quy tắc vàng: "Phải qua trái rồi vòng, Trái qua phải rồi vòng". Bắt chéo đầu dây phải lên đầu dây trái rồi quấn 1 vòng. Sau đó bắt chéo đầu trái lên đầu phải rồi quấn 1 vòng, kéo chặt. Nút tạo thành 2 vòng lồng vào nhau cân xứng.',
-          'imageUrl': 'https://images.unsplash.com/photo-1516939884455-1445c8652f83?w=800&q=80',
-          'tip': 'Dùng để nối 2 sợi dây có cùng tiết diện hoặc buộc dải băng y tế, tháo mở siêu nhanh chỉ bằng 1 động tác giật nhẹ.',
+          'diagramType': 'reef_knot',
+          'action': 'Quy tắc vàng: "Phải qua trái rồi vòng — Trái qua phải rồi vòng". Đặt đầu dây phải bắt chéo lên đầu dây trái, quấn 1 vòng. Sau đó lấy đầu dây trái bắt chéo lên đầu dây phải, quấn 1 vòng rồi kéo siết chặt. Hai vòng dây lồng vào nhau cân xứng.',
+          'keyRule': 'Chỉ dùng nối 2 sợi dây có cùng tiết diện và chất liệu.',
+          'tip': 'Để tháo nút siêu nhanh: Giật mạnh một đầu dây tự do, nút sẽ tự bung ra mà không bị kẹt.',
         },
         {
+          'number': '02',
           'title': 'Nút thòng lọng (Bowline) — Vua của các nút dây',
-          'action': 'Tạo một vòng tròn không bao giờ bị thít chặt dù chịu tải nặng hàng trăm kg. Câu thần chú dễ nhớ: "Thỏ chui ra khỏi hang, chạy vòng quanh thân cây, rồi chui ngược lại vào hang". Tạo 1 vòng khuyên nhỏ, luồn đầu dây từ dưới lên, vòng qua thân dây chính, rồi luồn lại vào khuyên, kéo siết chặt.',
-          'imageUrl': 'https://images.unsplash.com/photo-1527631746610-bca00a040d60?w=800&q=80',
-          'tip': 'Dùng buộc quanh người khi cứu hộ vượt suối, neo võng hoặc kéo đồ nặng lên vách đá an toàn.',
+          'diagramType': 'bowline_knot',
+          'action': 'Tạo một vòng khuyên cố định không bao giờ bị thít chặt dù chịu tải trọng hàng trăm kg. Câu thần chú: "Thỏ chui lên khỏi hang, vòng qua gốc cây đại thụ, rồi chui ngược lại vào hang". Tạo vòng khuyên nhỏ, luồn đầu dây từ dưới lên, vòng sau thân dây chính rồi xỏ ngược lại lỗ tròn, kéo siết.',
+          'keyRule': 'Nút neo chịu tải an toàn số 1 thế giới — rất dễ tháo dù vừa kéo tải cực nặng.',
+          'tip': 'Dùng làm vòng cứu sinh quấn quanh người khi hỗ trợ vượt suối hoặc neo võng vào thân cây to.',
         },
         {
-          'title': 'Nút néo tăng đơ (Taut-line) — Tăng giảm độ căng dây lều',
-          'action': 'Vòng đầu dây qua cọc cắm đất. Quấn đầu dây 2 vòng bên trong lòng dây chính về phía cọc lều, sau đó quấn tiếp 1 vòng bên ngoài về phía lều và thắt nút lại. Nút này có thể dùng ngón tay trượt lên xuống để điều chỉnh độ căng của dây lều khi trời mưa gió.',
-          'imageUrl': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80',
-          'tip': 'Khi trời đổ mưa, dây lều sẽ bị chùng do ngấm nước, bạn chỉ cần dùng tay đẩy nút trượt lên phía trên là lều lại căng đét mà không cần tháo dây.',
+          'number': '03',
+          'title': 'Nút tăng đơ (Taut-line Hitch) — Căng dây lều tự động',
+          'diagramType': 'tautline_knot',
+          'action': 'Vòng dây qua cọc cắm đất. Quấn đầu dây 2 vòng bên trong lòng dây chính hướng về phía cọc lều. Sau đó vòng tiếp 1 vòng bên ngoài về phía lều rồi thắt nút khóa. Nút này ma sát tự khóa nhưng có thể dùng tay trượt lên xuống để chỉnh độ chùng căng của dây lều.',
+          'keyRule': 'Trời mưa dây lều bị giãn, chỉ cần dùng ngón tay đẩy nút trượt lên là dây căng lại ngay.',
+          'tip': 'Không cần phải tháo cọc cắm lại mỗi khi gió giật làm chùng bạt.',
         },
       ],
       'donts': [
-        'Không dùng dây thừng đã mục nát, tơi sợi hoặc sờn vỏ ngoài để mắc võng qua đêm.',
+        'Không dùng dây thừng đã sờn vỏ lõi hoặc bị mục ẩm để căng võng ngủ qua đêm trên cao.',
       ],
     },
     {
       'id': 'skill_4',
-      'title': 'Khử trùng và tìm nguồn nước sạch',
+      'title': 'Khử trùng & Lọc nước sinh tồn',
       'category': 'Nước sạch',
-      'categoryIcon': Icons.water_drop,
-      'readTime': '3 phút',
-      'desc': 'Cách thu thập và xử lý nước tự nhiên để uống an toàn không nhiễm khuẩn.',
+      'categoryIcon': Icons.water_drop_outlined,
+      'readTime': '4 phút đọc',
+      'desc': 'Cách chế tạo cột lọc 4 tầng tự nhiên và phương pháp khử trùng nguồn nước suối rừng an toàn.',
       'priority': 'SỐNG CÒN',
-      'accent': AppColors.alpineCyan,
-      'heroImage': 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80',
-      'equipment': ['Khăn rằn / vải sạch nhiều lớp', 'Chai nước hoặc bình dã ngoại', 'Ấm đun nước & bếp gas mini', 'Viên khử khuẩn Aquatabs'],
+      'accent': AppColors.editorialTerracotta,
+      'equipment': [
+        'Vỏ chai nhựa 1.5L rỗng cắt đáy',
+        'Vải lọc / khăn bông sạch / bông gòn',
+        'Than củi gỗ sạch nghiền vụn',
+        'Cát mịn tự nhiên & sỏi đá nhỏ',
+        'Viên lọc nước Aquatabs hoặc cồn đun sôi',
+      ],
       'steps': [
         {
-          'title': 'Bước 1: Chọn nguồn nước thiên nhiên tối ưu',
-          'action': 'Luôn lấy nước từ các con suối đá chảy xiết trên cao. Tuyệt đối tránh xa các vũng nước tù đọng dưới thung lũng, nơi chăn thả trâu bò hoặc gần rác thải. Nước chảy xiết có nồng độ oxy cao và ít vi khuẩn kỵ khí hơn.',
-          'imageUrl': 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80',
-          'tip': 'Nếu chỉ có vũng nước đục, hãy đào một hố sâu cách mép nước 1 mét, nước ngấm qua cát vào hố sẽ trong hơn rất nhiều.',
+          'number': '01',
+          'title': 'Thu thập nguồn nước suối chảy',
+          'diagramType': 'water_source',
+          'action': 'Luôn lấy nước ở nơi có dòng nước chảy liên tục qua các gờ đá, nước trong suốt. Tránh lấy nước ở các vũng nước tù đọng có rêu xanh hoặc gần xác động vật thối rữa ở thượng nguồn.',
+          'keyRule': 'Nước suối dù trong vắt vẫn chứa vi khuẩn E.coli và ký sinh trùng Giardia gây tiêu chảy cấp.',
+          'tip': 'Hứng nước vào bình chứa, để yên 15-20 phút cho bùn cát lắng xuống đáy trước khi bắt đầu lọc.',
         },
         {
-          'title': 'Bước 2: Lọc cơ học loại bỏ bùn đất & ký sinh trùng',
-          'action': 'Gập chiếc khăn rằn hoặc áo thun làm 4-6 lớp, đặt lên miệng bình chứa. Rót nước từ từ qua lớp vải để giữ lại 100% cát, lá cây mục, ấu trùng muỗi và trứng giun sán. Có thể lót thêm than củi giã nhỏ ở giữa 2 lớp vải để khử mùi hôi của bùn.',
-          'imageUrl': 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=800&q=80',
-          'tip': 'Lọc vải chỉ làm nước trong, KHÔNG tiêu diệt được virus và vi khuẩn gây bệnh tiêu chảy.',
+          'number': '02',
+          'title': 'Thiết lập cột lọc tự nhiên 4 tầng',
+          'diagramType': 'filter_column',
+          'action': 'Lộn ngược chai nhựa cắt đáy. Tầng 1 (dưới cùng sát nắp chai có đục lỗ): Lót lớp vải bông sạch. Tầng 2: Lớp than củi nghiền nhỏ dày 6-8cm (than hoạt tính hấp phụ độc chất và mùi hôi). Tầng 3: Lớp cát sông mịn sạch dày 5cm. Tầng 4 (trên cùng): Lớp sỏi đá nhỏ để ngăn cát bị xáo trộn khi rót nước.',
+          'keyRule': 'Rót nước nhẹ nhàng vào cột lọc, bỏ nước của 2-3 mẻ đầu tiên cho đến khi nước chảy ra trong veo.',
+          'tip': 'Cột lọc chỉ loại bỏ cặn bẩn cơ học và khử mùi, KHÔNG DIỆT ĐƯỢC vi khuẩn siêu vi.',
         },
         {
-          'title': 'Bước 3: Đun sôi sùng sục tối thiểu 3 phút',
-          'action': 'Đun nước trên bếp ga mini hoặc lửa trại. Khi nước sôi ùng ục, giữ lửa sôi liên tục tối thiểu 3 phút (ở vùng núi cao trên 1,000m nước sôi ở nhiệt độ thấp hơn nên cần đun sôi 5 phút). Nhiệt độ 100°C tiêu diệt hoàn toàn amip ăn não, vi khuẩn tả và E.coli.',
-          'imageUrl': 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&q=80',
-          'tip': 'Nước sau khi đun sôi có vị ngang vì mất oxy, bạn hãy rót qua lại giữa 2 chiếc cốc vài lần để hòa tan oxy lại trước khi uống.',
-        },
-        {
-          'title': 'Bước 4: Sử dụng viên lọc hóa học Aquatabs',
-          'action': 'Nếu không thể nhóm lửa đun sôi, thả 1 viên Aquatabs 8.5mg vào 1 Lít nước đã lọc trong. Đậy nắp kín, lắc đều và CHỜ ĐỦ 30 PHÚT trước khi mở ra uống. Clo trong viên sẽ khử trùng hoàn toàn vi sinh vật gây hại.',
-          'imageUrl': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80',
-          'tip': 'Luôn mang theo 1 vỉ viên lọc nước khẩn cấp trong ngăn kéo khóa nhỏ nhất của balo leo núi.',
+          'number': '03',
+          'title': 'Đun sôi tối thiểu 3 phút hoặc dùng viên Aquatabs',
+          'diagramType': 'boil_sanitize',
+          'action': 'Sau khi lọc nước trong, cho vào ca inox đun sôi sùng sục liên tục trong ít nhất 3 phút (ở vùng núi cao trên 1,500m nhiệt độ sôi thấp hơn, cần đun 5 phút). Nếu không thể nhóm lửa, dùng 1 viên Aquatabs cho 2 lít nước, lắc đều và chờ đủ 30 phút trước khi uống.',
+          'keyRule': 'Đun sôi tối thiểu 3 phút là tiêu chuẩn vàng diệt 99.9% mầm bệnh trong tự nhiên.',
+          'tip': 'Để nước nguội tự nhiên trong bình kín, không thả đá bẩn hoặc lá cây chưa tiệt trùng vào.',
         },
       ],
       'donts': [
-        'TUYỆT ĐỐI KHÔNG uống nước suối trực tiếp chưa qua xử lý dù nhìn thấy rất trong vắt (nguy cơ nhiễm ký sinh trùng Giardia gây mất nước cấp).',
+        'TUYỆT ĐỐI KHÔNG uống nước biển hoặc nước đọng trong hốc cây lâu ngày có mùi chua thối.',
+        'TUYỆT ĐỐI KHÔNG uống nước lã trực tiếp từ suối dù nhìn rất trong và mát lạnh.',
       ],
     },
     {
       'id': 'skill_5',
-      'title': 'Quy tắc STOP khi bị lạc trong rừng',
+      'title': 'Quy tắc sinh tồn S.T.O.P khi lạc rừng',
       'category': 'Định hướng',
-      'categoryIcon': Icons.explore,
-      'readTime': '4 phút',
-      'desc': 'Bình tĩnh kiểm soát tình hình và sinh tồn chờ đội cứu hộ tiếp cận.',
+      'categoryIcon': Icons.compass_calibration_outlined,
+      'readTime': '4 phút đọc',
+      'desc': 'Nguyên lý tâm lý và hành động 4 bước giúp 95% người lạc rừng sống sót và được giải cứu an toàn.',
       'priority': 'SỐNG CÒN',
-      'accent': AppColors.neonGreen,
-      'heroImage': 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=80',
-      'equipment': ['Còi cứu nạn đa năng', 'La bàn & bản đồ offline', 'Bật lửa / đá đánh lửa', 'Áo mưa / bạt cứu sinh'],
+      'accent': AppColors.editorialTerracotta,
+      'equipment': [
+        'Còi cứu nạn dã ngoại (thổi mã SOS)',
+        'La bàn cơ & bản đồ giấy / ứng dụng ngoại tuyến',
+        'Bật lửa chống gió / đá đánh lửa sinh tồn',
+        'Áo mưa hoặc bạt che màu nổi bật',
+      ],
       'steps': [
         {
-          'title': 'S — STOP (Dừng lại ngay lập tức)',
-          'action': 'Ngay khi nhận ra bạn không còn thấy đồng đội hoặc lạc mất dấu đường mòn: DỪNG LẠI NGAY LẬP TỨC. Ngồi xuống một tảng đá, hít thở sâu 10 nhịp. Nỗi sợ hãi sẽ thôi thúc bạn chạy loạn xạ, và 90% nạn nhân tử vong vì lao vào khe vực hoặc kiệt sức do chạy hoảng loạn.',
-          'imageUrl': 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=80',
-          'tip': 'Thổi 3 hồi còi thật dài (Mã cứu nạn quốc tế: 3 tiếng còi = SOS). Dừng lại 1 phút lắng nghe phản hồi.',
+          'number': '01',
+          'title': 'S — STOP: Dừng lại ngay lập tức',
+          'diagramType': 'stop_step',
+          'action': 'Ngay khi phát hiện mất dấu đường mòn hoặc lạc đoàn: DỪNG LẠI NGAY LẬP TỨC. Ngồi xuống hít sâu 10 nhịp. Sự hoảng sợ bản năng sẽ thúc giục bạn cắm đầu chạy, và 90% trường hợp chấn thương nặng hoặc tử vong là do lao vào vực sâu trong cơn hoảng loạn.',
+          'keyRule': 'Thổi 3 tiếng còi thật dài (Mã cứu nạn quốc tế: 3 hồi còi = SOS). Lắng nghe 1 phút xem có tiếng đáp.',
+          'tip': 'Đánh dấu vị trí bạn đang đứng bằng cách buộc dải vải đỏ hoặc xếp cành cây chữ X.',
         },
         {
-          'title': 'T — THINK (Suy nghĩ và định hình lại)',
-          'action': 'Cố gắng nhớ lại: Bạn tách đoàn bao lâu rồi? Điểm mốc quen thuộc cuối cùng bạn nhìn thấy là gì (con suối, cây thông sét đánh, mỏm đá đôi)? Mở ứng dụng Travel App kiểm tra tọa độ GPS ngoại tuyến đã lưu trên bản đồ.',
-          'imageUrl': 'https://images.unsplash.com/photo-1508873696983-2df5293cb325?w=800&q=80',
-          'tip': 'Nếu bạn chỉ mới lạc 5-10 phút, bạn có thể men theo dấu chân cỏ dập để quay lại điểm mốc trước đó.',
+          'number': '02',
+          'title': 'T — THINK: Suy nghĩ và định hình lại',
+          'diagramType': 'think_step',
+          'action': 'Hồi tưởng lại: Bạn rời đoàn cách đây bao lâu? Điểm mốc quen thuộc cuối cùng bạn thấy là gì (thác nước, cây thông đôi, cột mốc)? Mở ứng dụng Travel App xem vị trí và tọa độ GPS đã lưu trên bộ đệm ngoại tuyến.',
+          'keyRule': 'Nếu mới lạc dưới 10 phút, bạn có thể men theo dấu vết cỏ dập để quay lại vị trí ban đầu.',
+          'tip': 'Ghi chép lại các thông tin vào điện thoại hoặc sổ tay để giữ bình tĩnh tinh thần.',
         },
         {
-          'title': 'O — OBSERVE (Quan sát địa hình xung quanh)',
-          'action': 'Quan sát mặt trời để xác định hướng Đông - Tây. Nhìn xung quanh tìm: nguồn nước sạch, mỏm đất cao kín gió để trú ẩn. Để ý sương mù và mây đen: nếu trời sắp tối (sau 16h30) hoặc sắp mưa, dừng việc tìm đường và chuyển ngay sang chế độ trú ẩn.',
-          'imageUrl': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80',
-          'tip': 'Tuyệt đối KHÔNG men theo lòng suối cạn đi xuống vực sâu hoang dã vì địa hình suối thác ở Việt Nam thường có các vách dựng đứng 30-50m không thể leo xuống.',
+          'number': '03',
+          'title': 'O — OBSERVE: Quan sát địa hình và thời tiết',
+          'diagramType': 'observe_step',
+          'action': 'Quan sát mặt trời để định hướng Đông - Tây. Tìm kiếm nguồn nước suối gần đó, mỏm đất cao khô ráo không có nguy cơ sạt lở để trú ẩn. Nếu trời đã sau 16h30 hoặc có mây dông kéo đến, ngừng tìm đường và tập trung toàn lực vào việc trú ẩn.',
+          'keyRule': 'TUYỆT ĐỐI KHÔNG đi men theo lòng khe suối hoang dã vì suối nhiệt đới luôn có vực thác dựng đứng 30-50m chắn lối.',
+          'tip': 'Địa điểm trú ẩn tốt nhất là lưng chừng đồi, khuất gió và cách nguồn nước 50m.',
         },
         {
-          'title': 'P — PLAN (Lập kế hoạch sinh tồn & Phát tín hiệu)',
-          'action': 'Dựng lều hoặc căng bạt trú ẩn trước 17h00. Thu gom củi khô dự trữ cho cả đêm. Đốt 3 đống lửa tạo thành hình tam giác ở khoảng đất trống (tín hiệu cấp cứu quốc tế). Ban ngày cho thêm lá cây tươi để tạo khói trắng bốc cao cho trực thăng hoặc đội tìm kiếm phát hiện.',
-          'imageUrl': 'https://images.unsplash.com/photo-1470246973918-29a93221c455?w=800&q=80',
-          'tip': 'Ở yên một chỗ! Đội tìm kiếm cứu hộ luôn bắt đầu lùng soát từ điểm cuối cùng bạn được nhìn thấy.',
+          'number': '04',
+          'title': 'P — PLAN: Kế hoạch trú ẩn & Tín hiệu cứu hộ',
+          'diagramType': 'plan_step',
+          'action': 'Dựng lều hoặc căng bạt trú ẩn trước 17h00. Thu gom củi khô dự trữ cho cả đêm. Tạo 3 đống lửa thành hình tam giác ở bãi đất trống (tín hiệu cấp cứu quốc tế). Ban ngày cho thêm lá cây tươi để tạo cột khói trắng dày bốc cao cho trực thăng hoặc đội tìm kiếm cứu nạn.',
+          'keyRule': 'Ở YÊN MỘT CHỖ! Đội cứu hộ luôn khoanh vùng tìm kiếm bắt đầu từ điểm bạn được nhìn thấy cuối cùng.',
+          'tip': 'Treo áo mưa hoặc bạt màu nổi lên ngọn cây cao để tăng khả năng phát hiện từ xa.',
         },
       ],
       'donts': [
-        'Không cố đi tiếp trong bóng đêm vì nguy cơ sảy chân rớt vực sâu.',
+        'TUYỆT ĐỐI KHÔNG cố dò đường di chuyển trong bóng đêm (dễ sẩy chân rơi xuống vực hoặc đụng phải thú dữ).',
       ],
     },
   ];
@@ -250,127 +299,301 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
     }).toList();
   }
 
+  Widget _buildStepDiagramCard(Map<String, dynamic> step, Color accent) {
+    final diagramType = step['diagramType'] as String? ?? '';
+    final number = step['number'] as String? ?? '01';
+    final title = step['title'] as String? ?? '';
+    final keyRule = step['keyRule'] as String? ?? '';
+
+    IconData diagramIcon = Icons.medical_services_outlined;
+    String diagramSub = 'Sơ đồ thao tác chuẩn';
+
+    if (diagramType == 'immobilize_limb') {
+      diagramIcon = Icons.accessibility_new_outlined;
+      diagramSub = 'Quy chuẩn bất động chi thấp hơn tim';
+    } else if (diagramType == 'pressure_wrap') {
+      diagramIcon = Icons.healing_outlined;
+      diagramSub = 'Kỹ thuật băng ép bản rộng hở ngón';
+    } else if (diagramType == 'splint_joint') {
+      diagramIcon = Icons.view_column_outlined;
+      diagramSub = 'Nẹp cố định vượt qua 2 khớp liền kề';
+    } else if (diagramType == 'stretcher_carry') {
+      diagramIcon = Icons.airline_seat_flat_outlined;
+      diagramSub = 'Vận chuyển nạn nhân bằng cáng mềm';
+    } else if (diagramType == 'wind_shelter') {
+      diagramIcon = Icons.holiday_village_outlined;
+      diagramSub = 'Chắn gió lùa 360 độ & lót thảm cách nhiệt';
+    } else if (diagramType == 'strip_wet_cloth') {
+      diagramIcon = Icons.dry_cleaning_outlined;
+      diagramSub = 'Cởi đồ ướt & bọc chăn nhôm phản xạ nhiệt';
+    } else if (diagramType == 'core_warming') {
+      diagramIcon = Icons.favorite_outline;
+      diagramSub = 'Ủ ấm 4 điểm vàng mạch máu trung tâm';
+    } else if (diagramType == 'warm_sip') {
+      diagramIcon = Icons.local_cafe_outlined;
+      diagramSub = 'Bổ sung nước ấm gừng ngụm nhỏ';
+    } else if (diagramType == 'reef_knot') {
+      diagramIcon = Icons.all_inclusive;
+      diagramSub = 'Phải qua Trái • Trái qua Phải';
+    } else if (diagramType == 'bowline_knot') {
+      diagramIcon = Icons.loop;
+      diagramSub = 'Thỏ ra khỏi hang • Vòng qua cây • Vào lại hang';
+    } else if (diagramType == 'tautline_knot') {
+      diagramIcon = Icons.tune;
+      diagramSub = '2 vòng trong • 1 vòng ngoài trượt tự khóa';
+    } else if (diagramType == 'water_source') {
+      diagramIcon = Icons.waves;
+      diagramSub = 'Chọn nước suối chảy liên tục qua gờ đá';
+    } else if (diagramType == 'filter_column') {
+      diagramIcon = Icons.filter_alt_outlined;
+      diagramSub = 'Sỏi nhỏ → Cát mịn → Than hoạt tính → Vải lọc';
+    } else if (diagramType == 'boil_sanitize') {
+      diagramIcon = Icons.whatshot_outlined;
+      diagramSub = 'Đun sôi sùng sục 3-5 phút hoặc Aquatabs';
+    } else if (diagramType == 'stop_step') {
+      diagramIcon = Icons.pan_tool_outlined;
+      diagramSub = 'Dừng lại ngay lập tức • Thổi 3 hồi còi dài';
+    } else if (diagramType == 'think_step') {
+      diagramIcon = Icons.psychology_outlined;
+      diagramSub = 'Hồi tưởng điểm mốc • Kiểm tra tọa độ GPS';
+    } else if (diagramType == 'observe_step') {
+      diagramIcon = Icons.visibility_outlined;
+      diagramSub = 'Quan sát hướng mặt trời • Tránh lòng vực suối';
+    } else if (diagramType == 'plan_step') {
+      diagramIcon = Icons.mode_standby;
+      diagramSub = 'Dựng trại trước 17h • Đốt 3 đống lửa tam giác';
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.editorialBg,
+        borderRadius: AppRadius.roundedMd,
+        border: Border.all(color: AppColors.editorialBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.12),
+                  borderRadius: AppRadius.roundedSm,
+                  border: Border.all(color: accent.withValues(alpha: 0.3)),
+                ),
+                child: Center(
+                  child: Icon(diagramIcon, color: accent, size: 20),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'BƯỚC $number: $title',
+                      style: const TextStyle(
+                        fontFamily: 'serif',
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                        color: AppColors.editorialInk,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      diagramSub,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: accent,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (keyRule.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: AppRadius.roundedSm,
+                border: Border.all(color: AppColors.editorialBorder),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.check_circle_outline, size: 14, color: accent),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      keyRule,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.editorialInk,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   void _openArticleDetail(Map<String, dynamic> skill) {
+    final accent = skill['accent'] as Color;
+    final equipment = (skill['equipment'] as List<dynamic>?) ?? [];
+    final steps = (skill['steps'] as List<dynamic>?) ?? [];
+    final donts = (skill['donts'] as List<dynamic>?) ?? [];
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.surfaceElevated,
+      backgroundColor: AppColors.editorialBg,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (context) {
-        final steps = (skill['steps'] as List<dynamic>?)?.cast<Map<String, dynamic>>() ?? [];
-        final donts = (skill['donts'] as List<dynamic>?)?.cast<String>() ?? [];
-        final equipment = (skill['equipment'] as List<dynamic>?)?.cast<String>() ?? [];
-        final Color accent = skill['accent'] as Color;
-        final String? heroImage = skill['heroImage'] as String?;
-
         return DraggableScrollableSheet(
-          initialChildSize: 0.90,
+          initialChildSize: 0.88,
+          maxChildSize: 0.96,
           minChildSize: 0.5,
-          maxChildSize: 0.95,
           expand: false,
           builder: (context, scrollController) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+            return Container(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
               child: ListView(
                 controller: scrollController,
                 physics: const BouncingScrollPhysics(),
                 children: [
-                  const SizedBox(height: 12),
                   Center(
                     child: Container(
                       width: 40,
                       height: 4,
-                      decoration: BoxDecoration(color: Colors.white24, borderRadius: AppRadius.roundedPill),
+                      decoration: BoxDecoration(
+                        color: AppColors.editorialBorder,
+                        borderRadius: AppRadius.roundedPill,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
 
-                  // Hero Image Header
-                  if (heroImage != null) ...[
-                    ClipRRect(
-                      borderRadius: AppRadius.roundedLg,
-                      child: Stack(
-                        children: [
-                          Image.network(
-                            heroImage,
-                            height: 160,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Container(
-                              height: 120,
-                              color: AppColors.surfaceHigh,
-                              child: Center(child: Icon(Icons.terrain, color: accent, size: 40)),
-                            ),
+                  // Category & Status Ribbon
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: accent.withValues(alpha: 0.12),
+                          borderRadius: AppRadius.roundedPill,
+                          border: Border.all(color: accent.withValues(alpha: 0.3)),
+                        ),
+                        child: Text(
+                          skill['category'] as String,
+                          style: TextStyle(
+                            color: accent,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
                           ),
-                          Positioned.fill(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.transparent,
-                                    Colors.black.withValues(alpha: 0.8),
-                                  ],
-                                ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.editorialSurface,
+                          borderRadius: AppRadius.roundedPill,
+                          border: Border.all(color: AppColors.editorialBorder),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.offline_pin, size: 13, color: AppColors.editorialPine),
+                            SizedBox(width: 4),
+                            Text(
+                              'Đã lưu sẵn trên máy',
+                              style: TextStyle(
+                                color: AppColors.editorialInk,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ),
-                          Positioned(
-                            bottom: 12,
-                            left: 14,
-                            right: 14,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                TacticalPill(
-                                  text: skill['category'] as String,
-                                  color: accent,
-                                  backgroundColor: Colors.black.withValues(alpha: 0.6),
-                                ),
-                                TacticalPill(
-                                  text: 'NGOẠI TUYẾN 100%',
-                                  color: AppColors.emerald,
-                                  backgroundColor: Colors.black.withValues(alpha: 0.6),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+                    ],
+                  ),
+
+                  const SizedBox(height: 14),
 
                   // Article Headline
-                  Text(skill['title'] as String, style: AppTypography.displayHero.copyWith(fontSize: 22)),
-                  const SizedBox(height: 6),
-                  Text(skill['desc'] as String, style: AppTypography.bodyLarge),
+                  Text(
+                    skill['title'] as String,
+                    style: const TextStyle(
+                      fontFamily: 'serif',
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.editorialInk,
+                      height: 1.25,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    skill['desc'] as String,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: AppColors.editorialMuted,
+                      height: 1.5,
+                    ),
+                  ),
 
                   // Required Equipment Checklist
                   if (equipment.isNotEmpty) ...[
-                    const SizedBox(height: 14),
-                    Text('DỤNG CỤ CẦN CHUẨN BỊ', style: AppTypography.captionBadge.copyWith(color: AppColors.emerald)),
+                    const SizedBox(height: 18),
+                    const Text(
+                      'DỤNG CỤ CẦN CHUẨN BỊ',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.6,
+                        color: AppColors.editorialPine,
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
                       children: equipment.map((item) {
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
-                            color: AppColors.surfaceBase,
-                            borderRadius: AppRadius.roundedPill,
-                            border: Border.all(color: AppColors.borderSubtle),
+                            color: AppColors.editorialSurface,
+                            borderRadius: AppRadius.roundedMd,
+                            border: Border.all(color: AppColors.editorialBorder),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.check_circle_outline, size: 14, color: AppColors.emerald),
+                              const Icon(Icons.check_circle_outline, size: 15, color: AppColors.editorialPine),
                               const SizedBox(width: 6),
-                              Text(item, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500)),
+                              Text(
+                                item.toString(),
+                                style: const TextStyle(
+                                  color: AppColors.editorialInk,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ],
                           ),
                         );
@@ -378,117 +601,73 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                     ),
                   ],
 
-                  const Divider(height: 28, color: AppColors.borderSubtle),
+                  const SizedBox(height: 22),
 
-                  // Step by step breakdown with instructional images
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('HƯỚNG DẪN THỰC HIỆN TỪNG BƯỚC', style: AppTypography.captionBadge.copyWith(color: AppColors.emerald)),
-                      Text('${steps.length} BƯỚC', style: TextStyle(color: accent, fontSize: 11, fontWeight: FontWeight.bold)),
-                    ],
+                  // Steps with Instructional Diagrams
+                  const Text(
+                    'QUY TRÌNH THỰC HIỆN TỪNG BƯỚC',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.6,
+                      color: AppColors.editorialPine,
+                    ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 12),
 
-                  ...steps.asMap().entries.map((entry) {
-                    final idx = entry.key + 1;
-                    final s = entry.value;
-                    final stepImg = s['imageUrl'] as String?;
-                    final tip = s['tip'] as String?;
+                  ...steps.map((s) {
+                    final stepMap = s as Map<String, dynamic>;
+                    final tip = stepMap['tip'] as String?;
 
                     return Container(
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceHigh,
+                        color: AppColors.editorialSurface,
                         borderRadius: AppRadius.roundedLg,
-                        border: Border.all(color: AppColors.borderSubtle),
+                        border: Border.all(color: AppColors.editorialBorder),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Step Header
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 14,
-                                backgroundColor: accent.withValues(alpha: 0.2),
-                                child: Text('$idx', style: TextStyle(color: accent, fontWeight: FontWeight.bold, fontSize: 12)),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  s['title'] as String,
-                                  style: AppTypography.titleMedium.copyWith(fontSize: 15, fontWeight: FontWeight.w800),
-                                ),
-                              ),
-                            ],
-                          ),
+                          // Instructional Diagram Card
+                          _buildStepDiagramCard(stepMap, accent),
                           const SizedBox(height: 12),
 
-                          // Step Illustration Image
-                          if (stepImg != null) ...[
-                            ClipRRect(
-                              borderRadius: AppRadius.roundedMd,
-                              child: Stack(
-                                children: [
-                                  Image.network(
-                                    stepImg,
-                                    height: 140,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) => Container(
-                                      height: 90,
-                                      color: AppColors.surfaceBase,
-                                      child: Center(child: Icon(Icons.medical_services_outlined, color: accent, size: 30)),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 8,
-                                    left: 8,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withValues(alpha: 0.75),
-                                        borderRadius: AppRadius.roundedPill,
-                                      ),
-                                      child: Text(
-                                        'HÌNH MINH HỌA THAO TÁC',
-                                        style: TextStyle(color: accent, fontSize: 9, fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                          ],
-
-                          // Action guide text
+                          // Action text
                           Text(
-                            s['action'] as String,
-                            style: AppTypography.bodyMedium.copyWith(color: AppColors.textPrimary, height: 1.5, fontSize: 13),
+                            stepMap['action'] as String,
+                            style: const TextStyle(
+                              color: AppColors.editorialInk,
+                              height: 1.55,
+                              fontSize: 13,
+                            ),
                           ),
 
-                          // Pro Tip Box
+                          // Pro-tip Callout
                           if (tip != null) ...[
                             const SizedBox(height: 10),
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: AppColors.emerald.withValues(alpha: 0.10),
-                                borderRadius: AppRadius.roundedMd,
-                                border: Border.all(color: AppColors.emerald.withValues(alpha: 0.3)),
+                                color: AppColors.editorialBg,
+                                borderRadius: AppRadius.roundedSm,
+                                border: Border.all(color: AppColors.editorialBorder),
                               ),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(Icons.lightbulb_outline, size: 16, color: AppColors.emerald),
-                                  const SizedBox(width: 8),
+                                  const Icon(Icons.lightbulb_outline, size: 15, color: AppColors.editorialTerracotta),
+                                  const SizedBox(width: 6),
                                   Expanded(
                                     child: Text(
-                                      'MẸO VÀNG: $tip',
-                                      style: const TextStyle(color: Colors.white, fontSize: 11, height: 1.4),
+                                      tip,
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        color: AppColors.editorialMuted,
+                                        height: 1.4,
+                                        fontStyle: FontStyle.italic,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -500,38 +679,53 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                     );
                   }),
 
-                  const SizedBox(height: 8),
-
-                  // DONTs Warning Box
+                  // Warning / Don'ts Section
                   if (donts.isNotEmpty) ...[
+                    const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppColors.emergencyRed.withValues(alpha: 0.12),
+                        color: const Color(0xFFFEF2F2),
                         borderRadius: AppRadius.roundedLg,
-                        border: Border.all(color: AppColors.emergencyRed.withValues(alpha: 0.4)),
+                        border: Border.all(color: const Color(0xFFFCA5A5)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Row(
                             children: [
-                              Icon(Icons.warning_amber_rounded, size: 20, color: AppColors.emergencyRed),
+                              Icon(Icons.warning_amber_rounded, color: AppColors.emergencyRed, size: 18),
                               SizedBox(width: 8),
-                              Text('ĐIỀU CẤM KỴ TUYỆT ĐỐI (NGUY HIỂM TÍNH MẠNG)', style: TextStyle(color: AppColors.emergencyRed, fontWeight: FontWeight.w900, fontSize: 12)),
+                              Text(
+                                'ĐIỀU CẤM KỴ TUYỆT ĐỐI (NGUY HIỂM TÍNH MẠNG)',
+                                style: TextStyle(
+                                  color: AppColors.emergencyRed,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 10),
                           ...donts.map((d) => Padding(
-                            padding: const EdgeInsets.only(bottom: 6),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('✕ ', style: TextStyle(color: AppColors.emergencyRed, fontWeight: FontWeight.bold, fontSize: 13)),
-                                Expanded(child: Text(d, style: AppTypography.bodyMedium.copyWith(color: AppColors.textPrimary, height: 1.4))),
-                              ],
-                            ),
-                          )),
+                                padding: const EdgeInsets.only(bottom: 6),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('✕ ', style: TextStyle(color: AppColors.emergencyRed, fontWeight: FontWeight.bold, fontSize: 13)),
+                                    Expanded(
+                                      child: Text(
+                                        d.toString(),
+                                        style: const TextStyle(
+                                          color: Color(0xFF991B1B),
+                                          fontSize: 12,
+                                          height: 1.45,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )),
                         ],
                       ),
                     ),
@@ -545,25 +739,32 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                       Navigator.pop(context);
                     },
                     child: Container(
-                      height: 50,
+                      height: 48,
                       decoration: BoxDecoration(
-                        color: AppColors.emerald,
+                        color: AppColors.editorialPine,
                         borderRadius: AppRadius.roundedMd,
                       ),
                       child: const Center(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.check, color: Colors.black, size: 18),
+                            Icon(Icons.check, color: Colors.white, size: 18),
                             SizedBox(width: 8),
-                            Text('Tôi Đã Nắm Rõ Quy Trình Này', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 13)),
+                            Text(
+                              'Tôi Đã Nắm Rõ Quy Trình Này',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 30),
                 ],
               ),
             );
@@ -579,64 +780,93 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
     final filtered = _filteredSkills;
 
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: AppColors.editorialBg,
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            // Header with Offline Status
+            // Header
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.space16, 12, AppSpacing.space16, 12),
+                padding: const EdgeInsets.fromLTRB(AppSpacing.space16, 16, AppSpacing.space16, 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        TacticalPill(
-                          icon: Icons.offline_pin,
-                          text: 'NGOẠI TUYẾN 100%',
-                          color: AppColors.emerald,
-                          backgroundColor: AppColors.surfaceHigh,
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.editorialSurface,
+                            borderRadius: AppRadius.roundedPill,
+                            border: Border.all(color: AppColors.editorialBorder),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.offline_pin, size: 14, color: AppColors.editorialPine),
+                              SizedBox(width: 6),
+                              Text(
+                                'Cẩm nang lưu sẵn ngoại tuyến',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.editorialInk,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         Text(
-                          '${_bookmarkedIds.length} bài ghim',
-                          style: AppTypography.captionBadge.copyWith(color: AppColors.tacticalOrange),
+                          '${_bookmarkedIds.length} bài đã lưu',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.editorialTerracotta,
+                          ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 12),
-                    Text(
+                    const Text(
                       'Cẩm Nang Sinh Tồn',
-                      style: AppTypography.displayHero,
+                      style: TextStyle(
+                        fontFamily: 'serif',
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.editorialInk,
+                      ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      'Sơ cứu khẩn cấp, kỹ năng dã ngoại & thoát hiểm trong rừng',
-                      style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                    const Text(
+                      'Sơ cứu khẩn cấp, kỹ năng dã ngoại & thoát hiểm trong rừng sâu',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.editorialMuted,
+                      ),
                     ),
                     const SizedBox(height: 14),
 
                     // Search input
                     Container(
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceBase,
+                        color: AppColors.editorialSurface,
                         borderRadius: AppRadius.roundedMd,
-                        border: Border.all(color: AppColors.borderSubtle),
+                        border: Border.all(color: AppColors.editorialBorder),
                       ),
                       child: TextField(
                         controller: _searchController,
-                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                        style: const TextStyle(color: AppColors.editorialInk, fontSize: 13),
                         decoration: InputDecoration(
                           hintText: 'Tìm bài sơ cứu rắn cắn, hạ thân nhiệt, nút dây...',
-                          hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 12),
-                          prefixIcon: const Icon(Icons.search, color: AppColors.emerald, size: 18),
+                          hintStyle: const TextStyle(color: AppColors.editorialMuted, fontSize: 12),
+                          prefixIcon: const Icon(Icons.search, color: AppColors.editorialPine, size: 18),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                           suffixIcon: _searchQuery.isNotEmpty
                               ? IconButton(
-                                  icon: const Icon(Icons.clear, size: 16, color: AppColors.textMuted),
+                                  icon: const Icon(Icons.clear, size: 16, color: AppColors.editorialMuted),
                                   onPressed: () => setState(() {
                                     _searchController.clear();
                                     _searchQuery = '';
@@ -655,7 +885,7 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
             // Category Selector Chips
             SliverToBoxAdapter(
               child: SizedBox(
-                height: 40,
+                height: 38,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
@@ -675,17 +905,19 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
-                            color: isSelected ? AppColors.emerald : AppColors.surfaceHigh,
+                            color: isSelected ? AppColors.editorialPine : AppColors.editorialSurface,
                             borderRadius: AppRadius.roundedPill,
-                            border: Border.all(color: isSelected ? AppColors.emerald : AppColors.borderSubtle),
+                            border: Border.all(
+                              color: isSelected ? AppColors.editorialPine : AppColors.editorialBorder,
+                            ),
                           ),
                           child: Center(
                             child: Text(
                               cat,
                               style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                                color: isSelected ? Colors.black : Colors.white,
+                                fontSize: 12,
+                                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                color: isSelected ? Colors.white : AppColors.editorialInk,
                               ),
                             ),
                           ),
@@ -699,7 +931,7 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
 
             const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
-            // Quick Emergency Banner (Breaking card monotony)
+            // Quick Emergency Banner
             if (_selectedCategory == 'Tất cả' && _searchQuery.isEmpty) ...[
               SliverToBoxAdapter(
                 child: Padding(
@@ -707,17 +939,22 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      const Row(
                         children: [
-                          const Icon(Icons.flash_on, color: AppColors.emergencyRed, size: 16),
-                          const SizedBox(width: 6),
+                          Icon(Icons.bolt, color: AppColors.editorialTerracotta, size: 16),
+                          SizedBox(width: 4),
                           Text(
-                            'SƠ CỨU CẤP TỐC (EMERGENCY)',
-                            style: AppTypography.captionBadge.copyWith(color: AppColors.emergencyRed, letterSpacing: 0.6),
+                            'SƠ CỨU CẤP TỐC',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.6,
+                              color: AppColors.editorialTerracotta,
+                            ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 8),
                       Row(
                         children: [
                           Expanded(
@@ -726,24 +963,30 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                               child: Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: AppColors.emergencyRed.withValues(alpha: 0.12),
+                                  color: AppColors.editorialSurface,
                                   borderRadius: AppRadius.roundedMd,
-                                  border: Border.all(color: AppColors.emergencyRed.withValues(alpha: 0.4)),
+                                  border: Border.all(color: AppColors.editorialTerracotta.withValues(alpha: 0.4)),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const Row(
                                       children: [
-                                        Icon(Icons.medical_services_outlined, size: 16, color: AppColors.emergencyRed),
+                                        Icon(Icons.medical_services_outlined, size: 16, color: AppColors.editorialTerracotta),
                                         Spacer(),
-                                        Text('3m', style: TextStyle(color: AppColors.emergencyRed, fontSize: 10, fontWeight: FontWeight.bold)),
+                                        Text('3m', style: TextStyle(color: AppColors.editorialTerracotta, fontSize: 10, fontWeight: FontWeight.bold)),
                                       ],
                                     ),
                                     const SizedBox(height: 8),
-                                    const Text('RẮN ĐỘC CẮN', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 12)),
+                                    const Text(
+                                      'RẮN ĐỘC CẮN',
+                                      style: TextStyle(color: AppColors.editorialInk, fontWeight: FontWeight.w800, fontSize: 12),
+                                    ),
                                     const SizedBox(height: 2),
-                                    Text('Quy tắc nẹp ép cố định', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 10)),
+                                    const Text(
+                                      'Băng ép & nẹp cố định',
+                                      style: TextStyle(color: AppColors.editorialMuted, fontSize: 10),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -756,24 +999,30 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                               child: Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: AppColors.tacticalOrange.withValues(alpha: 0.12),
+                                  color: AppColors.editorialSurface,
                                   borderRadius: AppRadius.roundedMd,
-                                  border: Border.all(color: AppColors.tacticalOrange.withValues(alpha: 0.4)),
+                                  border: Border.all(color: AppColors.editorialPine.withValues(alpha: 0.4)),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const Row(
                                       children: [
-                                        Icon(Icons.ac_unit, size: 16, color: AppColors.tacticalOrange),
+                                        Icon(Icons.ac_unit_outlined, size: 16, color: AppColors.editorialPine),
                                         Spacer(),
-                                        Text('4m', style: TextStyle(color: AppColors.tacticalOrange, fontSize: 10, fontWeight: FontWeight.bold)),
+                                        Text('4m', style: TextStyle(color: AppColors.editorialPine, fontSize: 10, fontWeight: FontWeight.bold)),
                                       ],
                                     ),
                                     const SizedBox(height: 8),
-                                    const Text('HẠ THÂN NHIỆT', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 12)),
+                                    const Text(
+                                      'HẠ THÂN NHIỆT',
+                                      style: TextStyle(color: AppColors.editorialInk, fontWeight: FontWeight.w800, fontSize: 12),
+                                    ),
                                     const SizedBox(height: 2),
-                                    Text('Xử lý mưa lạnh dã ngoại', style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 10)),
+                                    const Text(
+                                      'Ủ ấm 4 điểm vàng',
+                                      style: TextStyle(color: AppColors.editorialMuted, fontSize: 10),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -782,15 +1031,13 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      Text('SỔ TAY THỰC ĐỊA (FIELD MANUAL)', style: AppTypography.captionBadge.copyWith(color: AppColors.textMuted)),
-                      const SizedBox(height: 10),
                     ],
                   ),
                 ),
               ),
             ],
 
-            // Skills Card List (Styled as Field Manual with left accent stripe & serial number)
+            // Skills Card List
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space16),
               sliver: SliverList(
@@ -801,16 +1048,11 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                     final Color accent = skill['accent'] as Color;
 
                     return Container(
-                      margin: const EdgeInsets.only(bottom: 14),
+                      margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceBase,
+                        color: AppColors.editorialSurface,
                         borderRadius: AppRadius.roundedLg,
-                        border: Border(
-                          left: BorderSide(color: accent, width: 4),
-                          top: const BorderSide(color: AppColors.borderSubtle),
-                          right: const BorderSide(color: AppColors.borderSubtle),
-                          bottom: const BorderSide(color: AppColors.borderSubtle),
-                        ),
+                        border: Border.all(color: AppColors.editorialBorder),
                       ),
                       child: Material(
                         color: Colors.transparent,
@@ -837,10 +1079,20 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                                           ),
                                         ),
                                         const SizedBox(width: 8),
-                                        TacticalPill(
-                                          text: skill['priority'] as String,
-                                          color: accent,
-                                          backgroundColor: accent.withValues(alpha: 0.15),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                          decoration: BoxDecoration(
+                                            color: accent.withValues(alpha: 0.1),
+                                            borderRadius: AppRadius.roundedPill,
+                                          ),
+                                          child: Text(
+                                            skill['priority'] as String,
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w800,
+                                              color: accent,
+                                            ),
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -848,14 +1100,14 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                                       children: [
                                         Text(
                                           skill['readTime'] as String,
-                                          style: AppTypography.captionBadge.copyWith(color: AppColors.textMuted),
+                                          style: const TextStyle(fontSize: 11, color: AppColors.editorialMuted),
                                         ),
                                         const SizedBox(width: 8),
                                         BouncingButton(
                                           onTap: () => _toggleBookmark(skill['id'] as String),
                                           child: Icon(
                                             isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                                            color: isBookmarked ? AppColors.tacticalOrange : AppColors.textMuted,
+                                            color: isBookmarked ? AppColors.editorialTerracotta : AppColors.editorialMuted,
                                             size: 20,
                                           ),
                                         ),
@@ -866,12 +1118,21 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                                 const SizedBox(height: 10),
                                 Text(
                                   skill['title'] as String,
-                                  style: AppTypography.headlineMedium.copyWith(fontSize: 17),
+                                  style: const TextStyle(
+                                    fontFamily: 'serif',
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.editorialInk,
+                                  ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   skill['desc'] as String,
-                                  style: AppTypography.bodyMedium,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.editorialMuted,
+                                    height: 1.45,
+                                  ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -881,9 +1142,13 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                                   children: [
                                     Text(
                                       'Xem hướng dẫn chi tiết →',
-                                      style: AppTypography.captionBadge.copyWith(color: AppColors.emerald),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color: accent,
+                                      ),
                                     ),
-                                    const Icon(Icons.arrow_forward_ios, size: 12, color: AppColors.emerald),
+                                    Icon(Icons.arrow_forward, size: 14, color: accent),
                                   ],
                                 ),
                               ],
@@ -891,7 +1156,7 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                           ),
                         ),
                       ),
-                    ).animate().fadeIn(duration: 200.ms, delay: (index * 40).ms).slideY(begin: 0.05, end: 0);
+                    );
                   },
                   childCount: filtered.length,
                 ),

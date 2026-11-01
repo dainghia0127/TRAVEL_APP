@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:animations/animations.dart';
+import 'package:mobile_flutter/core/models/outdoor_image.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/services/storage_service.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
-import 'package:mobile_flutter/core/widgets/tactical_badge.dart';
+import 'package:mobile_flutter/core/widgets/editorial_image.dart';
 import 'package:mobile_flutter/features/offline_map/services/location_service.dart';
+import 'package:mobile_flutter/features/explore/presentation/screens/destination_detail_screen.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/bento_destination_grid.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/category_selector.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/trail_compact_row.dart';
-import 'package:mobile_flutter/features/explore/presentation/widgets/destination_card.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/search_filter_bar.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/empty_filter_state.dart';
 
@@ -81,7 +82,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
       'location': 'Lâm Đồng - Bình Thuận',
       'rating': '4.9',
       'reviews': '284',
-      'imageUrl': 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&q=80',
+      'imageUrl': 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=900&q=80',
+      'outdoorImage': const OutdoorImage(
+        url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=900&q=80',
+        localAsset: 'assets/images/hero_ta_nang.jpg',
+        photographer: 'Bailey Zindel',
+        caption: 'Đỉnh Tà Năng - Phan Dũng',
+      ),
       'description': 'Cung trekking đẹp nhất miền Nam qua sống lưng khủng long, đồi cỏ bạt ngàn và rừng khộp hoang dã.',
       'highlights': ['Đồi cỏ mênh mông', 'Ngắm bình minh sống lưng', 'Off-grid 100%'],
       'isFeatured': true,
@@ -99,7 +106,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
       'location': 'Đà Lạt, Lâm Đồng',
       'rating': '4.8',
       'reviews': '512',
-      'imageUrl': 'https://images.unsplash.com/photo-1510312305653-8ed496efae75?w=800&q=80',
+      'imageUrl': 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=900&q=80',
+      'outdoorImage': const OutdoorImage(
+        url: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=900&q=80',
+        localAsset: 'assets/images/lake_tuyen_lam.jpg',
+        photographer: 'Kalina Sak',
+        caption: 'Hồ Tuyền Lâm & Rừng Thông',
+      ),
       'description': 'Bãi cắm trại ven hồ yên bình, sương mây lãng đãng quanh rừng thông, cực kỳ thích hợp chèo SUP dã ngoại.',
       'highlights': ['Chèo SUP mặt hồ', 'Nước ngọt dồi dào', 'Phù hợp người mới'],
       'isFeatured': true,
@@ -117,7 +130,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
       'location': 'Khu BTTN Kon Chư Răng, Gia Lai',
       'rating': '5.0',
       'reviews': '142',
-      'imageUrl': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800&q=80',
+      'imageUrl': 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=900&q=80',
+      'outdoorImage': const OutdoorImage(
+        url: 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=900&q=80',
+        localAsset: 'assets/images/fall_k50.jpg',
+        photographer: 'Adam K.',
+        caption: 'Thác K50 - Hang Én',
+      ),
       'description': 'Dải lụa bạc hùng vĩ ẩn sâu giữa rừng nguyên sinh Tây Nguyên, tiếng nước ầm vang cả một góc thung lũng.',
       'highlights': ['Thác nước tráng lệ', 'Tổ chim én tự nhiên', 'Rừng nguyên sinh'],
       'isFeatured': true,
@@ -135,7 +154,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
       'location': 'Vườn Quốc Gia Bidoup Núi Bà',
       'rating': '4.9',
       'reviews': '189',
-      'imageUrl': 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80',
+      'imageUrl': 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=900&q=80',
+      'outdoorImage': const OutdoorImage(
+        url: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=900&q=80',
+        localAsset: 'assets/images/mang_den.jpg',
+        photographer: 'Nguyên Vũ',
+        caption: 'Rừng Rêu Bidoup Núi Bà',
+      ),
       'description': 'Nóc nhà tỉnh Lâm Đồng với thảm rừng rêu ma mị, cây thông 2 lá dẹt ngàn năm tuổi và không khí lạnh 10°C.',
       'highlights': ['Rừng rêu ma thuật', 'Nóc nhà Lâm Đồng', 'Hệ sinh vật đa dạng'],
       'isFeatured': false,
@@ -153,7 +178,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
       'location': 'Lào Cai - Lai Châu',
       'rating': '4.9',
       'reviews': '680',
-      'imageUrl': 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80',
+      'imageUrl': 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=900&q=80',
+      'outdoorImage': const OutdoorImage(
+        url: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=900&q=80',
+        localAsset: 'assets/images/pass_o_quy_ho.jpg',
+        photographer: 'Lê Hoàng',
+        caption: 'Đèo Ô Quy Hồ',
+      ),
       'description': 'Một trong tứ đại đỉnh đèo hiểm trở và ngoạn mục nhất Tây Bắc, nơi săn mây bồng bềnh và hoàng hôn tráng lệ.',
       'highlights': ['Săn biển mây cuồn cuộn', 'Cung đường uốn lượn', 'Hoàng hôn rực rỡ'],
       'isFeatured': false,
@@ -184,7 +215,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
         }
       }
     } catch (_) {
-      // Default to Quận 9, TP. Hồ Chí Minh
+      // Default stays: Quận 9, TP. Hồ Chí Minh
     } finally {
       if (mounted) setState(() => _isDetectingGps = false);
     }
@@ -194,7 +225,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     HapticFeedback.selectionClick();
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.surfaceElevated,
+      backgroundColor: AppColors.editorialSurface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -207,21 +238,27 @@ class _ExploreScreenState extends State<ExploreScreen> {
             children: [
               Center(
                 child: Container(
-                  width: 40,
+                  width: 36,
                   height: 4,
-                  decoration: BoxDecoration(color: Colors.white24, borderRadius: AppRadius.roundedPill),
+                  decoration: BoxDecoration(
+                    color: AppColors.editorialBorder,
+                    borderRadius: AppRadius.roundedPill,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('VỊ TRÍ & ĐỊA ĐIỂM DÃ NGOẠI', style: AppTypography.captionBadge.copyWith(color: AppColors.emerald)),
+                  const Text(
+                    'Vị Trí & Điểm Dã Ngoại',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
+                  ),
                   if (_isDetectingGps)
                     const SizedBox(
                       width: 14,
                       height: 14,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.emerald),
+                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.editorialPine),
                     ),
                 ],
               ),
@@ -242,18 +279,18 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.surfaceHigh : AppColors.surfaceBase,
-                        borderRadius: AppRadius.roundedMd,
+                        color: isSelected ? AppColors.editorialSurfaceSubtle : AppColors.editorialSurface,
+                        borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isSelected ? AppColors.emerald : AppColors.borderSubtle,
+                          color: isSelected ? AppColors.editorialPine : AppColors.editorialBorder,
                           width: isSelected ? 1.5 : 1,
                         ),
                       ),
                       child: Row(
                         children: [
                           Icon(
-                            loc['isGps'] == 'true' ? Icons.my_location : Icons.landscape_outlined,
-                            color: isSelected ? AppColors.emerald : AppColors.textSecondary,
+                            loc['isGps'] == 'true' ? Icons.near_me : Icons.landscape_outlined,
+                            color: isSelected ? AppColors.editorialPine : AppColors.editorialMuted,
                             size: 20,
                           ),
                           const SizedBox(width: 12),
@@ -264,21 +301,21 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                 Text(
                                   loc['name']!,
                                   style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                    color: AppColors.editorialInk,
+                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                                     fontSize: 13,
                                   ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   '${loc['desc']!} • ${loc['weather']!}',
-                                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                                  style: const TextStyle(color: AppColors.editorialMuted, fontSize: 11),
                                 ),
                               ],
                             ),
                           ),
                           if (isSelected)
-                            const Icon(Icons.check_circle, color: AppColors.emerald, size: 20),
+                            const Icon(Icons.check_circle, color: AppColors.editorialPine, size: 20),
                         ],
                       ),
                     ),
@@ -313,102 +350,143 @@ class _ExploreScreenState extends State<ExploreScreen> {
         _favoriteSpots.add(id);
       }
     });
-    StorageService.saveFavorites(_favoriteSpots.toList());
+    StorageService.toggleFavorite(id);
   }
 
   List<Map<String, dynamic>> get _filteredSpots {
     return _spots.where((spot) {
-      final matchCat = _selectedCategory == 'Tất cả' || spot['category'] == _selectedCategory;
-      final matchSearch = _searchQuery.isEmpty ||
+      final matchesCategory = _selectedCategory == 'Tất cả' || spot['category'] == _selectedCategory;
+      final matchesSearch = _searchQuery.isEmpty ||
           (spot['title'] as String).toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          (spot['location'] as String).toLowerCase().contains(_searchQuery.toLowerCase());
-      final matchDiff = _selectedDifficulty == null || spot['difficultyLevel'] == _selectedDifficulty;
-      return matchCat && matchSearch && matchDiff;
-    }).toList();
-  }
+          (spot['location'] as String).toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          (spot['description'] as String).toLowerCase().contains(_searchQuery.toLowerCase());
+      final matchesDifficulty = _selectedDifficulty == null || spot['difficultyLevel'] == _selectedDifficulty;
 
-  void _resetFilters() {
-    setState(() {
-      _searchController.clear();
-      _searchQuery = '';
-      _selectedCategory = 'Tất cả';
-      _selectedDifficulty = null;
-    });
+      return matchesCategory && matchesSearch && matchesDifficulty;
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     final filtered = _filteredSpots;
-    final isFiltering = _searchQuery.isNotEmpty || _selectedCategory != 'Tất cả' || _selectedDifficulty != null;
+    final isFiltering = _searchQuery.isNotEmpty || _selectedDifficulty != null || _selectedCategory != 'Tất cả';
+    final heroSpot = _spots[0];
 
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: AppColors.editorialBg,
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            // Top App Bar & Weather Scrim
+            // Top App Bar & Editorial Header
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.space16,
-                  AppSpacing.space12,
-                  AppSpacing.space16,
-                  AppSpacing.space12,
-                ),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Ambient Location & Weather (Interactive)
+                    // Location & Weather Pill Header
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         BouncingButton(
                           onTap: _showLocationSelectorSheet,
-                          child: TacticalPill(
-                            icon: Icons.my_location,
-                            text: _currentLocationName,
-                            color: AppColors.emerald,
-                            backgroundColor: AppColors.surfaceHigh,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: AppColors.editorialSurface,
+                              borderRadius: AppRadius.roundedPill,
+                              border: Border.all(color: AppColors.editorialBorder),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x06000000),
+                                  blurRadius: 6,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.near_me, size: 13, color: AppColors.editorialPine),
+                                const SizedBox(width: 6),
+                                Text(
+                                  _currentLocationName,
+                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.editorialInk),
+                                ),
+                                const SizedBox(width: 4),
+                                const Icon(Icons.keyboard_arrow_down, size: 15, color: AppColors.editorialMuted),
+                              ],
+                            ),
                           ),
                         ),
-                        TacticalPill(
-                          icon: Icons.wb_sunny_outlined,
-                          text: _currentWeatherBrief,
-                          color: AppColors.tacticalOrange,
-                          backgroundColor: AppColors.surfaceHigh,
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.editorialSurface,
+                            borderRadius: AppRadius.roundedPill,
+                            border: Border.all(color: AppColors.editorialBorder),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.wb_sunny_outlined, size: 14, color: AppColors.editorialTerracotta),
+                              const SizedBox(width: 5),
+                              Text(
+                                _currentWeatherBrief,
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.editorialInk),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: AppSpacing.space16),
+                    const SizedBox(height: 18),
 
                     // Editorial Headline
-                    Text(
-                      'Khám Phá Cung Đường',
-                      style: AppTypography.displayHero,
-                    ).animate().fadeIn(duration: 260.ms).slideX(begin: -0.05, end: 0),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Bản đồ địa hình & cẩm nang sinh tồn ngoại tuyến 100%',
-                      style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                    const Text(
+                      'Khám Phá & Dã Ngoại',
+                      style: AppTypography.editorialHero,
                     ),
-                    const SizedBox(height: AppSpacing.space16),
-
-                    // Search & Filter Interface
-                    SearchFilterBar(
-                      controller: _searchController,
-                      selectedDifficulty: _selectedDifficulty,
-                      onChanged: (val) => setState(() => _searchQuery = val),
-                      onClear: () => setState(() {
-                        _searchController.clear();
-                        _searchQuery = '';
-                      }),
-                      onSelectDifficulty: (lvl) => setState(() => _selectedDifficulty = lvl),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Những cung đường trekking hùng vĩ và bãi cắm trại hoang sơ nhất Việt Nam',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.editorialMuted,
+                        height: 1.4,
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
+
+            // Destination-Led Inspirational Hero (Shown when not actively searching)
+            if (!isFiltering)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
+                  child: _buildHeroInspirationalCard(heroSpot),
+                ),
+              ),
+
+            // Search & Filter Interface
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SearchFilterBar(
+                  controller: _searchController,
+                  selectedDifficulty: _selectedDifficulty,
+                  onChanged: (val) => setState(() => _searchQuery = val),
+                  onClear: () => setState(() {
+                    _searchController.clear();
+                    _searchQuery = '';
+                  }),
+                  onSelectDifficulty: (lvl) => setState(() => _selectedDifficulty = lvl),
+                ),
+              ),
+            ),
+
+            const SliverToBoxAdapter(child: SizedBox(height: 14)),
 
             // Horizontal Categories Selector
             SliverToBoxAdapter(
@@ -419,9 +497,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ),
             ),
 
-            const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.space20)),
+            const SliverToBoxAdapter(child: SizedBox(height: 18)),
 
-            // 1. Bento Grid Spotlight (Only show when not actively searching to avoid clutter)
+            // 1. Bento Grid Spotlight (When in Discovery mode)
             if (!isFiltering) ...[
               SliverToBoxAdapter(
                 child: BentoDestinationGrid(
@@ -430,30 +508,33 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   onToggleFavorite: _toggleFavorite,
                 ),
               ),
-              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.space24)),
+              const SliverToBoxAdapter(child: SizedBox(height: 24)),
             ],
 
-            // Section 2: Diverse Trail Section Header
+            // Section 2: Header for curated lists
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space16),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
                   children: [
                     Text(
-                      isFiltering ? 'Kết Quả Bộ Lọc' : 'Tất Cả Cung Đường (Danh Mục)',
-                      style: AppTypography.headlineMedium.copyWith(fontSize: 18),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceHigh,
-                        borderRadius: AppRadius.roundedPill,
-                        border: Border.all(color: AppColors.borderSubtle),
+                      isFiltering ? 'Kết Quả Tìm Kiếm' : 'Gợi Ý Cho Bạn',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.editorialInk,
+                        letterSpacing: -0.3,
                       ),
-                      child: Text(
-                        '${filtered.length} địa điểm',
-                        style: AppTypography.captionBadge.copyWith(color: AppColors.textMuted),
+                    ),
+                    Text(
+                      '${filtered.length} cung đường',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.editorialMuted,
                       ),
                     ),
                   ],
@@ -461,42 +542,34 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ),
             ),
 
-            const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.space12)),
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
-            // Cards vs Rows based on context to BREAK CARD MONOTONY:
-            // When filtering: show rich detailed destination cards
-            // When general browsing: show clean compact editorial rows!
+            // Empty State
             if (filtered.isEmpty)
               SliverToBoxAdapter(
-                child: EmptyFilterState(onReset: _resetFilters),
-              )
-            else if (isFiltering)
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space16),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final spot = filtered[index];
-                      return DestinationCard(
-                        spot: spot,
-                        isFavorite: _favoriteSpots.contains(spot['id']),
-                        onToggleFavorite: () => _toggleFavorite(spot['id'] as String),
-                      );
-                    },
-                    childCount: filtered.length,
-                  ),
+                child: EmptyFilterState(
+                  onReset: () {
+                    setState(() {
+                      _searchController.clear();
+                      _searchQuery = '';
+                      _selectedDifficulty = null;
+                      _selectedCategory = 'Tất cả';
+                    });
+                  },
                 ),
               )
             else
+              // Compact Editorial Rows
               SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space16),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final spot = filtered[index];
+                      final isFav = _favoriteSpots.contains(spot['id']);
                       return TrailCompactRow(
                         spot: spot,
-                        isFavorite: _favoriteSpots.contains(spot['id']),
+                        isFavorite: isFav,
                         onToggleFavorite: () => _toggleFavorite(spot['id'] as String),
                       );
                     },
@@ -505,8 +578,151 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 ),
               ),
 
-            // Bottom Safe Inset Clearance
-            const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.space32)),
+            const SliverToBoxAdapter(child: SizedBox(height: 36)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeroInspirationalCard(Map<String, dynamic> spot) {
+    final isFav = _favoriteSpots.contains(spot['id']);
+    final OutdoorImage img = spot['outdoorImage'] as OutdoorImage;
+
+    return OpenContainer(
+      closedElevation: 0,
+      openElevation: 0,
+      closedColor: Colors.transparent,
+      openColor: AppColors.editorialBg,
+      transitionType: ContainerTransitionType.fadeThrough,
+      transitionDuration: const Duration(milliseconds: 360),
+      openBuilder: (context, action) => DestinationDetailScreen(
+        spot: spot,
+        isFavorite: isFav,
+        onToggleFavorite: () => _toggleFavorite(spot['id'] as String),
+      ),
+      closedBuilder: (context, action) => Container(
+        height: 260,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x1A000000),
+              blurRadius: 18,
+              offset: Offset(0, 6),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Full photograph with local bundled fallback & caching
+            EditorialImage(
+              image: img,
+              borderRadius: BorderRadius.circular(20),
+              showAttribution: true,
+            ),
+
+            // Gradient scrim for editorial readability
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0x20000000),
+                    Colors.transparent,
+                    Color(0x90000000),
+                    Color(0xEA000000),
+                  ],
+                  stops: [0.0, 0.3, 0.65, 1.0],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+            ),
+
+            // Top Badge
+            Positioned(
+              top: 14,
+              left: 14,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.6),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.auto_awesome, color: Color(0xFFFBBF24), size: 12),
+                    SizedBox(width: 5),
+                    Text(
+                      'ĐIỂM ĐẾN NỔI BẬT THÁNG NÀY',
+                      style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.4),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Bottom Content
+            Positioned(
+              bottom: 18,
+              left: 16,
+              right: 16,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    spot['title'] as String,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.4,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    spot['description'] as String,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                      height: 1.35,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '${spot['distance']} • ${spot['elevation']}',
+                          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      const Spacer(),
+                      const Row(
+                        children: [
+                          Text(
+                            'Chi tiết',
+                            style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700),
+                          ),
+                          SizedBox(width: 4),
+                          Icon(Icons.arrow_forward, color: Colors.white, size: 14),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

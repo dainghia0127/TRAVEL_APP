@@ -19,22 +19,26 @@ class EmptyFilterState extends StatelessWidget {
               width: 72,
               height: 72,
               decoration: BoxDecoration(
-                color: AppColors.surfaceHigh,
+                color: AppColors.editorialSurface,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.borderSubtle),
+                border: Border.all(color: AppColors.editorialBorder),
               ),
-              child: const Icon(Icons.explore_off_outlined, size: 36, color: AppColors.textMuted),
+              child: const Icon(Icons.explore_off_outlined, size: 36, color: AppColors.editorialMuted),
             ),
             const SizedBox(height: AppSpacing.space16),
-            Text(
-              'Không tìm thấy địa điểm',
-              style: AppTypography.headlineMedium.copyWith(fontSize: 17),
+            const Text(
+              'Không tìm thấy cung đường',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: AppColors.editorialInk,
+              ),
             ),
             const SizedBox(height: 6),
-            Text(
-              'Không có cung đường nào khớp với từ khóa hoặc bộ lọc độ khó bạn đã chọn.',
+            const Text(
+              'Không có địa điểm nào khớp với từ khóa hoặc bộ lọc độ khó bạn vừa chọn.',
               textAlign: TextAlign.center,
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.textMuted),
+              style: TextStyle(fontSize: 13, color: AppColors.editorialMuted, height: 1.4),
             ),
             const SizedBox(height: AppSpacing.space20),
             BouncingButton(
@@ -42,18 +46,17 @@ class EmptyFilterState extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
-                  color: AppColors.emerald.withValues(alpha: 0.15),
+                  color: AppColors.editorialPine,
                   borderRadius: AppRadius.roundedPill,
-                  border: Border.all(color: AppColors.emerald.withValues(alpha: 0.3)),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.refresh, size: 16, color: AppColors.emerald),
-                    const SizedBox(width: 6),
+                    Icon(Icons.refresh, size: 16, color: Colors.white),
+                    SizedBox(width: 6),
                     Text(
                       'Đặt lại bộ lọc tìm kiếm',
-                      style: AppTypography.captionBadge.copyWith(color: AppColors.emerald),
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
                     ),
                   ],
                 ),
@@ -65,4 +68,3 @@ class EmptyFilterState extends StatelessWidget {
     );
   }
 }
-

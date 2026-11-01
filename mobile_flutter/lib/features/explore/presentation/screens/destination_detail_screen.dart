@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:mobile_flutter/core/models/outdoor_image.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
-import 'package:mobile_flutter/core/widgets/tactical_badge.dart';
+import 'package:mobile_flutter/core/widgets/editorial_image.dart';
 
 class DestinationDetailScreen extends StatefulWidget {
   final Map<String, dynamic> spot;
@@ -37,14 +38,27 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
     HapticFeedback.mediumImpact();
   }
 
+  OutdoorImage _resolveImage() {
+    final spot = widget.spot;
+    if (spot['outdoorImage'] is OutdoorImage) {
+      return spot['outdoorImage'] as OutdoorImage;
+    }
+    final url = spot['imageUrl'] as String? ?? '';
+    return OutdoorImage(
+      url: url.isNotEmpty ? url : OutdoorImage.defaultNature.url,
+      localAsset: 'assets/images/default_nature.jpg',
+      photographer: 'Tác giả dã ngoại',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final spot = widget.spot;
     final highlights = (spot['highlights'] as List<dynamic>?)?.cast<String>() ?? [];
-    final imageUrl = spot['imageUrl'] as String? ?? '';
+    final img = _resolveImage();
 
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: AppColors.editorialBg,
       body: Stack(
         children: [
           // Scrollable Content
@@ -53,13 +67,13 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
             slivers: [
               // Hero Image App Bar
               SliverAppBar(
-                expandedHeight: 340,
+                expandedHeight: 320,
                 pinned: true,
-                backgroundColor: AppColors.bgDark,
+                backgroundColor: AppColors.editorialBg,
                 leading: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: CircleAvatar(
-                    backgroundColor: Colors.black.withValues(alpha: 0.6),
+                    backgroundColor: Colors.black.withValues(alpha: 0.5),
                     child: IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
                       onPressed: () => Navigator.of(context).pop(),
@@ -70,7 +84,7 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: CircleAvatar(
-                      backgroundColor: Colors.black.withValues(alpha: 0.6),
+                      backgroundColor: Colors.black.withValues(alpha: 0.5),
                       child: IconButton(
                         icon: Icon(
                           _fav ? Icons.favorite : Icons.favorite_border,
@@ -86,51 +100,62 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                   background: Stack(
                     fit: StackFit.expand,
                     children: [
-                      // Real Nature Photo
-                      if (imageUrl.isNotEmpty)
-                        Image.network(
-                          imageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
-                        )
-                      else
-                        _buildPlaceholder(),
+                      // Editorial Image with cache and local fallback
+                      EditorialImage(
+                        image: img,
+                        showAttribution: true,
+                      ),
 
                       // Gradient Scrim
                       Container(
                         decoration: const BoxDecoration(
-                          gradient: AppColors.heroOverlayGradient,
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0x30000000),
+                              Colors.transparent,
+                              Color(0x80000000),
+                              Color(0xD0000000),
+                            ],
+                            stops: [0.0, 0.35, 0.7, 1.0],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
                         ),
                       ),
 
                       // Floating Category & Rating Badge on bottom of image
                       Positioned(
-                        left: AppSpacing.space16,
-                        bottom: AppSpacing.space20,
-                        right: AppSpacing.space16,
+                        left: 16,
+                        bottom: 16,
+                        right: 16,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            TacticalPill(
-                              text: spot['category'] as String? ?? 'Dã ngoại',
-                              color: Colors.white,
-                              backgroundColor: Colors.black.withValues(alpha: 0.6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.6),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                spot['category'] as String? ?? 'Dã ngoại',
+                                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
+                              ),
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                               decoration: BoxDecoration(
                                 color: Colors.black.withValues(alpha: 0.6),
-                                borderRadius: AppRadius.roundedPill,
-                                border: Border.all(color: Colors.white24),
+                                borderRadius: BorderRadius.circular(20),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(Icons.star, size: 14, color: AppColors.summitGold),
+                                  const Icon(Icons.star, size: 14, color: Color(0xFFFBBF24)),
                                   const SizedBox(width: 4),
                                   Text(
                                     '${spot['rating']} (${spot['reviews']} đánh giá)',
-                                    style: AppTypography.captionBadge,
+                                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
                                   ),
                                 ],
                               ),
@@ -146,69 +171,62 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
               // Title & Location Header
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.space16, AppSpacing.space16, AppSpacing.space16, 0),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         spot['title'] as String? ?? '',
-                        style: AppTypography.displayHero.copyWith(fontSize: 26),
-                      ).animate().fadeIn(duration: 250.ms).slideY(begin: 0.1, end: 0),
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.editorialInk,
+                          letterSpacing: -0.5,
+                        ),
+                      ).animate().fadeIn(duration: 250.ms).slideY(begin: 0.08, end: 0),
                       const SizedBox(height: 6),
                       Row(
                         children: [
-                          const Icon(Icons.location_on, size: 15, color: AppColors.emerald),
+                          const Icon(Icons.place_outlined, size: 15, color: AppColors.editorialPine),
                           const SizedBox(width: 4),
                           Text(
                             spot['location'] as String? ?? '',
-                            style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                            style: const TextStyle(fontSize: 13, color: AppColors.editorialMuted),
                           ),
                         ],
                       ),
-                      const SizedBox(height: AppSpacing.space16),
+                      const SizedBox(height: 16),
 
-                      // 4-Column Tactical Bar
+                      // 4-Column Restrained Facts Bar
                       Container(
                         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceBase,
-                          borderRadius: AppRadius.roundedLg,
-                          border: Border.all(color: AppColors.borderSubtle),
+                          color: AppColors.editorialSurface,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: AppColors.editorialBorder),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x06000000),
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            TacticalBadge(
-                              icon: Icons.straighten,
-                              label: 'Cự ly',
-                              value: spot['distance'] as String? ?? '--',
-                            ),
+                            _buildFact(Icons.straighten, 'Cự ly', spot['distance'] as String? ?? '--'),
                             _buildDivider(),
-                            TacticalBadge(
-                              icon: Icons.terrain,
-                              label: 'Độ cao',
-                              value: spot['elevation'] as String? ?? '--',
-                            ),
+                            _buildFact(Icons.landscape, 'Độ cao', spot['elevation'] as String? ?? '--'),
                             _buildDivider(),
-                            TacticalBadge(
-                              icon: Icons.water_drop,
-                              label: 'Nguồn nước',
-                              value: spot['water'] as String? ?? '--',
-                            ),
+                            _buildFact(Icons.water_drop_outlined, 'Nguồn nước', spot['water'] as String? ?? '--'),
                             _buildDivider(),
-                            TacticalBadge(
-                              icon: Icons.signal_cellular_alt,
-                              label: 'Sóng 4G',
-                              value: spot['signal'] as String? ?? '--',
-                              iconColor: (spot['signal'] as String? ?? '').contains('0%')
-                                  ? AppColors.emergencyRed
-                                  : AppColors.emerald,
-                            ),
+                            _buildFact(Icons.signal_cellular_alt, 'Sóng 4G', spot['signal'] as String? ?? '--'),
                           ],
                         ),
-                      ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.1, end: 0),
+                      ).animate().fadeIn(delay: 80.ms).slideY(begin: 0.08, end: 0),
 
-                      const SizedBox(height: AppSpacing.space20),
+                      const SizedBox(height: 20),
 
                       // Tab selector
                       Row(
@@ -220,23 +238,23 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                           _buildTabButton(2, 'Lưu ý an toàn'),
                         ],
                       ),
-                      const SizedBox(height: AppSpacing.space16),
+                      const SizedBox(height: 18),
 
                       // Tab Content
                       if (_selectedTab == 0) ...[
-                        Text(
+                        const Text(
                           'Giới thiệu cung đường',
-                          style: AppTypography.headlineMedium.copyWith(fontSize: 17),
+                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           spot['description'] as String? ?? '',
-                          style: AppTypography.bodyLarge,
+                          style: const TextStyle(fontSize: 14, color: AppColors.editorialInk, height: 1.5),
                         ),
-                        const SizedBox(height: AppSpacing.space20),
-                        Text(
+                        const SizedBox(height: 20),
+                        const Text(
                           'Điểm nổi bật nhất',
-                          style: AppTypography.headlineMedium.copyWith(fontSize: 17),
+                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
                         ),
                         const SizedBox(height: 10),
                         Wrap(
@@ -245,43 +263,59 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                           children: highlights.map((h) => Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                             decoration: BoxDecoration(
-                              color: AppColors.surfaceHigh,
-                              borderRadius: AppRadius.roundedMd,
-                              border: Border.all(color: AppColors.borderSubtle),
+                              color: AppColors.editorialSurface,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: AppColors.editorialBorder),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.check_circle, size: 14, color: AppColors.emerald),
+                                const Icon(Icons.check, size: 14, color: AppColors.editorialPine),
                                 const SizedBox(width: 6),
-                                Text(h, style: AppTypography.bodyMedium.copyWith(color: AppColors.textPrimary)),
+                                Text(h, style: const TextStyle(fontSize: 12, color: AppColors.editorialInk, fontWeight: FontWeight.w500)),
                               ],
                             ),
                           )).toList(),
                         ),
                       ] else if (_selectedTab == 1) ...[
-                        _buildTrailStep('1', 'Điểm tập kết xuất phát', 'Chuẩn bị trang bị cá nhân và kiểm tra tín hiệu GPS lần cuối.', '0.0 km'),
-                        _buildTrailStep('2', 'Vượt dốc sống lưng khủng long', 'Cung đường gió mạnh trên độ cao 1,100m, cảnh quan đồi cỏ bao la.', '+ 18.5 km'),
-                        _buildTrailStep('3', 'Bãi hạ trại ven suối rừng', 'Nơi có nguồn nước ngọt tự nhiên dồi dào để dựng lều qua đêm.', '+ 12.0 km'),
-                        _buildTrailStep('4', 'Cung rừng khộp hạ sơn', 'Rừng rụng lá mùa khô, dốc thoải dẫn ra bìa rừng đón xe trung chuyển.', '+ 24.5 km'),
+                        const Text(
+                          'Lộ trình tham khảo',
+                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildTrailStep('1', 'Khởi hành tại Cửa rừng', 'Chuẩn bị thể lực, kiểm tra balo và bắt đầu tiến vào bìa rừng.', '0 km'),
+                        _buildTrailStep('2', 'Vượt dốc và sống lưng', 'Cung đường mở ra khung cảnh thung lũng cỏ bạt ngàn tuyệt đẹp.', '15 km'),
+                        _buildTrailStep('3', 'Bãi hạ trại ven suối', 'Nghỉ đêm, dựng lều kín gió, nấu ăn và ngắm bầu trời sao.', '28 km'),
+                        _buildTrailStep('4', 'Đích đến trạm kết thúc', 'Hoàn tất cung đường và tập kết đón xe trung chuyển.', '${spot['distance']}'),
                       ] else ...[
+                        const Text(
+                          'Quy tắc an toàn sinh tồn',
+                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
+                        ),
+                        const SizedBox(height: 12),
                         _buildSafetyNotice(
-                          Icons.warning_amber_rounded,
-                          AppColors.tacticalOrange,
-                          'Mất sóng di động dài ngày',
-                          'Tải sẵn bản đồ ngoại tuyến vector (.mbtiles) và pin sạc dự phòng 20,000mAh trước khi vào rừng.',
+                          Icons.water_drop,
+                          AppColors.editorialPine,
+                          'Mang tối thiểu 2.5 Lít nước',
+                          'Đoạn sống lưng rất nắng gió và không có nguồn nước trong suốt 12km.',
                         ),
                         const SizedBox(height: 10),
                         _buildSafetyNotice(
-                          Icons.water,
-                          AppColors.alpineCyan,
-                          'Tránh lũ quét đầu nguồn',
-                          'Nếu thấy nước suối chuyển màu đục ngầu kèm cành cây trôi, phải sơ tán lên sườn đồi cao ngay lập tức.',
+                          Icons.warning_amber_rounded,
+                          AppColors.editorialTerracotta,
+                          'Cảnh báo mất sóng di động',
+                          'Khu vực này mất sóng 70%. Luôn tải bản đồ và cẩm nang sơ cứu về máy trước khi đi.',
+                        ),
+                        const SizedBox(height: 10),
+                        _buildSafetyNotice(
+                          Icons.nights_stay,
+                          AppColors.editorialPine,
+                          'Dựng lều trước 16:30',
+                          'Nhiệt độ đêm vùng núi có thể hạ dưới 12°C kèm gió giật mạnh.',
                         ),
                       ],
 
-                      // Bottom Clearance
-                      const SizedBox(height: 110),
+                      const SizedBox(height: 110), // Bottom padding for sticky button
                     ],
                   ),
                 ),
@@ -289,90 +323,75 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
             ],
           ),
 
-          // Pinned Bottom Action Bar
+          // Bottom Action Bar
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: Container(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.space16, 12, AppSpacing.space16, 24),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
               decoration: BoxDecoration(
-                color: AppColors.surfaceBase,
-                border: const Border(
-                  top: BorderSide(color: AppColors.borderSubtle, width: 1),
-                ),
-                boxShadow: [
+                color: AppColors.editorialSurface,
+                border: const Border(top: BorderSide(color: AppColors.editorialBorder)),
+                boxShadow: const [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.6),
-                    blurRadius: 20,
-                    offset: const Offset(0, -6),
+                    color: Color(0x10000000),
+                    blurRadius: 16,
+                    offset: Offset(0, -4),
                   ),
                 ],
               ),
               child: Row(
                 children: [
-                  // Bookmark Offline Pill
                   BouncingButton(
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: AppColors.surfaceElevated,
-                          content: Row(
-                            children: [
-                              const Icon(Icons.cloud_download, color: AppColors.emerald, size: 18),
-                              const SizedBox(width: 8),
-                              Text('Đã tải gói dữ liệu offline cho ${spot['title']}', style: const TextStyle(color: Colors.white)),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
+                    onTap: _handleToggleFav,
                     child: Container(
-                      width: 52,
-                      height: 52,
+                      width: 50,
+                      height: 50,
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceHigh,
-                        borderRadius: AppRadius.roundedMd,
-                        border: Border.all(color: AppColors.borderSubtle),
+                        color: AppColors.editorialSurfaceSubtle,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.editorialBorder),
                       ),
-                      child: const Icon(Icons.download_for_offline_outlined, color: AppColors.emerald, size: 22),
+                      child: Icon(
+                        _fav ? Icons.favorite : Icons.favorite_border,
+                        color: _fav ? AppColors.emergencyRed : AppColors.editorialInk,
+                        size: 22,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
-
-                  // Main Start Button
                   Expanded(
                     child: BouncingButton(
                       onTap: () {
-                        HapticFeedback.mediumImpact();
-                        Navigator.of(context).pop();
+                        HapticFeedback.heavyImpact();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            backgroundColor: AppColors.editorialPine,
+                            content: Text(
+                              'Đã lưu cung đường vào kế hoạch dã ngoại của bạn!',
+                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        );
                       },
                       child: Container(
-                        height: 52,
+                        height: 50,
                         decoration: BoxDecoration(
-                          gradient: AppColors.emeraldGradient,
-                          borderRadius: AppRadius.roundedMd,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.emerald.withValues(alpha: 0.35),
-                              blurRadius: 16,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                          color: AppColors.editorialPine,
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.navigation, color: Colors.black, size: 20),
+                            Icon(Icons.add_task, color: Colors.white, size: 18),
                             SizedBox(width: 8),
                             Text(
-                              'Bắt Đầu Khám Phá',
+                              'Thêm Vào Lịch Trình',
                               style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
                                 fontSize: 15,
-                                letterSpacing: 0.2,
                               ),
                             ),
                           ],
@@ -389,17 +408,20 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
     );
   }
 
-  Widget _buildPlaceholder() {
-    return Container(
-      color: AppColors.surfaceHigh,
-      child: const Center(
-        child: Icon(Icons.terrain, size: 60, color: Colors.white12),
-      ),
+  Widget _buildFact(IconData icon, String label, String value) {
+    return Column(
+      children: [
+        Icon(icon, size: 16, color: AppColors.editorialPine),
+        const SizedBox(height: 4),
+        Text(label, style: const TextStyle(fontSize: 10, color: AppColors.editorialMuted)),
+        const SizedBox(height: 2),
+        Text(value, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.editorialInk)),
+      ],
     );
   }
 
   Widget _buildDivider() {
-    return Container(width: 1, height: 26, color: AppColors.borderSubtle);
+    return Container(width: 1, height: 26, color: AppColors.editorialBorder);
   }
 
   Widget _buildTabButton(int index, String label) {
@@ -409,12 +431,12 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
         onTap: () => setState(() => _selectedTab = index),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: 9),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.emerald : AppColors.surfaceHigh,
-            borderRadius: AppRadius.roundedMd,
+            color: isSelected ? AppColors.editorialPine : AppColors.editorialSurface,
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isSelected ? AppColors.emerald : AppColors.borderSubtle,
+              color: isSelected ? AppColors.editorialPine : AppColors.editorialBorder,
             ),
           ),
           child: Center(
@@ -422,8 +444,8 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
               label,
               style: TextStyle(
                 fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                color: isSelected ? Colors.black : AppColors.textSecondary,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? Colors.white : AppColors.editorialInk,
               ),
             ),
           ),
@@ -439,9 +461,9 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
-            radius: 14,
-            backgroundColor: AppColors.surfaceHigh,
-            child: Text(step, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.emerald)),
+            radius: 13,
+            backgroundColor: AppColors.editorialPine,
+            child: Text(step, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white)),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -451,12 +473,12 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(title, style: AppTypography.titleMedium.copyWith(fontSize: 14)),
-                    Text(dist, style: AppTypography.captionBadge.copyWith(color: AppColors.emerald)),
+                    Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.editorialInk)),
+                    Text(dist, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.editorialPine)),
                   ],
                 ),
                 const SizedBox(height: 3),
-                Text(desc, style: AppTypography.bodyMedium),
+                Text(desc, style: const TextStyle(fontSize: 12, color: AppColors.editorialMuted, height: 1.4)),
               ],
             ),
           ),
@@ -469,9 +491,9 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: AppRadius.roundedMd,
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -482,9 +504,9 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: AppTypography.titleMedium.copyWith(fontSize: 14, color: Colors.white)),
+                Text(title, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color)),
                 const SizedBox(height: 2),
-                Text(desc, style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary)),
+                Text(desc, style: const TextStyle(fontSize: 12, color: AppColors.editorialInk, height: 1.35)),
               ],
             ),
           ),
@@ -493,4 +515,3 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
     );
   }
 }
-

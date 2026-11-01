@@ -16,6 +16,18 @@ class StorageService {
     return prefs.getStringList(_keyFavorites) ?? [];
   }
 
+  /// Đảo trạng thái yêu thích của 1 địa điểm
+  static Future<List<String>> toggleFavorite(String id) async {
+    final list = await getFavorites();
+    if (list.contains(id)) {
+      list.remove(id);
+    } else {
+      list.add(id);
+    }
+    await saveFavorites(list);
+    return list;
+  }
+
   /// Lưu trạng thái checklist chuẩn bị đồ
   static Future<bool> saveChecklist(List<String> checkedItems) async {
     final prefs = await SharedPreferences.getInstance();
@@ -28,4 +40,3 @@ class StorageService {
     return prefs.getStringList(_keyChecklist) ?? [];
   }
 }
-

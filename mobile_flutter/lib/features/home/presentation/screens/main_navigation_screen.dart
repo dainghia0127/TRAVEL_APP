@@ -56,6 +56,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     },
   ];
 
+  bool get _isEditorialMode => _currentIndex == 0 || _currentIndex == 2 || _currentIndex == 3;
+
   void _onTabSelected(int index) {
     if (_currentIndex != index) {
       HapticFeedback.selectionClick();
@@ -65,8 +67,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isEditorial = _isEditorialMode;
+    final navBg = isEditorial ? AppColors.editorialSurface : AppColors.surfaceBase;
+    final navBorder = isEditorial ? AppColors.editorialBorder : AppColors.borderSubtle;
+    final primaryActiveColor = isEditorial ? AppColors.editorialPine : AppColors.emerald;
+    final unselectedColor = isEditorial ? AppColors.editorialMuted : AppColors.textMuted;
+
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: isEditorial ? AppColors.editorialBg : AppColors.bgDark,
       // Smooth Material Motion Transition between Tabs
       body: PageTransitionSwitcher(
         duration: const Duration(milliseconds: 280),
@@ -74,24 +82,25 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           return FadeThroughTransition(
             animation: primaryAnimation,
             secondaryAnimation: secondaryAnimation,
-            fillColor: AppColors.bgDark,
+            fillColor: isEditorial ? AppColors.editorialBg : AppColors.bgDark,
             child: child,
           );
         },
         child: _screens[_currentIndex],
       ),
 
-      // Premium Frosted Navigation Bar
-      bottomNavigationBar: Container(
+      // Adaptive Two-Mode Navigation Bar
+      bottomNavigationBar: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
         decoration: BoxDecoration(
-          color: AppColors.surfaceBase,
-          border: const Border(
-            top: BorderSide(color: AppColors.borderSubtle, width: 1),
+          color: navBg,
+          border: Border(
+            top: BorderSide(color: navBorder, width: 1),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.6),
-              blurRadius: 20,
+              color: Colors.black.withValues(alpha: isEditorial ? 0.05 : 0.6),
+              blurRadius: 16,
               offset: const Offset(0, -4),
             ),
           ],
@@ -106,6 +115,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               final isSelected = _currentIndex == index;
               final isEmergency = item['isEmergency'] == true;
 
+              final activeColor = isEmergency ? AppColors.emergencyRed : primaryActiveColor;
+              final inactiveColor = isEmergency ? Colors.red[400]! : unselectedColor;
+
               return Expanded(
                 child: BouncingButton(
                   onTap: () => _onTabSelected(index),
@@ -114,16 +126,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 6),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? (isEmergency
-                              ? AppColors.emergencyRed.withValues(alpha: 0.15)
-                              : AppColors.emerald.withValues(alpha: 0.15))
+                          ? activeColor.withValues(alpha: 0.12)
                           : Colors.transparent,
                       borderRadius: AppRadius.roundedMd,
                       border: isSelected
                           ? Border.all(
-                              color: isEmergency
-                                  ? AppColors.emergencyRed.withValues(alpha: 0.4)
-                                  : AppColors.emerald.withValues(alpha: 0.4),
+                              color: activeColor.withValues(alpha: 0.35),
                               width: 1,
                             )
                           : null,
@@ -133,23 +141,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       children: [
                         Icon(
                           isSelected ? item['activeIcon'] as IconData : item['icon'] as IconData,
-                          color: isSelected
-                              ? (isEmergency ? AppColors.emergencyRed : AppColors.emerald)
-                              : (isEmergency ? Colors.red[300] : AppColors.textMuted),
+                          color: isSelected ? activeColor : inactiveColor,
                           size: 22,
                         ),
                         const SizedBox(height: 3),
                         Text(
                           item['label'] as String,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-                            color: isSelected
-                                ? (isEmergency ? AppColors.emergencyRed : AppColors.emerald)
-                                : AppColors.textMuted,
+                            color: isSelected ? activeColor : inactiveColor,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),

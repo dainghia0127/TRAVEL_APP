@@ -10,6 +10,16 @@ class AppColors {
   static const Color surfaceElevated = Color(0xFF222F29);  // Dialog / Floating Sheets
   static const Color surfaceGlass = Color(0x331E2D26);     // Kính mờ (Frosted glass)
 
+  // Phân hệ Modern Outdoor Editorial (Khám phá, Chi tiết & Lịch trình)
+  static const Color editorialBg = Color(0xFFFBFBFA);           // Nền giấy ấm / off-white tự nhiên
+  static const Color editorialSurface = Color(0xFFFFFFFF);      // Thẻ trắng tinh khôi
+  static const Color editorialSurfaceSubtle = Color(0xFFF5F4EE);// Nền phụ ấm áp
+  static const Color editorialInk = Color(0xFF17221B);          // Chữ mực rừng sâu, độ tương phản cao
+  static const Color editorialMuted = Color(0xFF637066);        // Chữ phụ, mô tả, chú thích
+  static const Color editorialBorder = Color(0xFFE7E6DF);       // Viền thanh mảnh tao nhã
+  static const Color editorialPine = Color(0xFF1E3A2B);         // Xanh lá thông dã ngoại (primary)
+  static const Color editorialTerracotta = Color(0xFFC26D38);   // Đất nung / Cam ấm hoàng hôn
+
   // Đường viền (Borders)
   static const Color borderSubtle = Color(0x14FFFFFF);     // Viền mờ 8%
   static const Color borderMedium = Color(0x24FFFFFF);     // Viền rõ 14%
@@ -157,6 +167,43 @@ class AppTypography {
     fontWeight: FontWeight.w700,
     letterSpacing: 0.5,
     color: AppColors.textPrimary,
+  );
+
+  // Phân hệ Editorial Typography
+  static const TextStyle editorialHero = TextStyle(
+    fontSize: 32,
+    fontWeight: FontWeight.w800,
+    color: AppColors.editorialInk,
+    letterSpacing: -0.8,
+    height: 1.15,
+  );
+
+  static const TextStyle editorialHeadline = TextStyle(
+    fontSize: 22,
+    fontWeight: FontWeight.w700,
+    color: AppColors.editorialInk,
+    letterSpacing: -0.4,
+  );
+
+  static const TextStyle editorialSubhead = TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.w600,
+    color: AppColors.editorialPine,
+    letterSpacing: 0.1,
+  );
+
+  static const TextStyle editorialBody = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    color: AppColors.editorialInk,
+    height: 1.5,
+  );
+
+  static const TextStyle editorialCaption = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+    color: AppColors.editorialMuted,
+    letterSpacing: 0.2,
   );
 }
 

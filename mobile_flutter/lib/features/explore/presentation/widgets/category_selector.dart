@@ -25,7 +25,7 @@ class CategorySelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 44,
+      height: 42,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
@@ -46,37 +46,35 @@ class CategorySelector extends StatelessWidget {
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.emerald : AppColors.surfaceHigh,
+                  color: isSelected ? AppColors.editorialPine : AppColors.editorialSurface,
                   borderRadius: AppRadius.roundedPill,
                   border: Border.all(
-                    color: isSelected ? AppColors.emerald : AppColors.borderSubtle,
+                    color: isSelected ? AppColors.editorialPine : AppColors.editorialBorder,
                     width: 1,
                   ),
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: AppColors.emerald.withValues(alpha: 0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 3),
-                          ),
-                        ]
-                      : null,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: isSelected ? 0.08 : 0.02),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
                       cat.icon,
-                      size: 16,
-                      color: isSelected ? Colors.black : AppColors.emerald,
+                      size: 15,
+                      color: isSelected ? Colors.white : AppColors.editorialPine,
                     ),
                     const SizedBox(width: 6),
                     Text(
                       cat.title,
                       style: TextStyle(
                         fontSize: 12,
-                        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                        color: isSelected ? Colors.black : AppColors.textPrimary,
+                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                        color: isSelected ? Colors.white : AppColors.editorialInk,
                         letterSpacing: 0.1,
                       ),
                     ),
@@ -90,4 +88,3 @@ class CategorySelector extends StatelessWidget {
     );
   }
 }
-

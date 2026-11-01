@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
@@ -18,8 +17,8 @@ class SafetySosScreen extends StatefulWidget {
 class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProviderStateMixin {
   int _activeTab = 0; // 0: SOS Khẩn cấp, 1: Thời tiết vi khí hậu
   bool _isSosActive = false;
-  bool _flashState = false;
-  Timer? _morseTimer;
+  double _holdProgress = 0.0;
+  Timer? _holdTimer;
 
   OutdoorWeather? _currentWeather;
   final double _demoLat = 11.9404;
@@ -36,19 +35,61 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
     if (mounted) setState(() => _currentWeather = weather);
   }
 
-  void _toggleSos() {
-    HapticFeedback.heavyImpact();
-    setState(() {
-      _isSosActive = !_isSosActive;
-      if (_isSosActive) {
-        _morseTimer = Timer.periodic(const Duration(milliseconds: 280), (timer) {
-          if (mounted) setState(() => _flashState = !_flashState);
-        });
+  void _onHoldStart() {
+    if (_isSosActive) {
+      // Nếu đang active thì chạm để tắt ngay
+      _deactivateSos();
+      return;
+    }
+    _holdTimer?.cancel();
+    setState(() => _holdProgress = 0.0);
+
+    const int totalMs = 2000;
+    const int stepMs = 50;
+    int elapsed = 0;
+
+    _holdTimer = Timer.periodic(const Duration(milliseconds: stepMs), (timer) {
+      elapsed += stepMs;
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      final progress = elapsed / totalMs;
+      if (progress >= 1.0) {
+        timer.cancel();
+        _activateSos();
       } else {
-        _morseTimer?.cancel();
-        _flashState = false;
+        setState(() => _holdProgress = progress);
       }
     });
+  }
+
+  void _onHoldEnd() {
+    if (!_isSosActive) {
+      _holdTimer?.cancel();
+      if (mounted) {
+        setState(() => _holdProgress = 0.0);
+      }
+    }
+  }
+
+  void _activateSos() {
+    HapticFeedback.heavyImpact();
+    setState(() {
+      _isSosActive = true;
+      _holdProgress = 1.0;
+    });
+    _showSnackBar('ĐÃ KÍCH HOẠT TÍN HIỆU CỨU HỘ KHẨN CẤP (SOS)');
+  }
+
+  void _deactivateSos() {
+    HapticFeedback.mediumImpact();
+    _holdTimer?.cancel();
+    setState(() {
+      _isSosActive = false;
+      _holdProgress = 0.0;
+    });
+    _showSnackBar('Đã tắt tín hiệu cứu hộ khẩn cấp');
   }
 
   Future<void> _sendEmergencySms() async {
@@ -59,7 +100,7 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri);
       } else {
-        _showSnackBar('Đã chuẩn bị nội dung SMS cứu hộ kèm tọa độ GPS.');
+        _showSnackBar('Đã chuẩn bị nội dung tin nhắn cứu hộ kèm tọa độ GPS.');
       }
     } catch (_) {
       _showSnackBar('Đã chuẩn bị tin nhắn cứu hộ.');
@@ -94,7 +135,7 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
 
   @override
   void dispose() {
-    _morseTimer?.cancel();
+    _holdTimer?.cancel();
     super.dispose();
   }
 
@@ -120,17 +161,42 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
                         _activeTab == 0 ? 'Cứu Hộ & SOS' : 'Thời Tiết Dã Ngoại',
                         style: AppTypography.displayHero.copyWith(fontSize: 24),
                       ),
-                      TacticalPill(
-                        icon: Icons.shield_outlined,
-                        text: 'AN TOÀN',
-                        color: AppColors.emerald,
-                        backgroundColor: AppColors.surfaceHigh,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: _isSosActive
+                              ? AppColors.emergencyRed.withValues(alpha: 0.2)
+                              : AppColors.emerald.withValues(alpha: 0.15),
+                          borderRadius: AppRadius.roundedPill,
+                          border: Border.all(
+                            color: _isSosActive ? AppColors.emergencyRed : AppColors.emerald,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _isSosActive ? Icons.warning_amber_rounded : Icons.shield_outlined,
+                              size: 14,
+                              color: _isSosActive ? AppColors.emergencyRed : AppColors.emerald,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              _isSosActive ? 'BÁO ĐỘNG SOS' : 'SẴN SÀNG 24/7',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                color: _isSosActive ? AppColors.emergencyRed : AppColors.emerald,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
 
-                  // 2-Tab Switcher (SOS vs Weather)
+                  // 2-Tab Switcher
                   Row(
                     children: [
                       _buildHeaderTab(0, 'SOS Cứu Hộ Khẩn Cấp', Icons.emergency),
@@ -196,81 +262,109 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
     );
   }
 
-  // TAB 1: SOS VIEW
+  // TAB 1: SOS VIEW (Chống bấm nhầm & An toàn thị giác)
   Widget _buildSosView() {
     return ListView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space16, vertical: 8),
       children: [
-        // SOS Beacon Pulsing Container
+        // SOS Beacon Container
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 16),
           decoration: BoxDecoration(
-            color: _isSosActive
-                ? (_flashState ? const Color(0xFF7F1D1D) : const Color(0xFF450A0A))
-                : AppColors.surfaceBase,
+            color: _isSosActive ? const Color(0xFF381010) : AppColors.surfaceBase,
             borderRadius: AppRadius.roundedXl,
             border: Border.all(
-              color: _isSosActive ? AppColors.emergencyRed : AppColors.emergencyRed.withValues(alpha: 0.3),
+              color: _isSosActive ? AppColors.emergencyRed : AppColors.borderSubtle,
               width: _isSosActive ? 2 : 1,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: _isSosActive ? AppColors.emergencyRed.withValues(alpha: 0.5) : Colors.black.withValues(alpha: 0.4),
-                blurRadius: _isSosActive ? 30 : 16,
-              ),
-            ],
           ),
           child: Column(
             children: [
-              // Beacon Button with multi-layer pulsing animation
+              // Hold to Activate Button with circular progress indicator
               GestureDetector(
-                onTap: _toggleSos,
-                child: Container(
-                  width: 130,
-                  height: 130,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: _isSosActive ? AppColors.sosGradient : null,
-                    color: _isSosActive ? null : const Color(0xFF2A1515),
-                    border: Border.all(color: AppColors.emergencyRed, width: _isSosActive ? 4 : 2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.emergencyRed.withValues(alpha: _isSosActive ? 0.7 : 0.25),
-                        blurRadius: _isSosActive ? 30 : 14,
-                        spreadRadius: _isSosActive ? 6 : 0,
+                onTapDown: (_) => _onHoldStart(),
+                onTapUp: (_) => _onHoldEnd(),
+                onTapCancel: () => _onHoldEnd(),
+                child: SizedBox(
+                  width: 140,
+                  height: 140,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Circular progress border
+                      if (!_isSosActive && _holdProgress > 0)
+                        SizedBox(
+                          width: 136,
+                          height: 136,
+                          child: CircularProgressIndicator(
+                            value: _holdProgress,
+                            strokeWidth: 4,
+                            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.emergencyRed),
+                            backgroundColor: Colors.transparent,
+                          ),
+                        ),
+                      // Core button
+                      Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _isSosActive ? AppColors.emergencyRed : const Color(0xFF2A1515),
+                          border: Border.all(
+                            color: AppColors.emergencyRed,
+                            width: 2.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.emergencyRed.withValues(alpha: _isSosActive ? 0.6 : 0.2),
+                              blurRadius: _isSosActive ? 24 : 12,
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                _isSosActive ? Icons.power_settings_new : Icons.emergency,
+                                size: 44,
+                                color: _isSosActive ? Colors.white : AppColors.emergencyRed,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _isSosActive ? 'TẮT SOS' : 'GIỮ 2 GIÂY',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.5,
+                                  color: _isSosActive ? Colors.white : AppColors.emergencyRed,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                  child: Center(
-                    child: Icon(
-                      _isSosActive ? Icons.flash_on : Icons.sos,
-                      size: 58,
-                      color: _isSosActive ? Colors.white : AppColors.emergencyRed,
-                    ),
-                  ),
-                )
-                    .animate(target: _isSosActive ? 1 : 0)
-                    .scale(begin: const Offset(1, 1), end: const Offset(1.08, 1.08), duration: 600.ms, curve: Curves.easeInOut)
-                    .then()
-                    .scale(begin: const Offset(1.08, 1.08), end: const Offset(1, 1), duration: 600.ms),
+                ),
               ),
               const SizedBox(height: 18),
               Text(
-                _isSosActive ? 'ĐANG PHÁT MÃ MORSE SOS (... --- ...)' : 'CHẠM ĐỂ KÍCH HOẠT SOS',
+                _isSosActive ? 'ĐANG KÍCH HOẠT BÁO ĐỘNG CỨU HỘ' : 'NHẤN GIỮ 2 GIÂY ĐỂ PHÁT SOS',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.5,
-                  color: _isSosActive ? Colors.white : AppColors.emergencyRed,
+                  color: _isSosActive ? AppColors.emergencyRed : Colors.white,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 _isSosActive
-                    ? 'Chớp đèn flash màn hình & phát xung âm thanh định vị ban đêm'
-                    : 'Phát tín hiệu cứu hộ khẩn cấp bằng đèn & còi hú tần số cao',
+                    ? 'Chế độ an toàn: Chạm một lần vào nút đỏ ở trên để tắt ngay'
+                    : 'Cơ chế chống chạm nhầm trong ba lô khi trekking',
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
@@ -280,7 +374,7 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
 
         const SizedBox(height: 16),
 
-        // Military GPS Coordinates Card
+        // GPS Satellite Coordinates Card
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -294,7 +388,15 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('TỌA ĐỘ GPS CỦA BẠN (OFFLINE)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.emerald, letterSpacing: 0.4)),
+                  const Text(
+                    'TỌA ĐỘ VỆ TINH GPS (WGS84)',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.emerald,
+                      letterSpacing: 0.4,
+                    ),
+                  ),
                   BouncingButton(
                     onTap: _copyGpsCoordinates,
                     child: Container(
@@ -318,7 +420,7 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
               const SizedBox(height: 8),
               Text('$_demoLat, $_demoLng', style: AppTypography.displayHero.copyWith(fontSize: 22)),
               const SizedBox(height: 2),
-              const Text('Cao độ vệ tinh: 1,485m • Sai số: ± 3.5m', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+              const Text('Cao độ vệ tinh: 1,485m • Sai số ước lượng: ± 3.5m', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
             ],
           ),
         ),
@@ -373,7 +475,68 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
           ],
         ),
 
+        const SizedBox(height: 14),
+
+        // Local Forest Ranger Contacts
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceBase,
+            borderRadius: AppRadius.roundedMd,
+            border: Border.all(color: AppColors.borderSubtle),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'ĐƯỜNG DÂY NÓNG ĐỊA PHƯƠNG (KHẨN CẤP)',
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textSecondary, letterSpacing: 0.4),
+              ),
+              const SizedBox(height: 10),
+              _buildContactRow('Cứu nạn Quốc Gia', '112', Icons.phone_in_talk),
+              const Divider(height: 16, color: AppColors.borderSubtle),
+              _buildContactRow('Kiểm Lâm Tà Năng (Đức Trọng)', '02633843115', Icons.forest),
+              const Divider(height: 16, color: AppColors.borderSubtle),
+              _buildContactRow('UBND Xã Phan Dũng (Tuy Phong)', '02523851115', Icons.location_city),
+            ],
+          ),
+        ),
+
         const SizedBox(height: 30),
+      ],
+    );
+  }
+
+  Widget _buildContactRow(String name, String phone, IconData icon) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 16, color: AppColors.emerald),
+            const SizedBox(width: 8),
+            Text(name, style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w600)),
+          ],
+        ),
+        BouncingButton(
+          onTap: () => _callEmergency(phone),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceHigh,
+              borderRadius: AppRadius.roundedPill,
+              border: Border.all(color: AppColors.emerald.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.call, size: 12, color: AppColors.emerald),
+                const SizedBox(width: 4),
+                Text(phone, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.emerald)),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }
