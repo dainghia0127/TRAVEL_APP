@@ -82,6 +82,7 @@ class EditorialImage extends StatelessWidget {
         height: height,
         fit: fit,
         alignment: image.focalPoint,
+        cacheWidth: 800,
         frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
           if (wasSynchronouslyLoaded || frame != null) return child;
           return SkeletonShimmer(
@@ -165,6 +166,7 @@ class EditorialImage extends StatelessWidget {
         height: height,
         fit: fit,
         alignment: image.focalPoint,
+        cacheWidth: 800,
         errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
       );
     }
