@@ -47,7 +47,7 @@ void main() {
     expect(find.text('Kế Hoạch Khám Phá'), findsOneWidget);
 
     // Tap back to 'Khám phá'
-    await tester.tap(find.text('Khám phá'));
+    await tester.tap(find.text('Khám phá').last);
     await tester.pump(const Duration(milliseconds: 200));
     expect(find.text('Khám Phá & Dã Ngoại'), findsOneWidget);
   });

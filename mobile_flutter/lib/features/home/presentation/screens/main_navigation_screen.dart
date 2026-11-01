@@ -12,12 +12,40 @@ import 'package:mobile_flutter/features/trip_planner/presentation/screens/trip_p
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
 
+  /// Cho phép các màn hình con (như Chi tiết địa điểm, Lịch trình, v.v.)
+  /// chuyển đổi tab một cách đồng bộ và tức thì.
+  static final ValueNotifier<int> activeTabNotifier = ValueNotifier<int>(0);
+
+  static void switchToTab(int index) {
+    activeTabNotifier.value = index;
+  }
+
   @override
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = MainNavigationScreen.activeTabNotifier.value;
+    MainNavigationScreen.activeTabNotifier.addListener(_handleExternalTabChange);
+  }
+
+  @override
+  void dispose() {
+    MainNavigationScreen.activeTabNotifier.removeListener(_handleExternalTabChange);
+    super.dispose();
+  }
+
+  void _handleExternalTabChange() {
+    final newIndex = MainNavigationScreen.activeTabNotifier.value;
+    if (_currentIndex != newIndex && mounted) {
+      setState(() => _currentIndex = newIndex);
+    }
+  }
 
   final List<Widget> _screens = const [
     ExploreScreen(),
@@ -61,6 +89,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   void _onTabSelected(int index) {
     if (_currentIndex != index) {
       HapticFeedback.selectionClick();
+      MainNavigationScreen.activeTabNotifier.value = index;
       setState(() => _currentIndex = index);
     }
   }

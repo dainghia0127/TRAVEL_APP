@@ -5,9 +5,11 @@ import 'package:mobile_flutter/core/models/outdoor_image.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
 import 'package:mobile_flutter/core/widgets/editorial_image.dart';
+import 'package:mobile_flutter/core/services/storage_service.dart';
 import 'package:mobile_flutter/features/explore/domain/entities/destination.dart';
 import 'package:mobile_flutter/features/explore/domain/entities/trekking_route.dart';
 import 'package:mobile_flutter/features/explore/domain/entities/safety_guideline.dart';
+import 'package:mobile_flutter/features/home/presentation/screens/main_navigation_screen.dart';
 
 class DestinationDetailScreen extends StatefulWidget {
   final Destination? destination;
@@ -30,17 +32,67 @@ class DestinationDetailScreen extends StatefulWidget {
 class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
   late bool _fav;
   int _selectedTab = 0; // 0: Tổng quan, 1: Lộ trình, 2: An toàn
+  bool _isInTrip = false;
+
+  String get _destId => widget.destination?.id ?? (widget.spot?['id'] as String? ?? 'vn_ta_nang_phan_dung');
 
   @override
   void initState() {
     super.initState();
     _fav = widget.isFavorite;
+    _checkTripStatus();
+  }
+
+  Future<void> _checkTripStatus() async {
+    final trips = await StorageService.getTripDestinations();
+    if (mounted) {
+      setState(() {
+        _isInTrip = trips.contains(_destId);
+      });
+    }
   }
 
   void _handleToggleFav() {
     setState(() => _fav = !_fav);
     widget.onToggleFavorite();
     HapticFeedback.mediumImpact();
+  }
+
+  Future<void> _handleAddToTrip() async {
+    HapticFeedback.mediumImpact();
+    await StorageService.addTripDestination(_destId);
+    await StorageService.setSelectedTripDestination(_destId);
+    if (mounted) {
+      setState(() => _isInTrip = true);
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Đã thêm $_title vào Chuyến đi & sẵn sàng chỉ đường!'),
+          backgroundColor: AppColors.editorialPine,
+          duration: const Duration(seconds: 4),
+          action: SnackBarAction(
+            label: 'Mở Bản Đồ',
+            textColor: AppColors.summitGold,
+            onPressed: () {
+              Navigator.of(context).pop();
+              MainNavigationScreen.switchToTab(1);
+            },
+          ),
+        ),
+      );
+    }
+  }
+
+  void _navigateToMap() {
+    StorageService.setSelectedTripDestination(_destId);
+    Navigator.of(context).pop();
+    MainNavigationScreen.switchToTab(1);
+  }
+
+  void _navigateToTripPlanner() {
+    StorageService.setSelectedTripDestination(_destId);
+    Navigator.of(context).pop();
+    MainNavigationScreen.switchToTab(2);
   }
 
   OutdoorImage _resolveImage() {
@@ -439,45 +491,96 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(
-                    child: BouncingButton(
-                      onTap: () {
-                        HapticFeedback.mediumImpact();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Đã thêm $_title vào Kế hoạch Chuyến đi!'),
-                            backgroundColor: AppColors.editorialPine,
-                            duration: const Duration(seconds: 2),
+                  if (!_isInTrip)
+                    Expanded(
+                      child: BouncingButton(
+                        onTap: _handleAddToTrip,
+                        child: Container(
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: AppColors.editorialPine,
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.editorialPine.withValues(alpha: 0.3),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                        );
-                      },
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: AppColors.editorialPine,
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.editorialPine.withValues(alpha: 0.3),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.add_location_alt_outlined, color: Colors.white, size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                'Thêm Vào Chuyến Đi',
+                                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
+                              ),
+                            ],
+                          ),
                         ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.route, color: Colors.white, size: 20),
-                            SizedBox(width: 8),
-                            Text(
-                              'Lập Kế Hoạch Chuyến Đi',
-                              style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
-                            ),
-                          ],
+                      ),
+                    )
+                  else ...[
+                    Expanded(
+                      flex: 6,
+                      child: BouncingButton(
+                        onTap: _navigateToMap,
+                        child: Container(
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: AppColors.editorialPine,
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.editorialPine.withValues(alpha: 0.35),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.navigation_outlined, color: Colors.white, size: 19),
+                              SizedBox(width: 6),
+                              Text(
+                                'Chỉ Đường Bản Đồ',
+                                style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      flex: 5,
+                      child: BouncingButton(
+                        onTap: _navigateToTripPlanner,
+                        child: Container(
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: AppColors.editorialSurface,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: AppColors.editorialPine, width: 1.5),
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.calendar_month_outlined, color: AppColors.editorialPine, size: 18),
+                              SizedBox(width: 6),
+                              Text(
+                                'Xem Lịch Trình',
+                                style: TextStyle(color: AppColors.editorialPine, fontSize: 13, fontWeight: FontWeight.w700),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
