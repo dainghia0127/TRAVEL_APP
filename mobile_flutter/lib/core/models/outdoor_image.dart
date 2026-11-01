@@ -29,3 +29,4 @@ class OutdoorImage {
     caption: 'Vùng đồi hoang sơ dã ngoại',
   );
 }
+

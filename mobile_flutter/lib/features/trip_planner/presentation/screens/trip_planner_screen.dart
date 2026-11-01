@@ -380,7 +380,14 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                     decoration: BoxDecoration(
                       color: AppColors.editorialSurface,
                       borderRadius: AppRadius.roundedMd,
-                      border: Border.all(color: AppColors.editorialBorder),
+                      border: Border.all(color: AppColors.editorialBorder, width: 1.2),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x0C17221B),
+                          blurRadius: 10,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -658,7 +665,14 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                       decoration: BoxDecoration(
                         color: AppColors.editorialSurface,
                         borderRadius: AppRadius.roundedMd,
-                        border: Border.all(color: AppColors.editorialBorder),
+                        border: Border.all(color: AppColors.editorialBorder, width: 1.2),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x0817221B),
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Row(
                         children: [
@@ -744,7 +758,14 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
           decoration: BoxDecoration(
             color: AppColors.editorialSurface,
             borderRadius: AppRadius.roundedLg,
-            border: Border.all(color: AppColors.editorialBorder),
+            border: Border.all(color: AppColors.editorialBorder, width: 1.2),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x0C17221B),
+                blurRadius: 10,
+                offset: Offset(0, 3),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -895,8 +916,16 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
               color: AppColors.editorialSurface,
               borderRadius: AppRadius.roundedMd,
               border: Border.all(
-                color: isChecked ? AppColors.editorialPine.withValues(alpha: 0.3) : AppColors.editorialBorder,
+                color: isChecked ? AppColors.editorialPine.withValues(alpha: 0.4) : AppColors.editorialBorder,
+                width: 1.2,
               ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x0617221B),
+                  blurRadius: 6,
+                  offset: Offset(0, 2),
+                ),
+              ],
             ),
             child: ListTile(
               leading: Icon(

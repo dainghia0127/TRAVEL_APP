@@ -20,7 +20,7 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
   LatLng _currentLocation = const LatLng(11.6420, 108.4230); // Tà Năng
   bool _isLocating = false;
   String _selectedFilter = 'Tất cả';
-  String _currentLayer = 'dark'; // 'dark', 'satellite', 'topo'
+  String _currentLayer = 'topo'; // 'topo', 'satellite', 'streets'
 
   // Selected waypoint for bottom sheet preview
   Map<String, dynamic>? _selectedWaypoint;
@@ -120,9 +120,9 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
   }
 
   String get _layerStatusLabel {
-    if (_currentLayer == 'satellite') return 'VỆ TINH • ESRI ONLINE';
-    if (_currentLayer == 'topo') return 'ĐỊA HÌNH • ESRI TOPO';
-    return 'BẢN ĐỒ ĐÊM • CARTO';
+    if (_currentLayer == 'satellite') return 'VỆ TINH • ESRI SATELLITE';
+    if (_currentLayer == 'streets') return 'ĐƯỜNG MÒN • ESRI STREETS';
+    return 'ĐỊA HÌNH • ESRI TOPO';
   }
 
   @override
@@ -157,16 +157,15 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
               },
             ),
             children: [
-              // High-Contrast Dark Matter / Satellite / Topo Tiles
-              if (_currentLayer == 'dark')
-                TileLayer(
-                  urlTemplate: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-                  subdomains: const ['a', 'b', 'c', 'd'],
-                  userAgentPackageName: 'com.traveloutdoor.travel_app',
-                )
-              else if (_currentLayer == 'satellite')
+              // Free GIS ESRI Topo / Satellite / Streets Tiles (Không yêu cầu API key)
+              if (_currentLayer == 'satellite')
                 TileLayer(
                   urlTemplate: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                  userAgentPackageName: 'com.traveloutdoor.travel_app',
+                )
+              else if (_currentLayer == 'streets')
+                TileLayer(
+                  urlTemplate: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
                   userAgentPackageName: 'com.traveloutdoor.travel_app',
                 )
               else
@@ -571,24 +570,24 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
               Text('CHỌN LỚP BẢN ĐỒ DÃ NGOẠI', style: AppTypography.captionBadge.copyWith(color: AppColors.emerald)),
               const SizedBox(height: 12),
               _buildLayerOption(
-                id: 'dark',
-                name: 'Bản Đồ Đêm (Dark Matter)',
-                desc: 'Tối ưu quan sát ban đêm, tiết kiệm pin & độ tương phản cao',
-                icon: Icons.nightlight_round,
+                id: 'topo',
+                name: 'Bản Đồ Địa Hình & Cao Độ (ESRI Topo)',
+                desc: 'Đường đồng mức núi rừng Tà Năng, suối thác, đèo dốc rõ nét',
+                icon: Icons.terrain,
               ),
               const SizedBox(height: 10),
               _buildLayerOption(
                 id: 'satellite',
-                name: 'Ảnh Vệ Tinh (ESRI Satellite)',
+                name: 'Ảnh Vệ Tinh Độ Phân Giải Cao (ESRI Satellite)',
                 desc: 'Hình ảnh không gian thực tế, độ phủ rừng & tán cây',
                 icon: Icons.satellite_alt,
               ),
               const SizedBox(height: 10),
               _buildLayerOption(
-                id: 'topo',
-                name: 'Địa Hình Núi (Topographic)',
-                desc: 'Đường đồng mức cao độ, sống núi, suối & thung lũng',
-                icon: Icons.terrain,
+                id: 'streets',
+                name: 'Đường Mòn & Địa Danh Dã Ngoại (ESRI Streets)',
+                desc: 'Địa danh làng xã, suối cạn, đường mòn trekking & ranh giới',
+                icon: Icons.map_outlined,
               ),
             ],
           ),

@@ -11,12 +11,14 @@ class AppColors {
   static const Color surfaceGlass = Color(0x331E2D26);     // Kính mờ (Frosted glass)
 
   // Phân hệ Modern Outdoor Editorial (Khám phá, Chi tiết & Lịch trình)
-  static const Color editorialBg = Color(0xFFFBFBFA);           // Nền giấy ấm / off-white tự nhiên
-  static const Color editorialSurface = Color(0xFFFFFFFF);      // Thẻ trắng tinh khôi
-  static const Color editorialSurfaceSubtle = Color(0xFFF5F4EE);// Nền phụ ấm áp
+  static const Color editorialBg = Color(0xFFEFECE4);           // Nền giấy mộc dã ngoại ấm áp, tương phản rõ nét với khung
+  static const Color editorialSurface = Color(0xFFFFFFFF);      // Thẻ trắng tinh khôi nổi bật trên nền giấy
+  static const Color editorialSurfaceSubtle = Color(0xFFE5E0D5);// Khung thông tin phụ / chip / search bar
+  static const Color editorialSurfaceAlt = Color(0xFFFAF7F0);   // Nền thẻ biến thể ấm cúng
   static const Color editorialInk = Color(0xFF17221B);          // Chữ mực rừng sâu, độ tương phản cao
-  static const Color editorialMuted = Color(0xFF637066);        // Chữ phụ, mô tả, chú thích
-  static const Color editorialBorder = Color(0xFFE7E6DF);       // Viền thanh mảnh tao nhã
+  static const Color editorialMuted = Color(0xFF5A685F);        // Chữ phụ, mô tả, chú thích
+  static const Color editorialBorder = Color(0xFFD5CEC0);       // Viền rõ nét, định hình khung phân cách
+  static const Color editorialBorderSubtle = Color(0xFFE2DDD2); // Viền mảnh ngăn chia nội bộ
   static const Color editorialPine = Color(0xFF1E3A2B);         // Xanh lá thông dã ngoại (primary)
   static const Color editorialTerracotta = Color(0xFFC26D38);   // Đất nung / Cam ấm hoàng hôn
 
