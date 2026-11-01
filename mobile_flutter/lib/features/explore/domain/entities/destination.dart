@@ -25,6 +25,10 @@ class Destination {
   final String? dataSource; // Nguồn dữ liệu thực tế (UNESCO, Wikidata, OSM, Cục Du lịch)
   final List<DestinationMedia> media;
   final TrekkingRoute? route;
+  final List<String> localSpecialties; // Đặc sản ẩm thực địa phương
+  final List<String> mustTryActivities; // Trải nghiệm nhất định phải thử
+  final List<String> culturalHighlights; // Nét đẹp văn hóa & lịch sử bản địa
+  final String? gettingThereAdvice; // Hướng dẫn di chuyển & phương tiện đến
 
   const Destination({
     required this.id,
@@ -49,6 +53,10 @@ class Destination {
     this.dataSource,
     this.media = const [],
     this.route,
+    this.localSpecialties = const [],
+    this.mustTryActivities = const [],
+    this.culturalHighlights = const [],
+    this.gettingThereAdvice,
   });
 
   /// Kiểm tra xem điểm đến có thuộc quốc gia ngữ cảnh của người dùng hay không

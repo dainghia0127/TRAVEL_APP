@@ -139,6 +139,10 @@ class DestinationModel extends Destination {
     super.dataSource,
     super.media,
     super.route,
+    super.localSpecialties,
+    super.mustTryActivities,
+    super.culturalHighlights,
+    super.gettingThereAdvice,
   });
 
   factory DestinationModel.fromJson(Map<String, dynamic> json) {
@@ -158,6 +162,21 @@ class DestinationModel extends Destination {
         ['trekking'];
 
     final seasonsList = (json['best_travel_seasons'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [];
+
+    final specialtiesList = (json['local_specialties'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [];
+
+    final activitiesList = (json['must_try_activities'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [];
+
+    final culturalList = (json['cultural_highlights'] as List<dynamic>?)
             ?.map((e) => e.toString())
             .toList() ??
         [];
@@ -190,6 +209,10 @@ class DestinationModel extends Destination {
       dataSource: json['data_source'] as String?,
       media: mediaList,
       route: route,
+      localSpecialties: specialtiesList,
+      mustTryActivities: activitiesList,
+      culturalHighlights: culturalList,
+      gettingThereAdvice: json['getting_there_advice'] as String?,
     );
   }
 }

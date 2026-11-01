@@ -31,6 +31,7 @@ class NearbySection extends StatelessWidget {
           destination: dest,
           isFavorite: isFav,
           onToggleFavorite: () => onToggleFavorite(dest.id),
+          userLocation: userLocation,
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(

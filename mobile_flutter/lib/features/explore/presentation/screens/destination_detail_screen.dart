@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:mobile_flutter/core/models/outdoor_image.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
@@ -16,6 +17,7 @@ class DestinationDetailScreen extends StatefulWidget {
   final Map<String, dynamic>? spot;
   final bool isFavorite;
   final VoidCallback onToggleFavorite;
+  final LatLng? userLocation;
 
   const DestinationDetailScreen({
     super.key,
@@ -23,6 +25,7 @@ class DestinationDetailScreen extends StatefulWidget {
     this.spot,
     required this.isFavorite,
     required this.onToggleFavorite,
+    this.userLocation,
   }) : assert(destination != null || spot != null, 'Either destination or spot must be provided');
 
   @override
@@ -164,12 +167,42 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
   String? get _localName => widget.destination?.localName;
   String get _summary => widget.destination?.editorialSummary ?? widget.spot?['description'] as String? ?? '';
   String? get _content => widget.destination?.editorialContent;
-  String get _distance => widget.destination?.distanceDisplay ?? widget.spot?['distance'] as String? ?? '--';
   String get _elevation => widget.destination?.elevationDisplay ?? widget.spot?['elevation'] as String? ?? '--';
   List<String> get _seasons => widget.destination?.bestTravelSeasons ?? [];
   bool get _isVerified => widget.destination?.isVerified ?? false;
   TrekkingRoute? get _route => widget.destination?.route;
   SafetyGuideline? get _safety => _route?.safety;
+  List<String> get _localSpecialties => widget.destination?.localSpecialties ?? [];
+  List<String> get _mustTryActivities => widget.destination?.mustTryActivities ?? [];
+  List<String> get _culturalHighlights => widget.destination?.culturalHighlights ?? [];
+  String? get _gettingThereAdvice => widget.destination?.gettingThereAdvice;
+
+  /// Tính toán khoảng cách thực tế từ vị trí người dùng đến địa điểm
+  String get _computedDistance {
+    if (widget.destination != null &&
+        widget.destination!.centerLatitude != null &&
+        widget.destination!.centerLongitude != null) {
+      final userPos = widget.userLocation ?? const LatLng(10.8231, 106.6297);
+      final destPos = LatLng(
+        widget.destination!.centerLatitude!,
+        widget.destination!.centerLongitude!,
+      );
+      final dist = const Distance().as(LengthUnit.Kilometer, userPos, destPos);
+      if (dist >= 1000) {
+        final formatted = (dist / 1000).toStringAsFixed(1);
+        return '${formatted.replaceAll('.0', '')}k km';
+      }
+      return '${dist.round()} km';
+    }
+    if (widget.destination?.route?.distanceKm != null) {
+      return '${widget.destination!.route!.distanceKm} km';
+    }
+    final spotDist = widget.spot?['distance'] as String?;
+    if (spotDist != null && spotDist.isNotEmpty && spotDist != '--') {
+      return spotDist;
+    }
+    return '94 km';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -339,16 +372,18 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _buildFact(Icons.straighten, 'Cự ly', _distance),
+                            _buildFact(Icons.near_me_outlined, 'Khoảng cách', _computedDistance),
                             _buildDivider(),
                             _buildFact(Icons.landscape, 'Độ cao', _elevation),
                             _buildDivider(),
                             _buildFact(
-                              Icons.schedule,
-                              'Thời gian',
-                              _route?.estimatedDurationDays != null
-                                  ? '${_route!.estimatedDurationDays} ngày'
-                                  : '1 ngày',
+                              _route?.distanceKm != null ? Icons.straighten : Icons.schedule,
+                              _route?.distanceKm != null ? 'Cung đường' : 'Thời gian',
+                              _route?.distanceKm != null
+                                  ? '${_route!.distanceKm} km'
+                                  : (_route?.estimatedDurationDays != null
+                                      ? '${_route!.estimatedDurationDays} ngày'
+                                      : '1 ngày'),
                             ),
                             _buildDivider(),
                             _buildFact(
@@ -383,13 +418,171 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                         const SizedBox(height: 8),
                         Text(
                           _content ?? _summary,
-                          style: const TextStyle(fontSize: 14, color: AppColors.editorialInk, height: 1.5),
+                          style: const TextStyle(fontSize: 14, color: AppColors.editorialInk, height: 1.6),
                         ),
+
+                        // Chỉ dẫn di chuyển & Phương tiện
+                        if (_gettingThereAdvice != null && _gettingThereAdvice!.isNotEmpty) ...[
+                          const SizedBox(height: 22),
+                          const Row(
+                            children: [
+                              Icon(Icons.directions_bus_filled_outlined, size: 18, color: AppColors.editorialPine),
+                              SizedBox(width: 8),
+                              Text(
+                                'Chỉ dẫn di chuyển & Phương tiện',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: AppColors.editorialSurface,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: AppColors.editorialBorder),
+                            ),
+                            child: Text(
+                              _gettingThereAdvice!,
+                              style: const TextStyle(fontSize: 13.5, color: AppColors.editorialInk, height: 1.55),
+                            ),
+                          ),
+                        ],
+
+                        // Đặc sản & Ẩm thực địa phương
+                        if (_localSpecialties.isNotEmpty) ...[
+                          const SizedBox(height: 22),
+                          const Row(
+                            children: [
+                              Icon(Icons.restaurant_menu, size: 18, color: AppColors.editorialTerracotta),
+                              SizedBox(width: 8),
+                              Text(
+                                'Đặc sản & Ẩm thực địa phương',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          ..._localSpecialties.map((item) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: AppColors.editorialSurface,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: AppColors.editorialBorder),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.editorialTerracotta.withValues(alpha: 0.12),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.lunch_dining_outlined, size: 16, color: AppColors.editorialTerracotta),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      item,
+                                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.editorialInk),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )),
+                        ],
+
+                        // Trải nghiệm nhất định phải thử
+                        if (_mustTryActivities.isNotEmpty) ...[
+                          const SizedBox(height: 22),
+                          const Row(
+                            children: [
+                              Icon(Icons.explore_outlined, size: 18, color: AppColors.editorialPine),
+                              SizedBox(width: 8),
+                              Text(
+                                'Trải nghiệm dã ngoại không thể bỏ lỡ',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          ..._mustTryActivities.map((act) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: AppColors.editorialSurface,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: AppColors.editorialBorder),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.only(top: 2),
+                                    child: Icon(Icons.check_circle_outline, size: 16, color: AppColors.editorialPine),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      act,
+                                      style: const TextStyle(fontSize: 13, color: AppColors.editorialInk, height: 1.45),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )),
+                        ],
+
+                        // Nét đẹp văn hóa & Lịch sử bản địa
+                        if (_culturalHighlights.isNotEmpty) ...[
+                          const SizedBox(height: 22),
+                          const Row(
+                            children: [
+                              Icon(Icons.auto_stories_outlined, size: 18, color: AppColors.summitGold),
+                              SizedBox(width: 8),
+                              Text(
+                                'Nét đẹp văn hóa & Lịch sử bản địa',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          ..._culturalHighlights.map((cul) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Container(
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                color: AppColors.editorialSurface,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: AppColors.editorialBorder),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.bookmark_outline, size: 16, color: AppColors.summitGold),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      cul,
+                                      style: const TextStyle(fontSize: 13, color: AppColors.editorialInk, height: 1.5),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )),
+                        ],
+
                         if (_seasons.isNotEmpty) ...[
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 22),
                           const Text(
                             'Thời điểm lý tưởng nhất',
-                            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
                           ),
                           const SizedBox(height: 10),
                           Wrap(
