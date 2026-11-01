@@ -60,12 +60,12 @@ class ExploreController extends ChangeNotifier {
   /// Danh sách châu lục Quốc tế
   static const List<RegionItem> internationalRegions = [
     RegionItem(id: 'all', label: 'Tất cả châu lục'),
-    RegionItem(id: 'intl_asia', label: 'Châu Á'),
-    RegionItem(id: 'intl_europe', label: 'Châu Âu'),
-    RegionItem(id: 'intl_north_america', label: 'Bắc Mỹ'),
-    RegionItem(id: 'intl_south_america', label: 'Nam Mỹ'),
-    RegionItem(id: 'intl_oceania', label: 'Châu Đại Dương'),
-    RegionItem(id: 'intl_africa', label: 'Châu Phi'),
+    RegionItem(id: 'asia', label: 'Châu Á'),
+    RegionItem(id: 'europe', label: 'Châu Âu'),
+    RegionItem(id: 'north_america', label: 'Bắc Mỹ'),
+    RegionItem(id: 'south_america', label: 'Nam Mỹ'),
+    RegionItem(id: 'oceania', label: 'Châu Đại Dương'),
+    RegionItem(id: 'africa', label: 'Châu Phi'),
   ];
 
   List<RegionItem> get currentRegions =>

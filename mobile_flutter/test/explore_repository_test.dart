@@ -16,18 +16,18 @@ void main() {
   test('ExploreRepository reads seed JSON and separates Domestic & International correctly', () async {
     // 1. Lấy toàn bộ danh sách điểm đến
     final allDestinations = await repository.getAllDestinations();
-    expect(allDestinations.length, 16);
+    expect(allDestinations.length, 23);
 
     // 2. Điểm đến trong nước (Việt Nam)
     final domestic = await repository.getDomesticDestinations(userCountryCode: 'VN');
-    expect(domestic.length, 10);
+    expect(domestic.length, 14);
     for (final d in domestic) {
       expect(d.countryIds.contains('VN'), isTrue);
     }
 
     // 3. Điểm đến quốc tế
     final international = await repository.getInternationalDestinations(userCountryCode: 'VN');
-    expect(international.length, 6);
+    expect(international.length, 9);
     for (final d in international) {
       expect(d.countryIds.contains('VN'), isFalse);
     }

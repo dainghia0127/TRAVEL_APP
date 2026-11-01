@@ -48,13 +48,18 @@ class ExploreRepositoryImpl implements IExploreRepository {
         : getInternationalDestinations(userCountryCode: userCountryCode));
 
     return all.where((d) {
-      // Lọc theo từ khóa tìm kiếm (Tên, địa danh bản địa, tóm tắt)
+      // Lọc theo từ khóa tìm kiếm (Tên, địa danh bản địa, tỉnh/thành phố, quốc gia, tóm tắt)
       if (query.trim().isNotEmpty) {
         final q = query.trim().toLowerCase();
         final matchName = d.name.toLowerCase().contains(q);
         final matchLocal = (d.localName ?? '').toLowerCase().contains(q);
+        final matchProvince = (d.province ?? '').toLowerCase().contains(q);
+        final matchCountry = (d.countryName ?? '').toLowerCase().contains(q) ||
+            d.countryIds.any((c) => c.toLowerCase() == q);
         final matchSummary = d.editorialSummary.toLowerCase().contains(q);
-        if (!matchName && !matchLocal && !matchSummary) return false;
+        if (!matchName && !matchLocal && !matchProvince && !matchCountry && !matchSummary) {
+          return false;
+        }
       }
 
       // Lọc theo vùng miền / châu lục

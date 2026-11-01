@@ -151,7 +151,7 @@ class SearchFilterBar extends StatelessWidget {
                     onChanged: onChanged,
                     style: const TextStyle(color: AppColors.editorialInk, fontSize: 13, fontWeight: FontWeight.w500),
                     decoration: const InputDecoration(
-                      hintText: 'Tìm kiếm cung đường, đỉnh núi, thác nước...',
+                      hintText: 'Tìm địa điểm, tỉnh thành (Lào Cai...), quốc gia...',
                       hintStyle: TextStyle(color: AppColors.editorialMuted, fontSize: 13),
                       border: InputBorder.none,
                       isDense: true,

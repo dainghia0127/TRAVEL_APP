@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:animations/animations.dart';
-import 'package:mobile_flutter/core/models/outdoor_image.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
-import 'package:mobile_flutter/core/widgets/editorial_image.dart';
 import 'package:mobile_flutter/core/widgets/skeleton_shimmer.dart';
 import 'package:mobile_flutter/features/offline_map/services/location_service.dart';
 import 'package:mobile_flutter/features/weather_safety/services/weather_service.dart';
 import 'package:mobile_flutter/features/explore/data/datasources/explore_local_datasource.dart';
 import 'package:mobile_flutter/features/explore/data/repositories/explore_repository_impl.dart';
-import 'package:mobile_flutter/features/explore/domain/entities/destination.dart';
 import 'package:mobile_flutter/features/explore/presentation/controllers/explore_controller.dart';
-import 'package:mobile_flutter/features/explore/presentation/screens/destination_detail_screen.dart';
-import 'package:mobile_flutter/features/explore/presentation/widgets/bento_destination_grid.dart';
+import 'package:mobile_flutter/features/explore/presentation/widgets/area_hero_banner.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/category_selector.dart';
-import 'package:mobile_flutter/features/explore/presentation/widgets/trail_compact_row.dart';
-import 'package:mobile_flutter/features/explore/presentation/widgets/search_filter_bar.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/empty_filter_state.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/explore_tab_bar.dart';
+import 'package:mobile_flutter/features/explore/presentation/widgets/featured_carousel.dart';
+import 'package:mobile_flutter/features/explore/presentation/widgets/nearby_section.dart';
 import 'package:mobile_flutter/features/explore/presentation/widgets/region_chip_filter.dart';
+import 'package:mobile_flutter/features/explore/presentation/widgets/search_filter_bar.dart';
+import 'package:mobile_flutter/features/explore/presentation/widgets/seasonal_section.dart';
+import 'package:mobile_flutter/features/explore/presentation/widgets/trail_compact_row.dart';
+import 'package:mobile_flutter/features/explore/presentation/widgets/trending_grid_section.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -35,31 +35,40 @@ class _ExploreScreenState extends State<ExploreScreen> {
   String _currentLocationName = 'Quận 9, TP. Hồ Chí Minh • 14m';
   String _currentWeatherBrief = '31°C Nắng ráo';
   bool _isDetectingGps = false;
+  LatLng _currentUserLocation = const LatLng(10.8231, 106.6297);
 
-  final List<Map<String, String>> _presetLocations = const [
+  final List<Map<String, dynamic>> _presetLocations = const [
     {
       'name': 'Quận 9, TP. Hồ Chí Minh • 14m',
       'weather': '31°C Nắng ráo',
       'desc': 'Vị trí hiện tại (TP. Thủ Đức, TP.HCM)',
-      'isGps': 'true',
+      'isGps': true,
+      'lat': 10.8231,
+      'lon': 106.6297,
     },
     {
       'name': 'Tây Nguyên (Tà Năng) • 1,485m',
       'weather': '18°C Ít mây',
       'desc': 'Cao nguyên Lâm Đồng',
-      'isGps': 'false',
+      'isGps': false,
+      'lat': 11.6420,
+      'lon': 108.4230,
     },
     {
       'name': 'Đỉnh Fansipan • 3,143m',
       'weather': '9°C Sương mù lạnh',
       'desc': 'Nóc nhà Đông Dương (Sa Pa, Lào Cai)',
-      'isGps': 'false',
+      'isGps': false,
+      'lat': 22.3551,
+      'lon': 103.7745,
     },
     {
       'name': 'Rừng Nam Cát Tiên • 120m',
       'weather': '28°C Râm mát',
       'desc': 'Rừng nhiệt đới Đồng Nai',
-      'isGps': 'false',
+      'isGps': false,
+      'lat': 11.4239,
+      'lon': 107.4294,
     },
   ];
 
@@ -67,9 +76,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
     CategoryItem(title: 'Tất cả', icon: Icons.explore),
     CategoryItem(title: 'Trekking / Leo núi', icon: Icons.hiking),
     CategoryItem(title: 'Camping / Cắm trại', icon: Icons.holiday_village),
-    CategoryItem(title: 'Suối / Thác nước', icon: Icons.water),
-    CategoryItem(title: 'Cung đường đèo', icon: Icons.two_wheeler),
+    CategoryItem(title: 'Hiking / Đi bộ', icon: Icons.directions_walk),
+    CategoryItem(title: 'Biển đảo', icon: Icons.beach_access),
     CategoryItem(title: 'Vườn quốc gia', icon: Icons.forest),
+    CategoryItem(title: 'Cung đường đèo', icon: Icons.two_wheeler),
+    CategoryItem(title: 'Di sản UNESCO', icon: Icons.account_balance),
   ];
 
   @override
@@ -101,6 +112,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
     try {
       final pos = await LocationService.getCurrentLocation();
       if (pos != null && mounted) {
+        setState(() {
+          _currentUserLocation = LatLng(pos.latitude, pos.longitude);
+        });
+
         // Lấy thời tiết vi khí hậu thời gian thực từ Open-Meteo
         try {
           final forecast = await WeatherService.getForecast(pos.latitude, pos.longitude);
@@ -177,8 +192,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     onTap: () {
                       HapticFeedback.lightImpact();
                       setState(() {
-                        _currentLocationName = loc['name']!;
-                        _currentWeatherBrief = loc['weather']!;
+                        _currentLocationName = loc['name'] as String;
+                        _currentWeatherBrief = loc['weather'] as String;
+                        _currentUserLocation = LatLng(loc['lat'] as double, loc['lon'] as double);
                       });
                       Navigator.pop(context);
                     },
@@ -195,7 +211,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       child: Row(
                         children: [
                           Icon(
-                            loc['isGps'] == 'true' ? Icons.near_me : Icons.landscape_outlined,
+                            loc['isGps'] == true ? Icons.near_me : Icons.landscape_outlined,
                             color: isSelected ? AppColors.editorialPine : AppColors.editorialMuted,
                             size: 20,
                           ),
@@ -205,7 +221,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  loc['name']!,
+                                  loc['name'] as String,
                                   style: TextStyle(
                                     color: AppColors.editorialInk,
                                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
@@ -214,7 +230,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  '${loc['desc']!} • ${loc['weather']!}',
+                                  '${loc['desc']} • ${loc['weather']}',
                                   style: const TextStyle(color: AppColors.editorialMuted, fontSize: 11),
                                 ),
                               ],
@@ -241,12 +257,16 @@ class _ExploreScreenState extends State<ExploreScreen> {
         return 'trekking';
       case 'Camping / Cắm trại':
         return 'camping';
-      case 'Suối / Thác nước':
-        return 'waterfalls';
-      case 'Cung đường đèo':
-        return 'passes';
+      case 'Hiking / Đi bộ':
+        return 'hiking';
+      case 'Biển đảo':
+        return 'beach';
       case 'Vườn quốc gia':
-        return 'national_parks';
+        return 'nature';
+      case 'Cung đường đèo':
+        return 'road_trip';
+      case 'Di sản UNESCO':
+        return 'unesco';
       default:
         return 'all';
     }
@@ -258,12 +278,16 @@ class _ExploreScreenState extends State<ExploreScreen> {
         return 'Trekking / Leo núi';
       case 'camping':
         return 'Camping / Cắm trại';
-      case 'waterfalls':
-        return 'Suối / Thác nước';
-      case 'passes':
-        return 'Cung đường đèo';
-      case 'national_parks':
+      case 'hiking':
+        return 'Hiking / Đi bộ';
+      case 'beach':
+        return 'Biển đảo';
+      case 'nature':
         return 'Vườn quốc gia';
+      case 'road_trip':
+        return 'Cung đường đèo';
+      case 'unesco':
+        return 'Di sản UNESCO';
       default:
         return 'Tất cả';
     }
@@ -273,7 +297,12 @@ class _ExploreScreenState extends State<ExploreScreen> {
   Widget build(BuildContext context) {
     final destinations = _controller.destinations;
     final isFiltering = _controller.isFiltering;
-    final heroDest = destinations.isNotEmpty ? destinations[0] : null;
+    final currentMonth = DateTime.now().month;
+
+    // Phân loại danh mục chuyên đề
+    final featuredSpots = destinations.where((d) => d.isFeatured).toList();
+    final seasonalSpots = destinations.where((d) => d.isIdealSeason(currentMonth)).toList();
+    final trendingSpots = destinations.where((d) => d.isPopular || !d.isFeatured).toList();
 
     return Scaffold(
       backgroundColor: AppColors.editorialBg,
@@ -281,10 +310,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            // 1. Top App Bar & Editorial Header
+            // 1. Top App Bar & Live Status Pill
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -342,7 +371,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
 
                     // Editorial Headline
                     const Text(
@@ -352,15 +381,15 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     const SizedBox(height: 4),
                     Text(
                       _controller.isDomestic
-                          ? 'Những cung đường trekking hùng vĩ và bãi cắm trại hoang sơ nhất Việt Nam'
-                          : 'Các cung đường dã ngoại và vườn quốc gia tráng lệ khắp 6 châu lục',
+                          ? 'Dải đất gấm hoa - Di sản UNESCO, cung đèo hùng vĩ & biển đảo nguyên sơ'
+                          : 'Kỳ quan thế giới - Những nóc nhà địa cầu và vườn quốc gia tráng lệ 6 châu lục',
                       style: const TextStyle(
                         fontSize: 13,
                         color: AppColors.editorialMuted,
                         height: 1.4,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
 
                     // 2. Segmented Navigation Bar: TRONG NƯỚC / QUỐC TẾ
                     ExploreTabBar(
@@ -372,10 +401,18 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ),
             ),
 
-            // 3. Region Filter Chips (5 Miền VN hoặc 6 Châu Lục)
+            // 3. Hero Area Banner
+            SliverToBoxAdapter(
+              child: AreaHeroBanner(
+                isDomestic: _controller.isDomestic,
+                totalCount: destinations.length,
+              ),
+            ),
+
+            // 4. Region Filter Chips (5 Miền VN hoặc 6 Châu Lục)
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 14),
+                padding: const EdgeInsets.only(bottom: 12),
                 child: RegionChipFilter(
                   regions: _controller.currentRegions,
                   selectedRegion: _controller.selectedRegion,
@@ -384,16 +421,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ),
             ),
 
-            // 4. Hero Card (Shown when not actively filtering)
-            if (!isFiltering && heroDest != null)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child: _buildHeroCard(heroDest),
-                ),
-              ),
-
-            // 5. Search & Filter Interface
+            // 5. Search & Filter Bar
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -412,7 +440,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
-            // 6. Categories Selector
+            // 6. Categories Selector (Trekking, Camping, Hiking, Beach, Nature, Road Trip, UNESCO)
             SliverToBoxAdapter(
               child: CategorySelector(
                 categories: _categories,
@@ -423,234 +451,158 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ),
             ),
 
-            const SliverToBoxAdapter(child: SizedBox(height: 18)),
+            const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
-            // 7. Bento Grid Spotlight (When in Discovery mode)
-            if (!isFiltering && destinations.length >= 3) ...[
+            // =================================================================
+            // NỘI DUNG 1: KHI ĐANG TÌM KIẾM HOẶC LỌC NÂNG CAO
+            // =================================================================
+            if (isFiltering) ...[
               SliverToBoxAdapter(
-                child: BentoDestinationGrid(
-                  destinations: destinations,
-                  favoriteIds: _controller.favoriteIds,
-                  onToggleFavorite: (id) => _controller.toggleFavorite(id),
-                ),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 24)),
-            ],
-
-            // 8. Section Header for destination list
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Text(
-                      isFiltering ? 'Kết Quả Tìm Kiếm' : 'Gợi Ý Khám Phá',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.editorialInk,
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                    Text(
-                      '${destinations.length} điểm đến',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.editorialMuted,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SliverToBoxAdapter(child: SizedBox(height: 12)),
-
-            // 9. Loading State / Empty State / Destination List
-            if (_controller.isLoading)
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: SkeletonShimmer(
-                        width: double.infinity,
-                        height: 90,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    childCount: 4,
-                  ),
-                ),
-              )
-            else if (destinations.isEmpty)
-              SliverToBoxAdapter(
-                child: EmptyFilterState(
-                  onReset: () {
-                    _searchController.clear();
-                    _controller.resetFilters();
-                  },
-                ),
-              )
-            else
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final dest = destinations[index];
-                      final isFav = _controller.isFavorite(dest.id);
-                      return TrailCompactRow(
-                        destination: dest,
-                        isFavorite: isFav,
-                        onToggleFavorite: () => _controller.toggleFavorite(dest.id),
-                      );
-                    },
-                    childCount: destinations.length,
-                  ),
-                ),
-              ),
-
-            const SliverToBoxAdapter(child: SizedBox(height: 36)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeroCard(Destination dest) {
-    final isFav = _controller.isFavorite(dest.id);
-    final img = OutdoorImage.fromMedia(dest.heroMedia, caption: dest.name);
-
-    return OpenContainer(
-      closedElevation: 0,
-      openElevation: 0,
-      closedColor: Colors.transparent,
-      openColor: AppColors.editorialBg,
-      transitionType: ContainerTransitionType.fadeThrough,
-      transitionDuration: const Duration(milliseconds: 360),
-      openBuilder: (context, action) => DestinationDetailScreen(
-        destination: dest,
-        isFavorite: isFav,
-        onToggleFavorite: () => _controller.toggleFavorite(dest.id),
-      ),
-      closedBuilder: (context, action) => Container(
-        height: 250,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x18000000),
-              blurRadius: 18,
-              offset: Offset(0, 6),
-            ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            EditorialImage(
-              image: img,
-              borderRadius: BorderRadius.circular(20),
-              showAttribution: true,
-            ),
-            Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0x20000000),
-                    Colors.transparent,
-                    Color(0x90000000),
-                    Color(0xEA000000),
-                  ],
-                  stops: [0.0, 0.3, 0.65, 1.0],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-            ),
-            Positioned(
-              top: 14,
-              left: 14,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.auto_awesome, color: Color(0xFFFBBF24), size: 12),
-                    SizedBox(width: 5),
-                    Text(
-                      'ĐIỂM ĐẾN NỔI BẬT',
-                      style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.4),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 18,
-              left: 16,
-              right: 16,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    dest.name,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.4,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    dest.editorialSummary,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                      height: 1.35,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          '${dest.distanceDisplay} • ${dest.elevationDisplay}',
-                          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+                      const Text(
+                        'Kết Quả Tìm Kiếm',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.editorialInk,
+                          letterSpacing: -0.3,
                         ),
                       ),
-                      const Spacer(),
-                      const Row(
-                        children: [
-                          Text('Chi tiết', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
-                          SizedBox(width: 4),
-                          Icon(Icons.arrow_forward, color: Colors.white, size: 14),
-                        ],
+                      Text(
+                        '${destinations.length} địa điểm phù hợp',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.editorialPine,
+                        ),
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
+              const SliverToBoxAdapter(child: SizedBox(height: 12)),
+              if (_controller.isLoading)
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: SkeletonShimmer(
+                          width: double.infinity,
+                          height: 90,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      childCount: 4,
+                    ),
+                  ),
+                )
+              else if (destinations.isEmpty)
+                SliverToBoxAdapter(
+                  child: EmptyFilterState(
+                    onReset: () {
+                      _searchController.clear();
+                      _controller.resetFilters();
+                    },
+                  ),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final dest = destinations[index];
+                        final isFav = _controller.isFavorite(dest.id);
+                        return TrailCompactRow(
+                          destination: dest,
+                          isFavorite: isFav,
+                          onToggleFavorite: () => _controller.toggleFavorite(dest.id),
+                        );
+                      },
+                      childCount: destinations.length,
+                    ),
+                  ),
+                ),
+            ] else ...[
+              // =================================================================
+              // NỘI DUNG 2: KHÁM PHÁ THEO CÁC CHUYÊN ĐỀ PHÂN TẦNG (DISCOVERY FEED)
+              // =================================================================
+              if (_controller.isLoading)
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: SkeletonShimmer(
+                          width: double.infinity,
+                          height: 140,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      childCount: 3,
+                    ),
+                  ),
+                )
+              else ...[
+                // SECTION 1: ĐIỂM ĐẾN NỔI BẬT (FEATURED CAROUSEL)
+                if (featuredSpots.isNotEmpty) ...[
+                  SliverToBoxAdapter(
+                    child: FeaturedCarousel(
+                      destinations: featuredSpots,
+                      favoriteIds: _controller.favoriteIds,
+                      onToggleFavorite: (id) => _controller.toggleFavorite(id),
+                    ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                ],
+
+                // SECTION 2: GỢI Ý THEO MÙA & THỜI TIẾT
+                if (seasonalSpots.isNotEmpty) ...[
+                  SliverToBoxAdapter(
+                    child: SeasonalSection(
+                      destinations: seasonalSpots,
+                      currentMonth: currentMonth,
+                      favoriteIds: _controller.favoriteIds,
+                      onToggleFavorite: (id) => _controller.toggleFavorite(id),
+                    ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                ],
+
+                // SECTION 3: ĐỊA ĐIỂM GẦN BẠN NHẤT
+                if (destinations.isNotEmpty) ...[
+                  SliverToBoxAdapter(
+                    child: NearbySection(
+                      destinations: destinations,
+                      userLocation: _currentUserLocation,
+                      favoriteIds: _controller.favoriteIds,
+                      onToggleFavorite: (id) => _controller.toggleFavorite(id),
+                    ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                ],
+
+                // SECTION 4: ĐỊA ĐIỂM ĐƯỢC KHÁM PHÁ NHIỀU NHẤT
+                if (trendingSpots.isNotEmpty) ...[
+                  SliverToBoxAdapter(
+                    child: TrendingGridSection(
+                      destinations: trendingSpots,
+                      favoriteIds: _controller.favoriteIds,
+                      onToggleFavorite: (id) => _controller.toggleFavorite(id),
+                    ),
+                  ),
+                ],
+              ],
+            ],
+
+            const SliverToBoxAdapter(child: SizedBox(height: 36)),
           ],
         ),
       ),
