@@ -44,7 +44,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Outdoor Travel on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/hero_ta_nang.jpg"
         }
       ],
       "route": {
@@ -138,7 +139,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Hoàng Liên Explorer on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/pass_o_quy_ho.jpg"
         }
       ],
       "route": {
@@ -230,7 +232,8 @@
           "license": "CC-BY",
           "attribution": "Wikimedia Commons / Non Nuoc Cao Bang",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/fall_k50.jpg"
         }
       ],
       "route": {
@@ -321,7 +324,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Ha Long Explorer on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/fall_k50.jpg"
         }
       ],
       "route": {
@@ -415,7 +419,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Lao Than Trekker on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/pass_o_quy_ho.jpg"
         }
       ],
       "route": {
@@ -508,7 +513,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Cave Explorer on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/fall_k50.jpg"
         }
       ],
       "route": {
@@ -600,7 +606,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Trang An Heritage on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/fall_k50.jpg"
         }
       ],
       "route": {
@@ -692,7 +699,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Hai Van Pass Explorer on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/pass_o_quy_ho.jpg"
         }
       ]
     },
@@ -741,7 +749,8 @@
           "license": "CC-BY-SA",
           "attribution": "Photo by Ta Nang Explorer",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/hero_ta_nang.jpg"
         }
       ],
       "route": {
@@ -843,7 +852,8 @@
           "license": "CC-BY",
           "attribution": "Photo by Langbiang Trekker",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/mang_den.jpg"
         }
       ]
     },
@@ -886,13 +896,14 @@
       "media": [
         {
           "id": "media_cattien_1",
-          "image_url": "https://images.unsplash.com/photo-1511497584788-87676104235f?auto=format&fit=crop&w=1400&q=80",
+          "image_url": "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1400&q=80",
           "photographer": "Nhiếp ảnh thiên nhiên",
           "source_name": "Unsplash",
           "license": "Unsplash Free License",
           "attribution": "Photo by Cat Tien Forest Explorer on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/lake_tuyen_lam.jpg"
         }
       ],
       "route": {
@@ -983,7 +994,8 @@
           "license": "CC-BY",
           "attribution": "Photo by Ba Den Summit",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/mang_den.jpg"
         }
       ]
     },
@@ -1032,7 +1044,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Con Dao Islands on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/lake_tuyen_lam.jpg"
         }
       ]
     },
@@ -1080,7 +1093,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Phu Quoc Explorer on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/lake_tuyen_lam.jpg"
         }
       ]
     },
@@ -1124,7 +1138,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Mount Fuji Explorer on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/pass_o_quy_ho.jpg"
         }
       ],
       "route": {
@@ -1213,7 +1228,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Everest Base Camp on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/pass_o_quy_ho.jpg"
         }
       ]
     },
@@ -1259,7 +1275,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Taj Mahal Explorer on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/lake_tuyen_lam.jpg"
         }
       ]
     },
@@ -1307,7 +1324,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Mont Blanc Trail on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/pass_o_quy_ho.jpg"
         }
       ],
       "route": {
@@ -1407,7 +1425,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Lofoten Norway on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/lake_tuyen_lam.jpg"
         }
       ]
     },
@@ -1454,7 +1473,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Banff National Park on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/hero_ta_nang.jpg"
         }
       ]
     },
@@ -1501,7 +1521,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Milford Track NZ on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/hero_ta_nang.jpg"
         }
       ]
     },
@@ -1549,7 +1570,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Machu Picchu Explorer on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/hero_ta_nang.jpg"
         }
       ]
     },
@@ -1596,7 +1618,8 @@
           "license": "Unsplash Free License",
           "attribution": "Photo by Kilimanjaro Trekker on Unsplash",
           "aspect_ratio": 1.77,
-          "is_hero": true
+          "is_hero": true,
+          "local_asset_path": "assets/images/mang_den.jpg"
         }
       ]
     }
