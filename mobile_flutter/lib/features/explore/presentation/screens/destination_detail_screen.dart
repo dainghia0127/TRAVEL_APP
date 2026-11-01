@@ -67,12 +67,60 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Đã thêm $_title vào Chuyến đi & sẵn sàng chỉ đường!'),
-          backgroundColor: AppColors.editorialPine,
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 92),
+          elevation: 12,
+          backgroundColor: const Color(0xFF141916),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: Color(0xFF2E4537), width: 1.5),
+          ),
           duration: const Duration(seconds: 4),
+          content: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: AppColors.neonGreen.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.neonGreen.withValues(alpha: 0.5)),
+                ),
+                child: const Icon(Icons.check_circle_rounded, color: AppColors.neonGreen, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Đã thêm vào Chuyến đi!',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13.5,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '$_title • Sẵn sàng chỉ đường thực tế',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFFB0C4B8),
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
           action: SnackBarAction(
-            label: 'Mở Bản Đồ',
-            textColor: AppColors.summitGold,
+            label: 'MỞ BẢN ĐỒ',
+            textColor: AppColors.neonGreen,
             onPressed: () {
               Navigator.of(context).pop();
               MainNavigationScreen.switchToTab(1);

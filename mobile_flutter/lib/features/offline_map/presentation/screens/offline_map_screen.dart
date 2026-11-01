@@ -11,6 +11,7 @@ import 'package:mobile_flutter/features/explore/data/datasources/explore_local_d
 import 'package:mobile_flutter/features/explore/domain/entities/destination.dart';
 import 'package:mobile_flutter/features/home/presentation/screens/main_navigation_screen.dart';
 import 'package:mobile_flutter/features/offline_map/services/location_service.dart';
+import 'package:mobile_flutter/features/offline_map/services/routing_service.dart';
 
 class OfflineMapScreen extends StatefulWidget {
   const OfflineMapScreen({super.key});
@@ -32,6 +33,8 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
   List<LatLng> _routingPolyline = [];
   double _distanceToSelectedKm = 0.0;
   String _estimatedTravelDuration = '';
+  bool _isLoadingRoute = false;
+  bool _isActualRoad = false;
 
   // Waypoint được chọn để xem chi tiết
   Map<String, dynamic>? _selectedWaypoint;
@@ -159,29 +162,16 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
     } catch (_) {}
   }
 
-  void _selectTripDestination(Destination dest, {bool animateCamera = true}) {
+  Future<void> _selectTripDestination(Destination dest, {bool animateCamera = true}) async {
     HapticFeedback.selectionClick();
     final targetLoc = _getDestLatLng(dest);
-    final distKm = const Distance().as(LengthUnit.Kilometer, _currentLocation, targetLoc);
-
-    String travelTime;
-    if (distKm < 15) {
-      final mins = (distKm / 30.0 * 60).round() + 10;
-      travelTime = '$mins phút';
-    } else if (distKm < 120) {
-      final hours = (distKm / 45.0).toStringAsFixed(1);
-      travelTime = '$hours giờ xe';
-    } else {
-      final hours = (distKm / 65.0).toStringAsFixed(1);
-      travelTime = '$hours giờ di chuyển';
-    }
+    final directDistKm = const Distance().as(LengthUnit.Kilometer, _currentLocation, targetLoc);
 
     setState(() {
       _selectedTripDestination = dest;
       _selectedWaypoint = null;
-      _distanceToSelectedKm = distKm;
-      _estimatedTravelDuration = travelTime;
-      _routingPolyline = _generateRoutingPolyline(_currentLocation, targetLoc);
+      _distanceToSelectedKm = directDistKm;
+      _isLoadingRoute = true;
     });
 
     StorageService.setSelectedTripDestination(dest.id);
@@ -189,24 +179,22 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
     if (animateCamera) {
       _mapController.move(targetLoc, 13.0);
     }
-  }
 
-  /// Sinh đường dẫn polyline lượn sóng tự nhiên mô phỏng đường đi thực địa
-  List<LatLng> _generateRoutingPolyline(LatLng start, LatLng end) {
-    final List<LatLng> points = [start];
-    const int segments = 8;
-    for (int i = 1; i < segments; i++) {
-      final double fraction = i / segments;
-      final double lat = start.latitude + (end.latitude - start.latitude) * fraction;
-      final double lng = start.longitude + (end.longitude - start.longitude) * fraction;
-      final double wave = 0.012 * (1 - (2 * fraction - 1).abs());
-      points.add(LatLng(
-        lat + (i % 2 == 0 ? wave : -wave * 0.6),
-        lng + (i % 2 != 0 ? wave * 0.8 : -wave * 0.4),
-      ));
+    // Lấy tuyến đường thực tế qua OSRM bám sát mạng lưới đường bộ
+    final routeResult = await RoutingService.getActualRoute(
+      start: _currentLocation,
+      end: targetLoc,
+    );
+
+    if (mounted && _selectedTripDestination?.id == dest.id) {
+      setState(() {
+        _routingPolyline = routeResult.points;
+        _distanceToSelectedKm = routeResult.distanceKm;
+        _estimatedTravelDuration = routeResult.durationText;
+        _isActualRoad = routeResult.isActualRoadRoute;
+        _isLoadingRoute = false;
+      });
     }
-    points.add(end);
-    return points;
   }
 
   Future<void> _removeDestinationFromTrip(Destination dest) async {
@@ -222,14 +210,25 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
       setState(() {
         _currentLocation = pos;
         _isLocating = false;
-        // Cập nhật lại polyline nếu đã chọn địa điểm
-        if (_selectedTripDestination != null) {
-          final targetLoc = _getDestLatLng(_selectedTripDestination!);
-          _distanceToSelectedKm = const Distance().as(LengthUnit.Kilometer, _currentLocation, targetLoc);
-          _routingPolyline = _generateRoutingPolyline(_currentLocation, targetLoc);
-        }
       });
       _mapController.move(pos, 14.0);
+
+      // Cập nhật lại tuyến đường thực tế từ vị trí GPS mới
+      if (_selectedTripDestination != null) {
+        final targetLoc = _getDestLatLng(_selectedTripDestination!);
+        final routeResult = await RoutingService.getActualRoute(
+          start: pos,
+          end: targetLoc,
+        );
+        if (mounted) {
+          setState(() {
+            _routingPolyline = routeResult.points;
+            _distanceToSelectedKm = routeResult.distanceKm;
+            _estimatedTravelDuration = routeResult.durationText;
+            _isActualRoad = routeResult.isActualRoadRoute;
+          });
+        }
+      }
     } else {
       if (mounted) setState(() => _isLocating = false);
     }
@@ -734,34 +733,70 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Badge trạng thái tìm đường
+                    // Badge trạng thái tìm đường thực tế
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: AppColors.alpineCyan.withValues(alpha: 0.15),
-                            borderRadius: AppRadius.roundedPill,
-                            border: Border.all(color: AppColors.alpineCyan.withValues(alpha: 0.4)),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.directions, size: 14, color: AppColors.alpineCyan),
-                              SizedBox(width: 5),
-                              Text(
-                                'LỘ TRÌNH ĐANG CHỈ DẪN',
-                                style: TextStyle(
-                                  color: AppColors.alpineCyan,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.5,
+                        if (_isLoadingRoute)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppColors.alpineCyan.withValues(alpha: 0.15),
+                              borderRadius: AppRadius.roundedPill,
+                              border: Border.all(color: AppColors.alpineCyan.withValues(alpha: 0.4)),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  width: 12,
+                                  height: 12,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.alpineCyan),
                                 ),
+                                SizedBox(width: 6),
+                                Text(
+                                  'ĐANG TẢI TUYẾN ĐƯỜNG THỰC TẾ...',
+                                  style: TextStyle(
+                                    color: AppColors.alpineCyan,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        else
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: (_isActualRoad ? AppColors.neonGreen : AppColors.alpineCyan).withValues(alpha: 0.15),
+                              borderRadius: AppRadius.roundedPill,
+                              border: Border.all(
+                                color: (_isActualRoad ? AppColors.neonGreen : AppColors.alpineCyan).withValues(alpha: 0.4),
                               ),
-                            ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  _isActualRoad ? Icons.alt_route : Icons.directions,
+                                  size: 14,
+                                  color: _isActualRoad ? AppColors.neonGreen : AppColors.alpineCyan,
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  _isActualRoad ? 'TUYẾN ĐƯỜNG BỘ THỰC TẾ' : 'LỘ TRÌNH ĐỊNH TUYẾN DÃ NGOẠI',
+                                  style: TextStyle(
+                                    color: _isActualRoad ? AppColors.neonGreen : AppColors.alpineCyan,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
                         Text(
                           _getLocationLabel(_selectedTripDestination!),
                           style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
@@ -858,7 +893,18 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                             onTap: () {
                               HapticFeedback.lightImpact();
                               final target = _getDestLatLng(_selectedTripDestination!);
-                              _mapController.move(target, 14.0);
+                              // Căn giữa bao quát toàn bộ tuyến đường thực tế
+                              final centerLat = (_currentLocation.latitude + target.latitude) / 2.0;
+                              final centerLng = (_currentLocation.longitude + target.longitude) / 2.0;
+                              double zoom = 12.0;
+                              if (_distanceToSelectedKm > 400) {
+                                zoom = 6.5;
+                              } else if (_distanceToSelectedKm > 150) {
+                                zoom = 8.5;
+                              } else if (_distanceToSelectedKm > 50) {
+                                zoom = 10.0;
+                              }
+                              _mapController.move(LatLng(centerLat, centerLng), zoom);
                             },
                             child: Container(
                               decoration: BoxDecoration(

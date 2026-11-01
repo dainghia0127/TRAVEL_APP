@@ -8,6 +8,7 @@ import 'package:mobile_flutter/features/explore/data/datasources/explore_local_d
 import 'package:mobile_flutter/features/explore/domain/entities/destination.dart';
 import 'package:mobile_flutter/features/home/presentation/screens/main_navigation_screen.dart';
 import 'package:mobile_flutter/features/offline_map/services/location_service.dart';
+import 'package:mobile_flutter/features/offline_map/services/routing_service.dart';
 import 'package:mobile_flutter/features/weather_safety/services/weather_service.dart';
 
 class TripPlannerScreen extends StatefulWidget {
@@ -91,7 +92,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     }
   }
 
-  void _selectDestination(Destination dest, {bool updateChecklist = true}) {
+  Future<void> _selectDestination(Destination dest, {bool updateChecklist = true}) async {
     final target = LatLng(dest.centerLatitude ?? 11.6420, dest.centerLongitude ?? 108.4230);
     final dist = const Distance().as(LengthUnit.Kilometer, _userLocation, target);
 
@@ -114,6 +115,17 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
 
     if (updateChecklist) {
       _loadChecklistForDestination(dest);
+    }
+
+    // Tải cự ly đường bộ thực tế qua OSRM Routing
+    final routeResult = await RoutingService.getActualRoute(
+      start: _userLocation,
+      end: target,
+    );
+    if (mounted && _selectedDestination?.id == dest.id) {
+      setState(() {
+        _distanceFromUserKm = routeResult.distanceKm;
+      });
     }
   }
 
