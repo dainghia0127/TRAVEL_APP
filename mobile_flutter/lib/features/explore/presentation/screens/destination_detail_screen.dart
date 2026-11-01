@@ -82,11 +82,11 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: AppColors.neonGreen.withValues(alpha: 0.15),
+                  color: AppColors.summitGold.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.neonGreen.withValues(alpha: 0.5)),
+                  border: Border.all(color: AppColors.summitGold.withValues(alpha: 0.6)),
                 ),
-                child: const Icon(Icons.check_circle_rounded, color: AppColors.neonGreen, size: 20),
+                child: const Icon(Icons.check_circle_rounded, color: AppColors.summitGold, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -104,7 +104,7 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '$_title • Sẵn sàng chỉ đường thực tế',
+                      '$_title • Sẵn sàng tạo lộ trình & bản đồ',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -119,11 +119,11 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
             ],
           ),
           action: SnackBarAction(
-            label: 'MỞ BẢN ĐỒ',
-            textColor: AppColors.neonGreen,
+            label: 'XEM LỊCH TRÌNH',
+            textColor: AppColors.summitGold,
             onPressed: () {
               Navigator.of(context).pop();
-              MainNavigationScreen.switchToTab(1);
+              MainNavigationScreen.switchToTab(2);
             },
           ),
         ),

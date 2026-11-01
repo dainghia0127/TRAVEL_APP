@@ -828,6 +828,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
         else
           ReorderableListView.builder(
             shrinkWrap: true,
+            buildDefaultDragHandles: false,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: currentDayStops.length,
             // ignore: deprecated_member_use
@@ -952,7 +953,53 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                                 ],
                               ),
                             ),
-                            const Icon(Icons.drag_indicator, size: 18, color: AppColors.editorialBorder),
+
+                            // Micro Action Controls (Up / Down / Drag Handle)
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (index > 0)
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        final item = currentDayStops.removeAt(index);
+                                        currentDayStops.insert(index - 1, item);
+                                      });
+                                      HapticFeedback.selectionClick();
+                                    },
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(4.0),
+                                      child: Icon(Icons.arrow_upward, size: 16, color: AppColors.editorialMuted),
+                                    ),
+                                  ),
+                                if (index < currentDayStops.length - 1)
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        final item = currentDayStops.removeAt(index);
+                                        currentDayStops.insert(index + 1, item);
+                                      });
+                                      HapticFeedback.selectionClick();
+                                    },
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(4.0),
+                                      child: Icon(Icons.arrow_downward, size: 16, color: AppColors.editorialMuted),
+                                    ),
+                                  ),
+                                const SizedBox(width: 4),
+                                ReorderableDragStartListener(
+                                  index: index,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.editorialBg,
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: const Icon(Icons.drag_indicator, size: 18, color: AppColors.editorialPine),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),

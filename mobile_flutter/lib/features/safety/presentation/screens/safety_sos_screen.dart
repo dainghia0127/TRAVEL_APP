@@ -79,7 +79,7 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
       _isSosActive = true;
       _holdProgress = 1.0;
     });
-    _showSnackBar('ĐÃ KÍCH HOẠT TÍN HIỆU CỨU HỘ KHẨN CẤP (SOS)');
+    _showSnackBar('ĐÃ BẬT BÁO ĐỘNG SOS • Hãy đảm bảo loa ngoài ở mức âm lượng tối đa 100%!');
   }
 
   void _deactivateSos() {
@@ -368,6 +368,45 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
               ),
+
+              if (_isSosActive) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.summitGold.withValues(alpha: 0.12),
+                    borderRadius: AppRadius.roundedMd,
+                    border: Border.all(color: AppColors.summitGold, width: 1.5),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.volume_up_rounded, color: AppColors.summitGold, size: 24),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'LƯU Ý THỰC ĐỊA: BẬT ÂM LƯỢNG 100%',
+                              style: TextStyle(
+                                color: AppColors.summitGold,
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.4,
+                              ),
+                            ),
+                            SizedBox(height: 3),
+                            Text(
+                              'Hãy tăng âm lượng loa ngoài thiết bị lên mức tối đa để tín hiệu còi cứu hộ vang xa nhất (đạt bán kính 500m - 1km trong rừng núi).',
+                              style: TextStyle(color: Colors.white, fontSize: 11.5, height: 1.35),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
         ),

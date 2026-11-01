@@ -30,6 +30,7 @@ class ExploreScreen extends StatefulWidget {
 
 class _ExploreScreenState extends State<ExploreScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   late final ExploreController _controller;
 
   String _currentLocationName = 'Quận 9, TP. Hồ Chí Minh • 14m';
@@ -104,7 +105,20 @@ class _ExploreScreenState extends State<ExploreScreen> {
     _controller.removeListener(_onControllerUpdate);
     _controller.dispose();
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _scrollToResults() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          420.0,
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.easeOutCubic,
+        );
+      }
+    });
   }
 
   Future<void> _autoDetectGpsLocation() async {
@@ -308,6 +322,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       backgroundColor: AppColors.editorialBg,
       body: SafeArea(
         child: CustomScrollView(
+          controller: _scrollController,
           physics: const BouncingScrollPhysics(),
           slivers: [
             // 1. Top App Bar & Live Status Pill
@@ -428,12 +443,18 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 child: SearchFilterBar(
                   controller: _searchController,
                   selectedDifficulty: _controller.selectedDifficulty,
-                  onChanged: (val) => _controller.setSearchQuery(val),
+                  onChanged: (val) {
+                    _controller.setSearchQuery(val);
+                    if (val.trim().isNotEmpty) _scrollToResults();
+                  },
                   onClear: () {
                     _searchController.clear();
                     _controller.setSearchQuery('');
                   },
-                  onSelectDifficulty: (lvl) => _controller.selectDifficulty(lvl),
+                  onSelectDifficulty: (lvl) {
+                    _controller.selectDifficulty(lvl);
+                    if (lvl != null) _scrollToResults();
+                  },
                 ),
               ),
             ),
@@ -447,6 +468,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 selectedCategory: _mapIdToCategoryTitle(_controller.selectedCategory),
                 onSelectCategory: (catTitle) {
                   _controller.selectCategory(_mapCategoryToId(catTitle));
+                  if (catTitle != 'Tất cả') _scrollToResults();
                 },
               ),
             ),
