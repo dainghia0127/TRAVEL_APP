@@ -11,6 +11,8 @@ import 'package:mobile_flutter/features/explore/domain/entities/destination.dart
 import 'package:mobile_flutter/features/explore/domain/entities/trekking_route.dart';
 import 'package:mobile_flutter/features/explore/domain/entities/safety_guideline.dart';
 import 'package:mobile_flutter/features/home/presentation/screens/main_navigation_screen.dart';
+import 'package:mobile_flutter/features/weather_safety/services/weather_service.dart';
+import 'package:mobile_flutter/features/explore/data/datasources/overpass_service.dart';
 
 class DestinationDetailScreen extends StatefulWidget {
   final Destination? destination;
@@ -37,13 +39,64 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
   int _selectedTab = 0; // 0: Tổng quan, 1: Lộ trình, 2: An toàn
   bool _isInTrip = false;
 
+  OutdoorWeather? _liveWeather;
+  bool _isLoadingWeather = true;
+  List<Map<String, dynamic>> _nearbyPois = [];
+  bool _isLoadingPois = false;
+
   String get _destId => widget.destination?.id ?? (widget.spot?['id'] as String? ?? 'vn_ta_nang_phan_dung');
+  double? get _lat => widget.destination?.centerLatitude ?? (widget.spot?['lat'] as num?)?.toDouble();
+  double? get _lng => widget.destination?.centerLongitude ?? (widget.spot?['lng'] as num?)?.toDouble();
 
   @override
   void initState() {
     super.initState();
     _fav = widget.isFavorite;
     _checkTripStatus();
+    _fetchLiveWeather();
+    _fetchNearbyPois();
+  }
+
+  Future<void> _fetchLiveWeather() async {
+    final lat = _lat;
+    final lng = _lng;
+    if (lat != null && lng != null) {
+      try {
+        final w = await WeatherService.getForecast(lat, lng);
+        if (mounted) {
+          setState(() {
+            _liveWeather = w;
+            _isLoadingWeather = false;
+          });
+        }
+      } catch (_) {
+        if (mounted) setState(() => _isLoadingWeather = false);
+      }
+    } else {
+      if (mounted) setState(() => _isLoadingWeather = false);
+    }
+  }
+
+  Future<void> _fetchNearbyPois() async {
+    final lat = _lat;
+    final lng = _lng;
+    if (lat != null && lng != null) {
+      setState(() => _isLoadingPois = true);
+      try {
+        final pois = await OverpassService.getOutdoorPoisNearby(
+          center: LatLng(lat, lng),
+          radiusMeters: 10000,
+        );
+        if (mounted) {
+          setState(() {
+            _nearbyPois = pois;
+            _isLoadingPois = false;
+          });
+        }
+      } catch (_) {
+        if (mounted) setState(() => _isLoadingPois = false);
+      }
+    }
   }
 
   Future<void> _checkTripStatus() async {
@@ -748,6 +801,153 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                           )),
                         ],
 
+                        // THỜI TIẾT VI KHÍ HẬU THỜI GIAN THỰC TẠI ĐIỂM ĐẾN
+                        const SizedBox(height: 22),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Row(
+                              children: [
+                                Icon(Icons.cloud_outlined, size: 18, color: AppColors.editorialTerracotta),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Thời tiết vi khí hậu thời gian thực',
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: AppColors.editorialSurface,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppColors.editorialBorder),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.bolt, size: 12, color: AppColors.summitGold),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'OPEN-METEO LIVE',
+                                    style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: AppColors.editorialPine),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        if (_isLoadingWeather)
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: AppColors.editorialSurface,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: AppColors.editorialBorder),
+                            ),
+                            child: const Row(
+                              children: [
+                                SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.editorialPine),
+                                ),
+                                SizedBox(width: 12),
+                                Text(
+                                  'Đang kết nối trạm khí tượng vệ tinh...',
+                                  style: TextStyle(fontSize: 12, color: AppColors.editorialMuted),
+                                ),
+                              ],
+                            ),
+                          )
+                        else if (_liveWeather != null) ...[
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: AppColors.editorialSurface,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: AppColors.editorialBorder),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${_liveWeather!.temperature.round()}°C',
+                                          style: const TextStyle(
+                                            fontSize: 28,
+                                            fontWeight: FontWeight.w900,
+                                            color: AppColors.editorialInk,
+                                            letterSpacing: -0.5,
+                                          ),
+                                        ),
+                                        Text(
+                                          _liveWeather!.weatherDescription,
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.editorialPine,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        _buildWeatherMiniStat(
+                                          icon: Icons.air,
+                                          label: 'Gió',
+                                          value: '${_liveWeather!.windSpeed.round()} km/h',
+                                        ),
+                                        const SizedBox(width: 14),
+                                        _buildWeatherMiniStat(
+                                          icon: Icons.water_drop_outlined,
+                                          label: 'Mưa',
+                                          value: '${_liveWeather!.precipitationProb}%',
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                if (_liveWeather!.hasFlashFloodRisk ||
+                                    _liveWeather!.hasHypothermiaRisk ||
+                                    _liveWeather!.hasThunderstormRisk) ...[
+                                  const SizedBox(height: 12),
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.editorialTerracotta.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: AppColors.editorialTerracotta.withValues(alpha: 0.3)),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.warning_amber_rounded, size: 18, color: AppColors.editorialTerracotta),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            _liveWeather!.hasThunderstormRisk
+                                                ? 'Cảnh báo: Có nguy cơ giông sét cực đoan!'
+                                                : (_liveWeather!.hasFlashFloodRisk
+                                                    ? 'Cảnh báo: Nguy cơ lũ quét suối lớn!'
+                                                    : 'Lưu ý: Nguy cơ hạ thân nhiệt về đêm do gió lạnh!'),
+                                            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: AppColors.editorialTerracotta),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ],
+
+                        // THỜI ĐIỂM LÝ TƯỞNG NHẤT (CHUẨN HÓA THỜI GIAN THỰC)
                         if (_seasons.isNotEmpty) ...[
                           const SizedBox(height: 22),
                           const Text(
@@ -755,25 +955,150 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
                           ),
                           const SizedBox(height: 10),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: _seasons.map((s) => Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: AppColors.editorialSurface,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: AppColors.editorialBorder),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
+                          Builder(
+                            builder: (context) {
+                              final nowMonth = DateTime.now().month;
+                              final isCurrentIdeal = _seasons.any((s) => int.tryParse(s) == nowMonth);
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(Icons.wb_sunny_outlined, size: 14, color: AppColors.editorialTerracotta),
-                                  const SizedBox(width: 6),
-                                  Text(s, style: const TextStyle(fontSize: 12, color: AppColors.editorialInk, fontWeight: FontWeight.w500)),
+                                  if (isCurrentIdeal)
+                                    Container(
+                                      margin: const EdgeInsets.only(bottom: 10),
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.summitGold.withValues(alpha: 0.12),
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: AppColors.summitGold),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.stars_rounded, size: 16, color: AppColors.summitGold),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              'Thời điểm vàng: Tháng $nowMonth này đang là mùa đẹp nhất để trải nghiệm!',
+                                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: _seasons.map((s) {
+                                      final monthNum = int.tryParse(s);
+                                      final isNow = monthNum == nowMonth;
+                                      final label = monthNum != null ? 'Tháng $monthNum' : s;
+
+                                      return Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                        decoration: BoxDecoration(
+                                          color: isNow
+                                              ? AppColors.summitGold.withValues(alpha: 0.15)
+                                              : AppColors.editorialSurface,
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color: isNow ? AppColors.summitGold : AppColors.editorialBorder,
+                                            width: isNow ? 1.5 : 1,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              isNow ? Icons.wb_sunny : Icons.wb_sunny_outlined,
+                                              size: 14,
+                                              color: isNow ? AppColors.summitGold : AppColors.editorialTerracotta,
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              label,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: isNow ? AppColors.editorialInk : AppColors.editorialInk,
+                                                fontWeight: isNow ? FontWeight.w800 : FontWeight.w500,
+                                              ),
+                                            ),
+                                            if (isNow) ...[
+                                              const SizedBox(width: 4),
+                                              const Text(
+                                                '(Hiện tại)',
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: AppColors.summitGold,
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
                                 ],
+                              );
+                            },
+                          ),
+                        ],
+
+                        // TIỆN ÍCH DÃ NGOẠI XUNG QUANH TỪ OPENSTREETMAP (LIVE POI)
+                        if (_nearbyPois.isNotEmpty) ...[
+                          const SizedBox(height: 22),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Tiện ích thực địa lân cận (OSM)',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
                               ),
-                            )).toList(),
+                              Text(
+                                '${_nearbyPois.length} điểm trong 10km',
+                                style: const TextStyle(fontSize: 11, color: AppColors.editorialMuted),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            height: 72,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: _nearbyPois.take(8).length,
+                              separatorBuilder: (_, __) => const SizedBox(width: 8),
+                              itemBuilder: (context, i) {
+                                final poi = _nearbyPois[i];
+                                return Container(
+                                  width: 160,
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.editorialSurface,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: AppColors.editorialBorder),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        poi['name'] as String? ?? 'Điểm dã ngoại',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        poi['type'] as String? ?? 'Tiện ích',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(fontSize: 10.5, color: AppColors.editorialMuted),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ],
                       ] else if (_selectedTab == 1) ...[
@@ -1150,6 +1475,37 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildWeatherMiniStat({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Column(
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14, color: AppColors.editorialPine),
+            const SizedBox(width: 4),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                color: AppColors.editorialInk,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 10.5, color: AppColors.editorialMuted),
+        ),
+      ],
     );
   }
 }

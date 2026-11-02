@@ -66,6 +66,7 @@
 - [x] Bản dự phòng song hành React Native (Expo) đã sẵn sàng.
 - [x] Tạo file khởi chạy nhanh `run_app.bat` (chạy dạng App Desktop) và `run_web.bat` (mở trên tab trình duyệt).
 - [x] Đã khởi chạy máy chủ web nền và mở trực tiếp tab trình duyệt tại `http://localhost:8080`.
+- [x] Kết nối Git và đẩy toàn bộ mã nguồn lên GitHub tại: https://github.com/dainghia0127/TRAVEL_APP (branch: main).
 
 ---
 

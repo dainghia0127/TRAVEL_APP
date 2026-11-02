@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
@@ -157,6 +159,36 @@ class _ExploreScreenState extends State<ExploreScreen> {
     });
   }
 
+  Future<String> _resolveGpsLocationName(double lat, double lon) async {
+    try {
+      final uri = Uri.parse('https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$lon&format=json&accept-language=vi');
+      final res = await http.get(uri, headers: {'User-Agent': 'TravelApp/1.0'}).timeout(const Duration(seconds: 3));
+      if (res.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        final address = data['address'] as Map<String, dynamic>? ?? {};
+        final district = address['quarter'] ?? address['suburb'] ?? address['district'] ?? address['city_district'] ?? address['town'];
+        final city = address['city'] ?? address['state'] ?? address['county'];
+        if (district != null && city != null) {
+          return '$district, $city';
+        } else if (city != null) {
+          return '$city';
+        }
+      }
+    } catch (_) {}
+
+    // Fallback thông minh theo vùng địa lý nếu không có mạng
+    if (lat >= 10.5 && lat <= 11.1 && lon >= 106.4 && lon <= 107.0) {
+      return 'TP. Hồ Chí Minh';
+    } else if (lat >= 20.8 && lat <= 21.3 && lon >= 105.6 && lon <= 106.1) {
+      return 'Thủ đô Hà Nội';
+    } else if (lat >= 15.9 && lat <= 16.2 && lon >= 108.0 && lon <= 108.4) {
+      return 'TP. Đà Nẵng';
+    } else if (lat >= 11.8 && lat <= 12.1 && lon >= 108.3 && lon <= 108.6) {
+      return 'TP. Đà Lạt, Lâm Đồng';
+    }
+    return '${lat.toStringAsFixed(2)}°N, ${lon.toStringAsFixed(2)}°E';
+  }
+
   Future<void> _autoDetectGpsLocation() async {
     setState(() => _isDetectingGps = true);
     try {
@@ -166,7 +198,15 @@ class _ExploreScreenState extends State<ExploreScreen> {
           _currentUserLocation = LatLng(pos.latitude, pos.longitude);
         });
 
-        // Lấy thời tiết vi khí hậu thời gian thực từ Open-Meteo
+        // 1. Lấy tên địa danh thực tế từ GPS
+        final locName = await _resolveGpsLocationName(pos.latitude, pos.longitude);
+        if (mounted) {
+          setState(() {
+            _currentLocationName = locName;
+          });
+        }
+
+        // 2. Lấy thời tiết vi khí hậu thời gian thực từ Open-Meteo
         try {
           final forecast = await WeatherService.getForecast(pos.latitude, pos.longitude);
           if (mounted) {
@@ -175,16 +215,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
             });
           }
         } catch (_) {}
-
-        if (pos.latitude >= 10.3 && pos.latitude <= 11.2 && pos.longitude >= 106.3 && pos.longitude <= 107.1) {
-          setState(() {
-            _currentLocationName = 'Quận 9, TP. Hồ Chí Minh • 14m';
-          });
-        } else {
-          setState(() {
-            _currentLocationName = '${pos.latitude.toStringAsFixed(2)}°N, ${pos.longitude.toStringAsFixed(2)}°E';
-          });
-        }
       }
     } catch (_) {
     } finally {
@@ -239,15 +269,25 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 10),
                   child: BouncingButton(
-                    onTap: () {
+                    onTap: () async {
                       HapticFeedback.lightImpact();
+                      final lat = loc['lat'] as double;
+                      final lon = loc['lon'] as double;
+                      Navigator.pop(context);
                       setState(() {
                         _currentLocationName = loc['name'] as String;
-                        _currentWeatherBrief = loc['weather'] as String;
-                        _currentUserLocation = LatLng(loc['lat'] as double, loc['lon'] as double);
+                        _currentUserLocation = LatLng(lat, lon);
+                        _currentWeatherBrief = 'Đang tải thời tiết...';
                       });
-                      Navigator.pop(context);
                       _handleRefresh();
+                      try {
+                        final fc = await WeatherService.getForecast(lat, lon);
+                        if (mounted) {
+                          setState(() {
+                            _currentWeatherBrief = '${fc.temperature.round()}°C ${fc.weatherDescription}';
+                          });
+                        }
+                      } catch (_) {}
                     },
                     child: Container(
                       padding: const EdgeInsets.all(14),

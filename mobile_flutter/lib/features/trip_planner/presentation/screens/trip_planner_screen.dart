@@ -31,6 +31,133 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   double _distanceFromUserKm = 180.0;
   int _maxDays = 3;
 
+  DateTime _startDate = DateTime.now();
+  double _gasPrice = 24500.0; // Đơn giá xăng RON95 thực tế
+  int _foodPerDay = 220000; // Chi phí ăn uống dã ngoại / ngày
+  int _campFeePerNight = 120000; // Phí bãi trại / đêm
+
+  DateTime get _currentDayDate => _startDate.add(Duration(days: _selectedDay - 1));
+  String get _currentDayDateFormatted {
+    final d = _currentDayDate;
+    const weekdays = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
+    final weekdayStr = weekdays[(d.weekday - 1).clamp(0, 6)];
+    final dayStr = d.day < 10 ? '0${d.day}' : '${d.day}';
+    final monthStr = d.month < 10 ? '0${d.month}' : '${d.month}';
+    return '$weekdayStr, ngày $dayStr/$monthStr/${d.year}';
+  }
+
+  Future<void> _selectStartDate() async {
+    HapticFeedback.selectionClick();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _startDate,
+      firstDate: DateTime.now().subtract(const Duration(days: 30)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      helpText: 'CHỌN NGÀY BẮT ĐẦU CHUYẾN ĐI',
+      confirmText: 'XÁC NHẬN',
+      cancelText: 'ĐÓNG',
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: AppColors.summitGold,
+              onPrimary: Colors.black,
+              surface: Color(0xFF1B231F),
+              onSurface: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && mounted) {
+      setState(() => _startDate = picked);
+    }
+  }
+
+  void _showCostConfigDialog() {
+    HapticFeedback.mediumImpact();
+    final gasCtrl = TextEditingController(text: _gasPrice.round().toString());
+    final foodCtrl = TextEditingController(text: _foodPerDay.toString());
+    final campCtrl = TextEditingController(text: _campFeePerNight.toString());
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1B231F),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Row(
+            children: [
+              Icon(Icons.tune, color: AppColors.summitGold, size: 20),
+              SizedBox(width: 8),
+              Text('Tùy Chỉnh Định Mức Chi Phí', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: gasCtrl,
+                  keyboardType: TextInputType.number,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    labelText: 'Giá xăng RON95 (đ/lít)',
+                    labelStyle: TextStyle(color: AppColors.textSecondary),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: foodCtrl,
+                  keyboardType: TextInputType.number,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    labelText: 'Ăn uống trung bình (đ/người/ngày)',
+                    labelStyle: TextStyle(color: AppColors.textSecondary),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: campCtrl,
+                  keyboardType: TextInputType.number,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    labelText: 'Phí bãi trại / lều (đ/người/đêm)',
+                    labelStyle: TextStyle(color: AppColors.textSecondary),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Hủy', style: TextStyle(color: AppColors.textSecondary)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.editorialPine),
+              onPressed: () {
+                final g = double.tryParse(gasCtrl.text);
+                final f = int.tryParse(foodCtrl.text);
+                final c = int.tryParse(campCtrl.text);
+                if (mounted) {
+                  setState(() {
+                    if (g != null && g > 0) _gasPrice = g;
+                    if (f != null && f >= 0) _foodPerDay = f;
+                    if (c != null && c >= 0) _campFeePerNight = c;
+                  });
+                }
+                Navigator.pop(ctx);
+              },
+              child: const Text('Lưu thay đổi', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   List<String> _checklistItems = [];
   Set<String> _checkedItems = {};
 
@@ -179,11 +306,10 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     await _initTripData();
   }
 
-  // Dự toán chi phí nhiên liệu tính theo cự ly thực tế
+  // Dự toán chi phí nhiên liệu tính theo cự ly thực tế và giá xăng thời gian thực
   int get _fuelCostPerPerson {
     final totalRoundTripKm = (_distanceFromUserKm * 2).clamp(30.0, 3500.0);
     const double passMultiplier = 1.30;
-    const double gasPrice = 24000.0;
 
     final selected = _vehicles.firstWhere(
       (v) => v['title'] == _selectedVehicle,
@@ -193,11 +319,11 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     if (rate == 0.0) return 0;
 
     final totalLiters = (totalRoundTripKm * passMultiplier / 100.0) * rate;
-    return ((totalLiters * gasPrice) / _participants).round();
+    return ((totalLiters * _gasPrice) / _participants).round();
   }
 
-  int get _foodCostPerPerson => _maxDays * 220000;
-  int get _campFeePerPerson => (_maxDays - 1) * 120000;
+  int get _foodCostPerPerson => _maxDays * _foodPerDay;
+  int get _campFeePerPerson => (_maxDays - 1) * _campFeePerNight;
   int get _totalCostPerPerson => _fuelCostPerPerson + _foodCostPerPerson + _campFeePerPerson;
 
   void _toggleCheckItem(String item) {
@@ -766,7 +892,53 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
           ),
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 10),
+
+        // Lịch thời gian thực của chặng đang chọn
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppColors.editorialSurface,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: AppColors.editorialBorder),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.calendar_month_outlined, size: 16, color: AppColors.editorialPine),
+                  const SizedBox(width: 8),
+                  Text(
+                    _currentDayDateFormatted,
+                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
+                  ),
+                ],
+              ),
+              BouncingButton(
+                onTap: _selectStartDate,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.editorialSurfaceSubtle,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: AppColors.editorialBorder),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.edit_calendar, size: 12, color: AppColors.editorialPine),
+                      SizedBox(width: 4),
+                      Text('Đổi ngày', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.editorialPine)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 14),
 
         // Action Add Stop Button
         Row(
@@ -1051,14 +1223,38 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Dự Toán Chi Phí',
-                    style: TextStyle(
-                      fontFamily: 'serif',
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.editorialInk,
-                    ),
+                  Row(
+                    children: [
+                      const Text(
+                        'Dự Toán Chi Phí',
+                        style: TextStyle(
+                          fontFamily: 'serif',
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.editorialInk,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      BouncingButton(
+                        onTap: _showCostConfigDialog,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.editorialSurfaceSubtle,
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: AppColors.editorialBorder),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.tune, size: 12, color: AppColors.editorialPine),
+                              SizedBox(width: 2),
+                              Text('Tùy chỉnh', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.editorialPine)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   Text(
                     '${total.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} đ/người',

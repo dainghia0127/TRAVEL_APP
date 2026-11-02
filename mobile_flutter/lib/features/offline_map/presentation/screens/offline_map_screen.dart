@@ -239,9 +239,74 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
     }
   }
 
+  List<Map<String, dynamic>> get _currentWaypoints {
+    final dest = _selectedTripDestination;
+    if (dest == null || dest.id.contains('ta_nang')) {
+      return _waypoints;
+    }
+
+    if (dest.route != null && dest.route!.stages.isNotEmpty) {
+      final baseLat = dest.centerLatitude ?? 11.6420;
+      final baseLng = dest.centerLongitude ?? 108.4230;
+      final stages = dest.route!.stages;
+
+      return stages.asMap().entries.map((entry) {
+        final idx = entry.key;
+        final stage = entry.value;
+        final isLast = idx == stages.length - 1;
+        final isFirst = idx == 0;
+
+        final latOffset = (idx - stages.length / 2) * 0.008;
+        final lngOffset = (idx - stages.length / 2) * 0.008;
+
+        final terrain = stage.terrainType ?? '';
+        final isRiver = terrain.toLowerCase().contains('suối') || terrain.toLowerCase().contains('thác');
+
+        return {
+          'id': 'stage_${stage.stageNumber}',
+          'title': stage.title,
+          'category': isFirst ? 'Cửa rừng' : (isLast ? 'Đích đến' : (isRiver ? 'Nguồn nước' : 'Cắm trại')),
+          'icon': isFirst ? Icons.flag : (isLast ? Icons.check_circle : (isRiver ? Icons.water_drop : Icons.cabin)),
+          'color': isFirst ? AppColors.emerald : (isLast ? AppColors.neonGreen : AppColors.tacticalOrange),
+          'position': LatLng(baseLat + latOffset, baseLng + lngOffset),
+          'elevation': stage.elevationGainMeters != null ? '+${stage.elevationGainMeters}m' : '--',
+          'water': isRiver ? 'Có suối tự nhiên' : 'Nước mang theo',
+          'signal': isFirst ? '4G ổn định' : (isLast ? 'Có sóng' : 'Mất sóng (0%)'),
+          'desc': stage.description,
+        };
+      }).toList();
+    }
+
+    final baseLat = dest.centerLatitude ?? 11.6420;
+    final baseLng = dest.centerLongitude ?? 108.4230;
+    return [
+      {
+        'id': 'dest_${dest.id}',
+        'title': dest.name,
+        'category': 'Đích đến',
+        'icon': Icons.location_on,
+        'color': AppColors.summitGold,
+        'position': LatLng(baseLat, baseLng),
+        'elevation': dest.elevationDisplay,
+        'water': 'Kiểm tra thực địa',
+        'signal': 'Tùy khu vực',
+        'desc': dest.editorialSummary,
+      }
+    ];
+  }
+
+  List<LatLng> get _currentTrekkingTrail {
+    final list = _currentWaypoints;
+    if (list.length >= 2) {
+      return list.map((w) => w['position'] as LatLng).toList();
+    }
+    return _trekkingTrail;
+  }
+
   List<Map<String, dynamic>> get _filteredWaypoints {
-    if (_selectedFilter == 'Tất cả') return _waypoints;
-    return _waypoints.where((wp) => wp['category'] == _selectedFilter).toList();
+    final list = _currentWaypoints;
+    if (_selectedFilter == 'Tất cả') return list;
+    return list.where((wp) => wp['category'] == _selectedFilter).toList();
   }
 
   void _onSelectMarker(Map<String, dynamic> wp) {
@@ -310,14 +375,14 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
               // Cung đường mòn mẫu & Đường tìm đường định tuyến (Wayfinding Routing)
               PolylineLayer(
                 polylines: [
-                  // Trail cố định Tà Năng
+                  // Trail cung đường thực tế theo địa điểm đang chọn
                   Polyline(
-                    points: _trekkingTrail,
+                    points: _currentTrekkingTrail,
                     strokeWidth: 6.0,
                     color: Colors.black.withValues(alpha: 0.4),
                   ),
                   Polyline(
-                    points: _trekkingTrail,
+                    points: _currentTrekkingTrail,
                     strokeWidth: 3.5,
                     color: AppColors.tacticalOrange.withValues(alpha: 0.8),
                   ),

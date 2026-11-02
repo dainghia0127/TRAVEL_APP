@@ -5,6 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
 import 'package:mobile_flutter/core/widgets/tactical_badge.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:mobile_flutter/features/offline_map/services/location_service.dart';
 import 'package:mobile_flutter/features/weather_safety/services/weather_service.dart';
 
 class SafetySosScreen extends StatefulWidget {
@@ -21,18 +23,53 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
   Timer? _holdTimer;
 
   OutdoorWeather? _currentWeather;
-  final double _demoLat = 11.9404;
-  final double _demoLng = 108.4583;
+  Position? _realPosition;
+  bool _isGpsLoading = true;
+  String _gpsStatus = 'Đang dò sóng vệ tinh GPS...';
+
+  double get _currentLat => _realPosition?.latitude ?? 11.9404;
+  double get _currentLng => _realPosition?.longitude ?? 108.4583;
+  double get _currentAlt => _realPosition?.altitude ?? 1485.0;
+  double get _currentAcc => _realPosition?.accuracy ?? 3.5;
+  bool get _hasRealGps => _realPosition != null;
 
   @override
   void initState() {
     super.initState();
-    _loadWeatherWarning();
+    _detectLiveGpsAndWeather();
   }
 
-  Future<void> _loadWeatherWarning() async {
-    final weather = await WeatherService.getForecast(_demoLat, _demoLng);
-    if (mounted) setState(() => _currentWeather = weather);
+  Future<void> _detectLiveGpsAndWeather() async {
+    setState(() {
+      _isGpsLoading = true;
+      _gpsStatus = 'Đang dò sóng vệ tinh GPS...';
+    });
+
+    try {
+      final pos = await LocationService.getDetailedPosition();
+      if (pos != null && mounted) {
+        setState(() {
+          _realPosition = pos;
+          _isGpsLoading = false;
+          _gpsStatus = 'Đã khóa vệ tinh độ chính xác cao';
+        });
+
+        // Nạp thời tiết vi khí hậu thời gian thực theo tọa độ thực tế
+        final weather = await WeatherService.getForecast(pos.latitude, pos.longitude);
+        if (mounted) setState(() => _currentWeather = weather);
+        return;
+      }
+    } catch (_) {}
+
+    // Fallback an toàn nếu thiết bị chưa cấp quyền hoặc không có sóng GPS
+    if (mounted) {
+      setState(() {
+        _isGpsLoading = false;
+        _gpsStatus = 'Chưa nhận tín hiệu GPS (Chế độ tham chiếu)';
+      });
+      final weather = await WeatherService.getForecast(_currentLat, _currentLng);
+      if (mounted) setState(() => _currentWeather = weather);
+    }
   }
 
   void _onHoldStart() {
@@ -94,13 +131,16 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
 
   Future<void> _sendEmergencySms() async {
     HapticFeedback.mediumImpact();
-    final message = 'SOS! TOI DANG CAN CUU HO. Toa do GPS: $_demoLat, $_demoLng (Cao do: 1,485m). Vui long gui doi cuu ho khan cap!';
+    final altText = _currentAlt > 0 ? ' (Cao do: ${_currentAlt.round()}m)' : '';
+    final accText = ' [Sai so GPS: +/-${_currentAcc.toStringAsFixed(1)}m]';
+    final liveTag = _hasRealGps ? '[GPS THUC]' : '[GPS THAM CHIEU]';
+    final message = 'SOS! TOI DANG CAN CUU HO $liveTag. Toa do: ${_currentLat.toStringAsFixed(5)}, ${_currentLng.toStringAsFixed(5)}$altText$accText. Vui long ho tro khan cap!';
     final uri = Uri.parse('sms:115?body=${Uri.encodeComponent(message)}');
     try {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri);
       } else {
-        _showSnackBar('Đã chuẩn bị nội dung tin nhắn cứu hộ kèm tọa độ GPS.');
+        _showSnackBar('Đã chuẩn bị nội dung tin nhắn cứu hộ kèm tọa độ GPS thực.');
       }
     } catch (_) {
       _showSnackBar('Đã chuẩn bị tin nhắn cứu hộ.');
@@ -119,8 +159,10 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
 
   void _copyGpsCoordinates() {
     HapticFeedback.lightImpact();
-    Clipboard.setData(ClipboardData(text: '$_demoLat, $_demoLng (Cao độ: 1,485m)'));
-    _showSnackBar('Đã sao chép tọa độ GPS vào bộ nhớ đệm!');
+    final altText = _currentAlt > 0 ? ' (Cao độ: ${_currentAlt.round()}m)' : '';
+    final text = '${_currentLat.toStringAsFixed(5)}, ${_currentLng.toStringAsFixed(5)}$altText';
+    Clipboard.setData(ClipboardData(text: text));
+    _showSnackBar('Đã sao chép tọa độ GPS: $text');
   }
 
   void _showSnackBar(String msg) {
@@ -419,7 +461,9 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
           decoration: BoxDecoration(
             color: AppColors.surfaceBase,
             borderRadius: AppRadius.roundedLg,
-            border: Border.all(color: AppColors.borderSubtle),
+            border: Border.all(
+              color: _hasRealGps ? AppColors.emerald.withValues(alpha: 0.5) : AppColors.borderSubtle,
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -427,39 +471,102 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'TỌA ĐỘ VỆ TINH GPS (WGS84)',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.emerald,
-                      letterSpacing: 0.4,
-                    ),
+                  Row(
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _hasRealGps ? AppColors.neonGreen : AppColors.tacticalOrange,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _hasRealGps ? 'VỆ TINH GPS THỜI GIAN THỰC' : 'TỌA ĐỘ THAM CHIẾU (CHƯA CÓ GPS)',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: _hasRealGps ? AppColors.emerald : AppColors.tacticalOrange,
+                          letterSpacing: 0.4,
+                        ),
+                      ),
+                    ],
                   ),
-                  BouncingButton(
-                    onTap: _copyGpsCoordinates,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceHigh,
-                        borderRadius: AppRadius.roundedPill,
+                  Row(
+                    children: [
+                      BouncingButton(
+                        onTap: _isGpsLoading ? null : _detectLiveGpsAndWeather,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          margin: const EdgeInsets.only(right: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceHigh,
+                            borderRadius: AppRadius.roundedPill,
+                          ),
+                          child: _isGpsLoading
+                              ? const SizedBox(
+                                  width: 12,
+                                  height: 12,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.emerald),
+                                )
+                              : const Icon(Icons.refresh, size: 14, color: AppColors.textSecondary),
+                        ),
                       ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.copy, size: 12, color: AppColors.emerald),
-                          SizedBox(width: 4),
-                          Text('Sao chép', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.emerald)),
-                        ],
+                      BouncingButton(
+                        onTap: _copyGpsCoordinates,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceHigh,
+                            borderRadius: AppRadius.roundedPill,
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.copy, size: 12, color: AppColors.emerald),
+                              SizedBox(width: 4),
+                              Text('Sao chép', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.emerald)),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ],
               ),
               const SizedBox(height: 8),
-              Text('$_demoLat, $_demoLng', style: AppTypography.displayHero.copyWith(fontSize: 22)),
-              const SizedBox(height: 2),
-              const Text('Cao độ vệ tinh: 1,485m • Sai số ước lượng: ± 3.5m', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+              Text(
+                '${_currentLat.toStringAsFixed(5)}, ${_currentLng.toStringAsFixed(5)}',
+                style: AppTypography.displayHero.copyWith(fontSize: 22),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  const Icon(Icons.terrain_outlined, size: 13, color: AppColors.textSecondary),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Cao độ: ${_currentAlt.round()}m',
+                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 11.5, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(width: 10),
+                  const Icon(Icons.gps_fixed, size: 13, color: AppColors.textSecondary),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Sai số: ±${_currentAcc.toStringAsFixed(1)}m',
+                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 11.5),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                _gpsStatus,
+                style: TextStyle(
+                  color: _hasRealGps ? AppColors.emerald : AppColors.textSecondary,
+                  fontSize: 11,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
             ],
           ),
         ),

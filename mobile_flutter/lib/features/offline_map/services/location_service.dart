@@ -2,41 +2,39 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
 class LocationService {
-  /// Yêu cầu cấp quyền và lấy tọa độ GPS phần cứng hiện tại
-  static Future<LatLng?> getCurrentLocation() async {
+  /// Lấy chi tiết thông tin GPS phần cứng (Tọa độ, độ cao, sai số, thời gian)
+  static Future<Position?> getDetailedPosition() async {
     bool serviceEnabled;
     LocationPermission permission;
 
-    // Kiểm tra xem dịch vụ GPS của thiết bị có đang bật không
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Dịch vụ định vị chưa bật
-      return null;
-    }
+    if (!serviceEnabled) return null;
 
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return null;
-      }
+      if (permission == LocationPermission.denied) return null;
     }
 
-    if (permission == LocationPermission.deniedForever) {
-      return null;
-    }
+    if (permission == LocationPermission.deniedForever) return null;
 
     try {
-      final position = await Geolocator.getCurrentPosition(
+      return await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
           timeLimit: Duration(seconds: 10),
         ),
       );
-      return LatLng(position.latitude, position.longitude);
     } catch (e) {
       return null;
     }
+  }
+
+  /// Yêu cầu cấp quyền và lấy tọa độ GPS phần cứng hiện tại
+  static Future<LatLng?> getCurrentLocation() async {
+    final pos = await getDetailedPosition();
+    if (pos == null) return null;
+    return LatLng(pos.latitude, pos.longitude);
   }
 
   /// Theo dõi vị trí GPS thời gian thực (Position Stream)
