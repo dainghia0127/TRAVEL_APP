@@ -41,39 +41,18 @@ class EditorialImage extends StatelessWidget {
         (image.url.startsWith('http://') || image.url.startsWith('https://')) &&
         image.url != OutdoorImage.defaultNature.url;
 
+    // Tính toán giới hạn kích thước giải mã GPU (GPU Decode Bounds) để tối ưu triệt để RAM
+    final int targetMemWidth = (width != null && width!.isFinite && width! > 0)
+        ? (width! * 2.0).round().clamp(200, 900)
+        : 800;
+
     Widget imageContent;
 
-    if (!kIsWeb && hasValidNetworkUrl) {
+    if (hasSpecificLocalAsset) {
       // =========================================================================
-      // [1] TRÊN APP THẬT NATIVE (Android / iOS):
-      // Ưu tiên nạp ĐỘNG từ Network URL qua CachedNetworkImage.
-      // - Hoàn toàn không bị giới hạn bởi browser CORS.
-      // - Tự động tải từ server/API/Cloudinary/S3 khi hệ thống có địa điểm mới.
-      // - Tự động lưu Disk Cache trên thiết bị người dùng (mở lần sau nạp 0ms, hoạt động offline).
-      // - Khi backend/admin thêm 100 hay 1.000 địa điểm mới, app tự động tải mà KHÔNG CẦN BUILD LẠI APP!
-      // =========================================================================
-      imageContent = CachedNetworkImage(
-        key: ValueKey('native_img_${image.url}'),
-        imageUrl: image.url,
-        width: width,
-        height: height,
-        fit: fit,
-        alignment: image.focalPoint,
-        fadeInDuration: const Duration(milliseconds: 200),
-        placeholder: (context, url) => SkeletonShimmer(
-          width: width ?? double.infinity,
-          height: height ?? 200,
-          borderRadius: radius,
-        ),
-        errorWidget: (context, url, error) => _buildAssetOrPlaceholder(hasSpecificLocalAsset),
-      );
-    } else if (hasSpecificLocalAsset) {
-      // =========================================================================
-      // [2] BUNDLED SEEDS (Bộ ảnh đóng gói sẵn trong App):
-      // Dành cho 32 địa danh hạt giống cốt lõi đã được lưu trữ trong bundle:
-      // - Giúp Web Preview (localhost:8080) render mượt mà, không dính lỗi CORS mạng của trình duyệt.
-      // - Đảm bảo trải nghiệm First-Launch: người dùng vừa tải app về mở lên có ngay ảnh đẹp 0ms.
-      // - Phục vụ chế độ Offline khi đi trekking vào rừng sâu hoàn toàn mất sóng di động.
+      // [1] ƯU TIÊN BUNDLED SEEDS (Bộ ảnh đóng gói sẵn trong App):
+      // - Nạp tức thì 0ms, không tốn data 4G/5G, hoạt động 100% offline trong rừng.
+      // - Giới hạn cacheWidth để giải mã GPU siêu nhanh, mượt mà 60-120fps.
       // =========================================================================
       imageContent = Image.asset(
         image.localAsset,
@@ -82,7 +61,7 @@ class EditorialImage extends StatelessWidget {
         height: height,
         fit: fit,
         alignment: image.focalPoint,
-        cacheWidth: 800,
+        cacheWidth: targetMemWidth,
         frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
           if (wasSynchronouslyLoaded || frame != null) return child;
           return SkeletonShimmer(
@@ -93,10 +72,33 @@ class EditorialImage extends StatelessWidget {
         },
         errorBuilder: (context, error, stackTrace) => _buildNetworkFallback(radius),
       );
+    } else if (!kIsWeb && hasValidNetworkUrl) {
+      // =========================================================================
+      // [2] ĐỊA ĐIỂM ĐỘNG MỚI TRÊN MOBILE NATIVE (iOS / Android):
+      // - Tự động tải từ server/API và lưu Disk Cache.
+      // - memCacheWidth: Giới hạn giải mã vào RAM GPU, ngăn chặn triệt để giật lag/OOM.
+      // =========================================================================
+      imageContent = CachedNetworkImage(
+        key: ValueKey('native_img_${image.url}'),
+        imageUrl: image.url,
+        width: width,
+        height: height,
+        fit: fit,
+        alignment: image.focalPoint,
+        fadeInDuration: const Duration(milliseconds: 150),
+        memCacheWidth: targetMemWidth,
+        maxWidthDiskCache: 1200,
+        maxHeightDiskCache: 1200,
+        placeholder: (context, url) => SkeletonShimmer(
+          width: width ?? double.infinity,
+          height: height ?? 200,
+          borderRadius: radius,
+        ),
+        errorWidget: (context, url, error) => _buildAssetOrPlaceholder(hasSpecificLocalAsset),
+      );
     } else if (hasValidNetworkUrl) {
       // =========================================================================
-      // [3] ĐỊA ĐIỂM ĐỘNG MỚI TRÊN WEB (Dynamic Web Images):
-      // Khi hệ thống thêm địa điểm mới từ API (chưa có trong asset bundle), Web nạp trực tiếp qua Image.network.
+      // [3] ĐỊA ĐIỂM ĐỘNG MỚI TRÊN WEB:
       // =========================================================================
       imageContent = Image.network(
         image.url,
@@ -105,6 +107,7 @@ class EditorialImage extends StatelessWidget {
         height: height,
         fit: fit,
         alignment: image.focalPoint,
+        cacheWidth: targetMemWidth,
         frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
           if (wasSynchronouslyLoaded || frame != null) return child;
           return SkeletonShimmer(
@@ -116,7 +119,7 @@ class EditorialImage extends StatelessWidget {
         errorBuilder: (context, error, stackTrace) => _buildAssetOrPlaceholder(hasSpecificLocalAsset),
       );
     } else {
-      // [4] FALLBACK MẶC ĐỊNH
+      // [4] FALLBACK AN TOÀN
       imageContent = _buildAssetOrPlaceholder(hasSpecificLocalAsset);
     }
 

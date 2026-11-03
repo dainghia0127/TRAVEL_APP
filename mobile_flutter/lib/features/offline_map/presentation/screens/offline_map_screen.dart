@@ -360,16 +360,22 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                 TileLayer(
                   urlTemplate: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
                   userAgentPackageName: 'com.traveloutdoor.travel_app',
+                  panBuffer: 1,
+                  keepBuffer: 3,
                 )
               else if (_currentLayer == 'streets')
                 TileLayer(
                   urlTemplate: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
                   userAgentPackageName: 'com.traveloutdoor.travel_app',
+                  panBuffer: 1,
+                  keepBuffer: 3,
                 )
               else
                 TileLayer(
                   urlTemplate: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
                   userAgentPackageName: 'com.traveloutdoor.travel_app',
+                  panBuffer: 1,
+                  keepBuffer: 3,
                 ),
 
               // Cung đường mòn mẫu & Đường tìm đường định tuyến (Wayfinding Routing)

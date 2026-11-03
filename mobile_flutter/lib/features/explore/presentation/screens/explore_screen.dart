@@ -394,10 +394,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
     final isFiltering = _controller.isFiltering;
     final currentMonth = DateTime.now().month;
 
-    // Phân loại danh mục chuyên đề
-    final featuredSpots = destinations.where((d) => d.isFeatured).toList();
-    final seasonalSpots = destinations.where((d) => d.isIdealSeason(currentMonth)).toList();
-    final trendingSpots = destinations.where((d) => d.isPopular || !d.isFeatured).toList();
+    // Sử dụng danh sách đã được pre-computed trong controller (O(1) access, tối ưu 60/120fps)
+    final featuredSpots = _controller.featuredSpots;
+    final seasonalSpots = _controller.seasonalSpots;
+    final trendingSpots = _controller.trendingSpots;
 
     return Scaffold(
       backgroundColor: AppColors.editorialBg,

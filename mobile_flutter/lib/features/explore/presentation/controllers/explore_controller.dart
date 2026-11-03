@@ -30,6 +30,12 @@ class ExploreController extends ChangeNotifier {
   List<Destination> _destinations = [];
   Set<String> _favoriteIds = {};
 
+  // Pre-computed categorized caches for high performance (O(1) access on 60/120fps scrolling)
+  List<Destination> _featuredSpots = [];
+  List<Destination> _seasonalSpots = [];
+  List<Destination> _trendingSpots = [];
+  List<Destination> _socialTrendingSpots = [];
+
   // Getters
   bool get isDomestic => _isDomestic;
   String get selectedRegion => _selectedRegion;
@@ -41,15 +47,15 @@ class ExploreController extends ChangeNotifier {
   List<Destination> get destinations => _destinations;
   Set<String> get favoriteIds => _favoriteIds;
 
-  /// Danh sách các địa điểm Hot Trend trên mạng xã hội (TikTok, Facebook)
-  List<Destination> get socialTrendingSpots =>
-      _destinations.where((d) => d.isSocialTrend).toList();
+  List<Destination> get featuredSpots => _featuredSpots;
+  List<Destination> get seasonalSpots => _seasonalSpots;
+  List<Destination> get trendingSpots => _trendingSpots;
+  List<Destination> get socialTrendingSpots => _socialTrendingSpots;
 
   /// Lọc các địa điểm Hot Trend theo Tỉnh / Thành Phố được chọn
   List<Destination> getHotTrendsByProvince(String provinceName) {
     final pNorm = provinceName.toLowerCase();
-    return _destinations.where((d) {
-      if (!d.isSocialTrend) return false;
+    return _socialTrendingSpots.where((d) {
       final prov = (d.province ?? '').toLowerCase();
       return prov.contains(pNorm) || pNorm.contains(prov);
     }).toList();
@@ -165,9 +171,20 @@ class ExploreController extends ChangeNotifier {
         difficultyLevel: _selectedDifficulty,
         userCountryCode: userCountryCode,
       );
+
+      // Pre-compute categorized lists once to prevent re-filtering during 60/120fps scrolling
+      final currentMonth = DateTime.now().month;
+      _featuredSpots = _destinations.where((d) => d.isFeatured).toList();
+      _seasonalSpots = _destinations.where((d) => d.isIdealSeason(currentMonth)).toList();
+      _trendingSpots = _destinations.where((d) => d.isPopular || !d.isFeatured).toList();
+      _socialTrendingSpots = _destinations.where((d) => d.isSocialTrend).toList();
     } catch (e) {
       _errorMessage = 'Không thể tải danh sách điểm đến: $e';
       _destinations = [];
+      _featuredSpots = [];
+      _seasonalSpots = [];
+      _trendingSpots = [];
+      _socialTrendingSpots = [];
     } finally {
       _isLoading = false;
       notifyListeners();

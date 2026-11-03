@@ -9,7 +9,8 @@ abstract class IExploreLocalDataSource {
 
 class ExploreLocalDataSource implements IExploreLocalDataSource {
   static const String _assetPath = 'assets/data/destinations_seed.json';
-  List<DestinationModel>? _cachedDestinations;
+  // Static RAM Cache: Toàn bộ app chỉ parse JSON đúng 1 lần duy nhất trong toàn vòng đời
+  static List<DestinationModel>? _cachedDestinations;
 
   @override
   Future<List<DestinationModel>> getSeedDestinations() async {
