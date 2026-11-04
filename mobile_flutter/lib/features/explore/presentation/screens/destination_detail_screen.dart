@@ -1055,7 +1055,9 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
                               ),
                               Text(
-                                '${_nearbyPois.length} điểm trong 10km',
+                                _isLoadingPois
+                                    ? 'Đang quét bản đồ...'
+                                    : '${_nearbyPois.length} điểm trong 10km',
                                 style: const TextStyle(fontSize: 11, color: AppColors.editorialMuted),
                               ),
                             ],
@@ -1066,7 +1068,7 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                             child: ListView.separated(
                               scrollDirection: Axis.horizontal,
                               itemCount: _nearbyPois.take(8).length,
-                              separatorBuilder: (_, __) => const SizedBox(width: 8),
+                              separatorBuilder: (context, index) => const SizedBox(width: 8),
                               itemBuilder: (context, i) {
                                 final poi = _nearbyPois[i];
                                 return Container(

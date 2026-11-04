@@ -49,14 +49,12 @@ class _BouncingButtonState extends State<BouncingButton> with SingleTickerProvid
   void _onTapDown(TapDownDetails details) {
     if (widget.onTap != null) {
       _controller.forward();
-      HapticFeedback.lightImpact();
     }
   }
 
   void _onTapUp(TapUpDetails details) {
     if (widget.onTap != null) {
       _controller.reverse();
-      widget.onTap?.call();
     }
   }
 
@@ -70,9 +68,15 @@ class _BouncingButtonState extends State<BouncingButton> with SingleTickerProvid
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTapDown: _onTapDown,
-      onTapUp: _onTapUp,
-      onTapCancel: _onTapCancel,
+      onTapDown: widget.onTap != null ? _onTapDown : null,
+      onTapUp: widget.onTap != null ? _onTapUp : null,
+      onTapCancel: widget.onTap != null ? _onTapCancel : null,
+      onTap: widget.onTap != null
+          ? () {
+              HapticFeedback.lightImpact();
+              widget.onTap?.call();
+            }
+          : null,
       child: ScaleTransition(
         scale: _scaleAnimation,
         child: widget.child,

@@ -8,17 +8,27 @@ import 'package:mobile_flutter/features/explore/domain/entities/destination.dart
 import 'package:mobile_flutter/features/explore/presentation/screens/destination_detail_screen.dart';
 
 /// Danh mục Địa điểm Được Khám Phá Nhiều / Tiêu biểu (Trending & Popular Discovery)
-class TrendingGridSection extends StatelessWidget {
+class TrendingGridSection extends StatefulWidget {
   final List<Destination> destinations;
   final Set<String> favoriteIds;
   final Function(String) onToggleFavorite;
+  final VoidCallback? onScrollToTop;
 
   const TrendingGridSection({
     super.key,
     required this.destinations,
     required this.favoriteIds,
     required this.onToggleFavorite,
+    this.onScrollToTop,
   });
+
+  @override
+  State<TrendingGridSection> createState() => _TrendingGridSectionState();
+}
+
+class _TrendingGridSectionState extends State<TrendingGridSection> {
+  bool _isExpanded = false;
+  static const int _initialLimit = 8;
 
   void _openDetail(BuildContext context, Destination dest, bool isFav) {
     HapticFeedback.lightImpact();
@@ -27,7 +37,7 @@ class TrendingGridSection extends StatelessWidget {
         pageBuilder: (context, animation, secondaryAnimation) => DestinationDetailScreen(
           destination: dest,
           isFavorite: isFav,
-          onToggleFavorite: () => onToggleFavorite(dest.id),
+          onToggleFavorite: () => widget.onToggleFavorite(dest.id),
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(
@@ -42,7 +52,13 @@ class TrendingGridSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (destinations.isEmpty) return const SizedBox.shrink();
+    if (widget.destinations.isEmpty) return const SizedBox.shrink();
+
+    final totalCount = widget.destinations.length;
+    final displayList = _isExpanded
+        ? widget.destinations
+        : widget.destinations.take(_initialLimit).toList();
+    final remainingCount = totalCount - displayList.length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,7 +84,7 @@ class TrendingGridSection extends StatelessWidget {
                 ],
               ),
               Text(
-                '${destinations.length} địa danh',
+                '$totalCount địa danh',
                 style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.editorialMuted),
               ),
             ],
@@ -78,8 +94,8 @@ class TrendingGridSection extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
-            children: destinations.map((dest) {
-              final isFav = favoriteIds.contains(dest.id);
+            children: displayList.map((dest) {
+              final isFav = widget.favoriteIds.contains(dest.id);
               final isUnesco = dest.categoryIds.contains('unesco');
 
               return Padding(
@@ -154,11 +170,15 @@ class TrendingGridSection extends StatelessWidget {
                                       ),
                                     ),
                                     GestureDetector(
-                                      onTap: () => onToggleFavorite(dest.id),
-                                      child: Icon(
-                                        isFav ? Icons.favorite : Icons.favorite_border,
-                                        size: 16,
-                                        color: isFav ? AppColors.editorialTerracotta : AppColors.editorialMuted,
+                                      behavior: HitTestBehavior.opaque,
+                                      onTap: () => widget.onToggleFavorite(dest.id),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(4),
+                                        child: Icon(
+                                          isFav ? Icons.favorite : Icons.favorite_border,
+                                          size: 18,
+                                          color: isFav ? AppColors.editorialTerracotta : AppColors.editorialMuted,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -212,6 +232,119 @@ class TrendingGridSection extends StatelessWidget {
                 ),
               );
             }).toList(),
+          ),
+        ),
+
+        // Nút Xem thêm / Thu gọn để tránh tình trạng cuộn vô tận
+        if (totalCount > _initialLimit) ...[
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: BouncingButton(
+              onTap: () {
+                HapticFeedback.selectionClick();
+                setState(() => _isExpanded = !_isExpanded);
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.editorialSurface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.editorialBorder),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x04000000),
+                      blurRadius: 4,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      _isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                      size: 18,
+                      color: AppColors.editorialPine,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      _isExpanded ? 'Thu Gọn Danh Sách' : 'Xem Thêm ($remainingCount địa danh nữa)',
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.editorialPine,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+
+        // Footer Trang Trọng: Điểm dừng kết thúc Feed rõ ràng
+        const SizedBox(height: 24),
+        Center(
+          child: Column(
+            children: [
+              Container(
+                width: 32,
+                height: 3,
+                decoration: BoxDecoration(
+                  color: AppColors.editorialBorder,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                '✦ BẠN ĐÃ KHÁM PHÁ HẾT DANH MỤC TIÊU BIỂU ✦',
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                  color: AppColors.editorialMuted,
+                ),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Sử dụng thanh tìm kiếm ở đầu trang để tra cứu thêm hàng trăm tọa độ dã ngoại khác',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: AppColors.editorialMuted,
+                ),
+              ),
+              if (widget.onScrollToTop != null) ...[
+                const SizedBox(height: 12),
+                BouncingButton(
+                  onTap: widget.onScrollToTop,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.editorialSurface,
+                      borderRadius: AppRadius.roundedPill,
+                      border: Border.all(color: AppColors.editorialBorder),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.arrow_upward_rounded, size: 14, color: AppColors.editorialPine),
+                        SizedBox(width: 4),
+                        Text(
+                          'Lên đầu trang',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.editorialPine,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
       ],

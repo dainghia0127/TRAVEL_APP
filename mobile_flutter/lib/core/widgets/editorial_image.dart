@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_flutter/core/models/outdoor_image.dart';
-import 'package:mobile_flutter/core/widgets/skeleton_shimmer.dart';
 
 /// Widget hiển thị hình ảnh biên tập thông minh với kiến trúc 3 lớp:
 /// 1. Dynamic Network + Disk Cache (Trên Mobile Native: nạp động từ API/mạng, tự cache vào máy, KHÔNG CẦN build lại app khi có địa điểm mới)
@@ -41,10 +40,10 @@ class EditorialImage extends StatelessWidget {
         (image.url.startsWith('http://') || image.url.startsWith('https://')) &&
         image.url != OutdoorImage.defaultNature.url;
 
-    // Tính toán giới hạn kích thước giải mã GPU (GPU Decode Bounds) để tối ưu triệt để RAM
-    final int targetMemWidth = (width != null && width!.isFinite && width! > 0)
-        ? (width! * 2.0).round().clamp(200, 900)
-        : 800;
+    // Giới hạn giải mã bộ nhớ an toàn (Safe GPU Decoding)
+    final int? targetMemWidth = (width != null && width!.isFinite && width! > 0)
+        ? (width! * 2.0).round().clamp(180, 800)
+        : null;
 
     Widget imageContent;
 
@@ -52,7 +51,7 @@ class EditorialImage extends StatelessWidget {
       // =========================================================================
       // [1] ƯU TIÊN BUNDLED SEEDS (Bộ ảnh đóng gói sẵn trong App):
       // - Nạp tức thì 0ms, không tốn data 4G/5G, hoạt động 100% offline trong rừng.
-      // - Giới hạn cacheWidth để giải mã GPU siêu nhanh, mượt mà 60-120fps.
+      // - Fallback an toàn tới ảnh thiên nhiên mặc định nếu asset gặp sự cố giải mã.
       // =========================================================================
       imageContent = Image.asset(
         image.localAsset,
@@ -64,10 +63,17 @@ class EditorialImage extends StatelessWidget {
         cacheWidth: targetMemWidth,
         frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
           if (wasSynchronouslyLoaded || frame != null) return child;
-          return SkeletonShimmer(
-            width: width ?? double.infinity,
-            height: height ?? 200,
-            borderRadius: radius,
+          return Container(
+            width: width,
+            height: height,
+            color: const Color(0xFF1E293B),
+            child: const Center(
+              child: SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF10B981)),
+              ),
+            ),
           );
         },
         errorBuilder: (context, error, stackTrace) => _buildNetworkFallback(radius),
@@ -76,11 +82,14 @@ class EditorialImage extends StatelessWidget {
       // =========================================================================
       // [2] ĐỊA ĐIỂM ĐỘNG MỚI TRÊN MOBILE NATIVE (iOS / Android):
       // - Tự động tải từ server/API và lưu Disk Cache.
-      // - memCacheWidth: Giới hạn giải mã vào RAM GPU, ngăn chặn triệt để giật lag/OOM.
+      // - Bổ sung User-Agent hợp chuẩn ngăn chặn triệt để mã lỗi 403 từ Wikimedia/CDN.
       // =========================================================================
       imageContent = CachedNetworkImage(
         key: ValueKey('native_img_${image.url}'),
         imageUrl: image.url,
+        httpHeaders: const {
+          'User-Agent': 'TravelOutdoorApp/1.0 (iOS; Vietnamese Outdoor Survival Guide)',
+        },
         width: width,
         height: height,
         fit: fit,
@@ -89,10 +98,17 @@ class EditorialImage extends StatelessWidget {
         memCacheWidth: targetMemWidth,
         maxWidthDiskCache: 1200,
         maxHeightDiskCache: 1200,
-        placeholder: (context, url) => SkeletonShimmer(
-          width: width ?? double.infinity,
-          height: height ?? 200,
-          borderRadius: radius,
+        placeholder: (context, url) => Container(
+          width: width,
+          height: height,
+          color: const Color(0xFF1E293B),
+          child: const Center(
+            child: SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF10B981)),
+            ),
+          ),
         ),
         errorWidget: (context, url, error) => _buildAssetOrPlaceholder(hasSpecificLocalAsset),
       );
@@ -110,10 +126,17 @@ class EditorialImage extends StatelessWidget {
         cacheWidth: targetMemWidth,
         frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
           if (wasSynchronouslyLoaded || frame != null) return child;
-          return SkeletonShimmer(
-            width: width ?? double.infinity,
-            height: height ?? 200,
-            borderRadius: radius,
+          return Container(
+            width: width,
+            height: height,
+            color: const Color(0xFF1E293B),
+            child: const Center(
+              child: SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF10B981)),
+              ),
+            ),
           );
         },
         errorBuilder: (context, error, stackTrace) => _buildAssetOrPlaceholder(hasSpecificLocalAsset),
@@ -191,6 +214,9 @@ class EditorialImage extends StatelessWidget {
     return CachedNetworkImage(
       key: ValueKey('fb_native_${image.url}'),
       imageUrl: image.url,
+      httpHeaders: const {
+        'User-Agent': 'TravelOutdoorApp/1.0 (iOS; Vietnamese Outdoor Survival Guide)',
+      },
       width: width,
       height: height,
       fit: fit,
@@ -200,12 +226,20 @@ class EditorialImage extends StatelessWidget {
   }
 
   Widget _buildPlaceholder() {
-    return Container(
+    return Image.asset(
+      'assets/images/default_nature.jpg',
+      key: const ValueKey('fallback_default_nature'),
       width: width,
       height: height,
-      color: const Color(0xFFE2E8F0),
-      child: const Center(
-        child: Icon(Icons.landscape_outlined, size: 36, color: Color(0xFF94A3B8)),
+      fit: fit,
+      alignment: image.focalPoint,
+      errorBuilder: (context, error, stackTrace) => Container(
+        width: width,
+        height: height,
+        color: const Color(0xFF1E293B),
+        child: const Center(
+          child: Icon(Icons.landscape_outlined, size: 36, color: Color(0xFF64748B)),
+        ),
       ),
     );
   }

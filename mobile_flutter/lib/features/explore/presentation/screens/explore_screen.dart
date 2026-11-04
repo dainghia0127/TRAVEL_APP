@@ -416,61 +416,85 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Location & Weather Live Pill Header
+                    // Location & Weather Live Pill Header (Bảo vệ tràn màn hình trên mọi iPhone)
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        BouncingButton(
-                          onTap: _showLocationSelectorSheet,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: AppColors.editorialSurface,
-                              borderRadius: AppRadius.roundedPill,
-                              border: Border.all(color: AppColors.editorialBorder),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Color(0x06000000),
-                                  blurRadius: 6,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.near_me, size: 13, color: AppColors.editorialPine),
-                                const SizedBox(width: 6),
-                                Text(
-                                  _currentLocationName,
-                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.editorialInk),
-                                ),
-                                const SizedBox(width: 4),
-                                const Icon(Icons.keyboard_arrow_down, size: 15, color: AppColors.editorialMuted),
-                              ],
+                        // Cụm Vị trí bên trái: Tự động co giãn linh hoạt, không bao giờ đẩy văng nút
+                        Expanded(
+                          child: BouncingButton(
+                            onTap: _showLocationSelectorSheet,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: AppColors.editorialSurface,
+                                borderRadius: AppRadius.roundedPill,
+                                border: Border.all(color: AppColors.editorialBorder),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color(0x06000000),
+                                    blurRadius: 6,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.near_me, size: 13, color: AppColors.editorialPine),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      _currentLocationName,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.editorialInk,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  const Icon(Icons.keyboard_arrow_down, size: 15, color: AppColors.editorialMuted),
+                                ],
+                              ),
                             ),
                           ),
                         ),
+                        const SizedBox(width: 8),
+
+                        // Cụm Thời tiết & Nút Làm Mới bên phải: Luôn cố định, hiển thị trọn vẹn 100%
                         Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
                               decoration: BoxDecoration(
                                 color: AppColors.editorialSurface,
                                 borderRadius: AppRadius.roundedPill,
                                 border: Border.all(color: AppColors.editorialBorder),
                               ),
                               child: Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   const Icon(Icons.wb_sunny_outlined, size: 14, color: AppColors.editorialTerracotta),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    _currentWeatherBrief,
-                                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.editorialInk),
+                                  const SizedBox(width: 4),
+                                  ConstrainedBox(
+                                    constraints: const BoxConstraints(maxWidth: 100),
+                                    child: Text(
+                                      _currentWeatherBrief,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.editorialInk,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 6),
                             BouncingButton(
                               onTap: _handleRefresh,
                               child: Container(
@@ -758,6 +782,15 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       destinations: trendingSpots,
                       favoriteIds: _controller.favoriteIds,
                       onToggleFavorite: (id) => _controller.toggleFavorite(id),
+                      onScrollToTop: () {
+                        if (_scrollController.hasClients) {
+                          _scrollController.animateTo(
+                            0,
+                            duration: const Duration(milliseconds: 450),
+                            curve: Curves.easeOutCubic,
+                          );
+                        }
+                      },
                     ),
                   ),
                 ],
