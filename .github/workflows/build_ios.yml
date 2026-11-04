@@ -1,9 +1,15 @@
 name: Build iOS IPA
+run-name: "Build iOS IPA - ${{ github.ref_name }} (Run #${{ github.run_number }})"
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'Mã phiên bản hiển thị (VD: ver1.1)'
+        required: true
+        default: 'ver1.1'
 
 jobs:
   build-ios:
@@ -14,6 +20,15 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Generate Dynamic Version & Date Tag
+        id: meta
+        run: |
+          BUILD_DATE=$(date +"%d.%m.%Y")
+          VER="${{ inputs.version_name || 'ver1.1' }}"
+          TAG_NAME="${BUILD_DATE}_APP_TRAVEL_${VER}"
+          echo "tag_name=${TAG_NAME}" >> $GITHUB_OUTPUT
+          echo "=== ARTIFACT TAG: ${TAG_NAME} ==="
 
       - name: Setup Flutter Environment
         uses: subosito/flutter-action@v2
@@ -48,7 +63,6 @@ jobs:
       - name: Upload IPA Artifact to GitHub
         uses: actions/upload-artifact@v4
         with:
-          name: TravelOutdoorApp-iOS-Native
+          name: ${{ steps.meta.outputs.tag_name }}
           path: mobile_flutter/TravelOutdoorApp.ipa
           retention-days: 14
-
