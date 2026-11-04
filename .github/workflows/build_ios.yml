@@ -11,11 +11,16 @@ on:
         required: true
         default: 'ver1.1'
 
+# Tự động hủy (cancel) các lượt build cũ bị treo hoặc xếp hàng dở dang khi có commit mới
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-ios:
     name: Build Native iOS IPA
-    runs-on: macos-13
-    timeout-minutes: 45
+    runs-on: macos-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout Code
