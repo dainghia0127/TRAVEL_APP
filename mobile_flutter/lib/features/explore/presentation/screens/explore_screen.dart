@@ -8,6 +8,7 @@ import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
 import 'package:mobile_flutter/core/widgets/skeleton_shimmer.dart';
 import 'package:mobile_flutter/features/offline_map/services/location_service.dart';
 import 'package:mobile_flutter/features/weather_safety/services/weather_service.dart';
+import 'package:mobile_flutter/features/weather_safety/presentation/screens/weather_climate_screen.dart';
 import 'package:mobile_flutter/features/explore/domain/entities/destination.dart';
 import 'package:mobile_flutter/features/explore/data/datasources/explore_local_datasource.dart';
 import 'package:mobile_flutter/features/explore/data/repositories/explore_repository_impl.dart';
@@ -466,32 +467,45 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: AppColors.editorialSurface,
-                                borderRadius: AppRadius.roundedPill,
-                                border: Border.all(color: AppColors.editorialBorder),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.wb_sunny_outlined, size: 14, color: AppColors.editorialTerracotta),
-                                  const SizedBox(width: 4),
-                                  ConstrainedBox(
-                                    constraints: const BoxConstraints(maxWidth: 100),
-                                    child: Text(
-                                      _currentWeatherBrief,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 11.5,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.editorialInk,
+                            BouncingButton(
+                              onTap: () {
+                                HapticFeedback.selectionClick();
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const WeatherClimateScreen(),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.editorialSurface,
+                                  borderRadius: AppRadius.roundedPill,
+                                  border: Border.all(color: AppColors.editorialBorder),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.wb_sunny_outlined, size: 14, color: AppColors.editorialTerracotta),
+                                    const SizedBox(width: 4),
+                                    ConstrainedBox(
+                                      constraints: const BoxConstraints(maxWidth: 100),
+                                      child: Text(
+                                        _currentWeatherBrief,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 11.5,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.editorialInk,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 2),
+                                    const Icon(Icons.arrow_forward_ios, size: 9, color: AppColors.editorialMuted),
+                                  ],
+                                ),
                               ),
                             ),
                             const SizedBox(width: 6),

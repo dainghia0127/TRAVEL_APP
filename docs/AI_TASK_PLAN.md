@@ -92,6 +92,17 @@
   - Sửa thuật toán chọn icon thời tiết theo ngày/đêm (`is_day` WMO): Ban đêm (sau 18h) trời quang đãng hiển thị icon mặt trăng `nightlight_round` / `nightlight_outlined`, tuyệt đối không còn hiện icon mặt trời ban đêm.
   - Dữ liệu Real-time 100% từ Open-Meteo API: Tích hợp đầy đủ chuỗi dữ liệu dự báo từng giờ (Hourly Forecast 24 giờ tiếp theo) và dự báo nhiều ngày tới (Daily Forecast 7 ngày tới) kèm thanh nhiệt độ min/max và xác suất mưa thực tế, không gán cứng.
 
+### Giai Đoạn 7: Khắc Phục Triệt Để 3 Yêu Cầu Người Dùng Mới (Phase 7)
+- [x] Task 7.1: Sửa lỗi bản đồ Google Maps style "API key required": Thay thế hoàn toàn sang Google Maps Tile Server chính hãng (`https://mt{s}.google.com/vt/lyrs=m...` cho đường phố, `lyrs=y` cho vệ tinh hybrid và `lyrs=p` cho địa hình) hoạt động trực tiếp 100% miễn phí, sắc nét, không đòi API key và không có bất kỳ watermark nào.
+- [x] Task 7.2: Thêm cơ chế khôi phục Pop-up bản đồ khi lỡ tay tắt (`offline_map_screen.dart`):
+  - Lưu lại `_lastActiveDestination` khi chọn hoặc khi nhấn đóng.
+  - Hiển thị Floating Restore Bar / Mini Dock ở cạnh dưới màn hình (`Mở lại lộ trình: ${_lastActiveDestination.name}`) để người dùng chạm vào là bật lại pop-up ngay tức thì.
+  - Chạm vào Marker trên bản đồ hoặc chip địa điểm ở thanh trên đỉnh đều bật lại pop-up dẫn đường.
+- [x] Task 7.3: Tách biệt hoàn toàn SOS Cứu Hộ và Thời Tiết Khí Hậu thành 2 trang riêng:
+  - `safety_sos_screen.dart`: Chuyên biệt 100% cho Cứu nạn khẩn cấp, Morse Beacon, SMS 115 kèm GPS, Gọi cấp cứu, và Danh bạ đường dây nóng theo tỉnh/thành phố GPS. Không còn tab thời tiết gây phân tâm. Thêm card liên kết trực quan chuyển sang trang Thời tiết & Khí hậu.
+  - `weather_climate_screen.dart`: Màn hình độc lập riêng biệt cho Thời tiết và Khí hậu, tích hợp đồng hồ số real-time chạy từng giây, icon ngày/đêm chính xác (trời tối hiện mặt trăng), chuỗi dự báo từng giờ 24h & 7 ngày tới, cảnh báo nguy cơ cực đoan và checklist đồ dã ngoại thông minh.
+  - Kết nối mượt mà từ thanh thời tiết Header tại `explore_screen.dart`, chi tiết địa điểm tại `destination_detail_screen.dart` và từ màn hình SOS.
+
 ---
 
 ## 4. Công Việc Đang Thực Hiện

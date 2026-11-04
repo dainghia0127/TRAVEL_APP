@@ -40,6 +40,7 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
   // Quản lý danh sách các địa điểm trong chuyến đi
   List<Destination> _tripDestinations = [];
   Destination? _selectedTripDestination;
+  Destination? _lastActiveDestination; // Lưu lại điểm đến gần nhất để khôi phục pop-up khi lỡ tay tắt
   List<LatLng> _routingPolyline = [];
   double _distanceToSelectedKm = 0.0;
   String _estimatedTravelDuration = '';
@@ -221,6 +222,8 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
 
     setState(() {
       _selectedTripDestination = dest;
+      _lastActiveDestination = dest;
+      _isCardCollapsed = false;
       _selectedWaypoint = null;
       _distanceToSelectedKm = directDistKm;
       _isLoadingRoute = true;
@@ -407,37 +410,34 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
               },
             ),
             children: [
-              // ESRI Topo / Hybrid Satellite / CartoDB Voyager Retina (Mượt mà như Google Maps)
+              // Google Maps Standard / Google Hybrid Satellite / Google Terrain (Chuẩn Google Maps 100%, không cần API key)
               if (_currentLayer == 'satellite') ...[
                 TileLayer(
-                  urlTemplate: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                  urlTemplate: 'https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+                  subdomains: const ['0', '1', '2', '3'],
+                  fallbackUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
                   userAgentPackageName: 'com.traveloutdoor.travel_app',
-                  maxNativeZoom: 18,
-                  panBuffer: 2,
-                  keepBuffer: 6,
-                ),
-                TileLayer(
-                  urlTemplate: 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
-                  userAgentPackageName: 'com.traveloutdoor.travel_app',
-                  maxNativeZoom: 18,
+                  maxNativeZoom: 20,
                   panBuffer: 2,
                   keepBuffer: 6,
                 ),
               ] else if (_currentLayer == 'streets')
                 TileLayer(
-                  urlTemplate: 'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+                  urlTemplate: 'https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+                  subdomains: const ['0', '1', '2', '3'],
                   fallbackUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                   userAgentPackageName: 'com.traveloutdoor.travel_app',
-                  maxNativeZoom: 18,
+                  maxNativeZoom: 20,
                   panBuffer: 2,
                   keepBuffer: 6,
                 )
               else
                 TileLayer(
-                  urlTemplate: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+                  urlTemplate: 'https://mt{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',
+                  subdomains: const ['0', '1', '2', '3'],
                   fallbackUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                   userAgentPackageName: 'com.traveloutdoor.travel_app',
-                  maxNativeZoom: 18,
+                  maxNativeZoom: 20,
                   panBuffer: 2,
                   keepBuffer: 6,
                 ),
@@ -1080,7 +1080,13 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                             IconButton(
                               icon: const Icon(Icons.close, color: AppColors.textMuted, size: 18),
                               tooltip: 'Đóng',
-                              onPressed: () => setState(() => _selectedTripDestination = null),
+                              onPressed: () {
+                                HapticFeedback.lightImpact();
+                                setState(() {
+                                  _lastActiveDestination = _selectedTripDestination ?? _lastActiveDestination;
+                                  _selectedTripDestination = null;
+                                });
+                              },
                             ),
                           ],
                         )
@@ -1168,7 +1174,13 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                                   tooltip: 'Đóng',
                                   padding: EdgeInsets.zero,
                                   constraints: const BoxConstraints(),
-                                  onPressed: () => setState(() => _selectedTripDestination = null),
+                                  onPressed: () {
+                                    HapticFeedback.lightImpact();
+                                    setState(() {
+                                      _lastActiveDestination = _selectedTripDestination ?? _lastActiveDestination;
+                                      _selectedTripDestination = null;
+                                    });
+                                  },
                                 ),
                               ],
                             ),
@@ -1460,6 +1472,68 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                 ),
               ),
             ),
+
+          // Nút khôi phục Pop-up lộ trình khi lỡ tay đóng
+          if (_selectedTripDestination == null && _selectedWaypoint == null && _lastActiveDestination != null)
+            Positioned(
+              left: 20,
+              right: 20,
+              bottom: 24,
+              child: Center(
+                child: BouncingButton(
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    setState(() {
+                      _selectedTripDestination = _lastActiveDestination;
+                      _isCardCollapsed = false;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceElevated,
+                      borderRadius: AppRadius.roundedPill,
+                      border: Border.all(color: AppColors.summitGold.withValues(alpha: 0.8), width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.navigation, color: AppColors.summitGold, size: 16),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            'Mở lại lộ trình: ${_lastActiveDestination!.name}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12.5,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: const BoxDecoration(
+                            color: AppColors.summitGold,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.keyboard_arrow_up, color: Colors.black, size: 14),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -1492,22 +1566,22 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
               const SizedBox(height: 12),
               _buildLayerOption(
                 id: 'streets',
-                name: 'Bản Đồ Giao Thông Chi Tiết (Google Maps Style)',
-                desc: 'Đồ họa Retina HD siêu nét, đầy đủ tên đường tiếng Việt từng ngõ ngách',
+                name: 'Google Maps Đường Phố (Standard Roadmap)',
+                desc: 'Bản đồ Google Maps chính hãng, mượt mà, đầy đủ ngõ hẻm & tên đường tiếng Việt',
                 icon: Icons.map,
               ),
               const SizedBox(height: 10),
               _buildLayerOption(
                 id: 'satellite',
-                name: 'Ảnh Vệ Tinh Kèm Tên Đường (Hybrid Satellite)',
-                desc: 'Ảnh vệ tinh độ nét cao kết hợp lớp nhãn đường sá, làng xã & sông suối',
+                name: 'Google Maps Vệ Tinh (Hybrid Satellite)',
+                desc: 'Ảnh vệ tinh Google Maps độ nét cao kèm lớp nhãn đường sá & địa danh',
                 icon: Icons.satellite_alt,
               ),
               const SizedBox(height: 10),
               _buildLayerOption(
                 id: 'topo',
-                name: 'Bản Đồ Địa Hình Núi Rừng (Outdoor Topo)',
-                desc: 'Đường đồng mức cao độ, đèo dốc, thung lũng, suối cạn dã ngoại',
+                name: 'Google Maps Địa Hình (Terrain Topo)',
+                desc: 'Bản đồ địa hình Google Maps đồi núi đổ bóng 3D chuyên dụng dã ngoại',
                 icon: Icons.terrain,
               ),
             ],

@@ -12,6 +12,7 @@ import 'package:mobile_flutter/features/explore/domain/entities/trekking_route.d
 import 'package:mobile_flutter/features/explore/domain/entities/safety_guideline.dart';
 import 'package:mobile_flutter/features/home/presentation/screens/main_navigation_screen.dart';
 import 'package:mobile_flutter/features/weather_safety/services/weather_service.dart';
+import 'package:mobile_flutter/features/weather_safety/presentation/screens/weather_climate_screen.dart';
 import 'package:mobile_flutter/features/explore/data/datasources/overpass_service.dart';
 
 class DestinationDetailScreen extends StatefulWidget {
@@ -862,87 +863,115 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                             ),
                           )
                         else if (_liveWeather != null) ...[
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: AppColors.editorialSurface,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppColors.editorialBorder),
-                            ),
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${_liveWeather!.temperature.round()}°C',
-                                          style: const TextStyle(
-                                            fontSize: 28,
-                                            fontWeight: FontWeight.w900,
-                                            color: AppColors.editorialInk,
-                                            letterSpacing: -0.5,
+                          BouncingButton(
+                            onTap: () {
+                              HapticFeedback.selectionClick();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => WeatherClimateScreen(
+                                    initialDestinationId: widget.destination?.id,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppColors.editorialSurface,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppColors.editorialBorder),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '${_liveWeather!.temperature.round()}°C',
+                                            style: const TextStyle(
+                                              fontSize: 28,
+                                              fontWeight: FontWeight.w900,
+                                              color: AppColors.editorialInk,
+                                              letterSpacing: -0.5,
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          _liveWeather!.weatherDescription,
-                                          style: const TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600,
-                                            color: AppColors.editorialPine,
+                                          Text(
+                                            _liveWeather!.weatherDescription,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.editorialPine,
+                                            ),
                                           ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          _buildWeatherMiniStat(
+                                            icon: Icons.air,
+                                            label: 'Gió',
+                                            value: '${_liveWeather!.windSpeed.round()} km/h',
+                                          ),
+                                          const SizedBox(width: 14),
+                                          _buildWeatherMiniStat(
+                                            icon: Icons.water_drop_outlined,
+                                            label: 'Mưa',
+                                            value: '${_liveWeather!.precipitationProb}%',
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Chạm để xem chi tiết theo giờ & 7 ngày tới',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.editorialPine.withValues(alpha: 0.8),
                                         ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        _buildWeatherMiniStat(
-                                          icon: Icons.air,
-                                          label: 'Gió',
-                                          value: '${_liveWeather!.windSpeed.round()} km/h',
-                                        ),
-                                        const SizedBox(width: 14),
-                                        _buildWeatherMiniStat(
-                                          icon: Icons.water_drop_outlined,
-                                          label: 'Mưa',
-                                          value: '${_liveWeather!.precipitationProb}%',
-                                        ),
-                                      ],
+                                      ),
+                                      const Icon(Icons.arrow_forward_ios, size: 10, color: AppColors.editorialPine),
+                                    ],
+                                  ),
+                                  if (_liveWeather!.hasFlashFloodRisk ||
+                                      _liveWeather!.hasHypothermiaRisk ||
+                                      _liveWeather!.hasThunderstormRisk) ...[
+                                    const SizedBox(height: 12),
+                                    Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.editorialTerracotta.withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: AppColors.editorialTerracotta.withValues(alpha: 0.3)),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.warning_amber_rounded, size: 18, color: AppColors.editorialTerracotta),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              _liveWeather!.hasThunderstormRisk
+                                                  ? 'Cảnh báo: Có nguy cơ giông sét cực đoan!'
+                                                  : (_liveWeather!.hasFlashFloodRisk
+                                                      ? 'Cảnh báo: Nguy cơ lũ quét suối lớn!'
+                                                      : 'Lưu ý: Nguy cơ hạ thân nhiệt về đêm do gió lạnh!'),
+                                              style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: AppColors.editorialTerracotta),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
-                                ),
-                                if (_liveWeather!.hasFlashFloodRisk ||
-                                    _liveWeather!.hasHypothermiaRisk ||
-                                    _liveWeather!.hasThunderstormRisk) ...[
-                                  const SizedBox(height: 12),
-                                  Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.editorialTerracotta.withValues(alpha: 0.1),
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(color: AppColors.editorialTerracotta.withValues(alpha: 0.3)),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        const Icon(Icons.warning_amber_rounded, size: 18, color: AppColors.editorialTerracotta),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Text(
-                                            _liveWeather!.hasThunderstormRisk
-                                                ? 'Cảnh báo: Có nguy cơ giông sét cực đoan!'
-                                                : (_liveWeather!.hasFlashFloodRisk
-                                                    ? 'Cảnh báo: Nguy cơ lũ quét suối lớn!'
-                                                    : 'Lưu ý: Nguy cơ hạ thân nhiệt về đêm do gió lạnh!'),
-                                            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: AppColors.editorialTerracotta),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
                                 ],
-                              ],
+                              ),
                             ),
                           ),
                         ],
