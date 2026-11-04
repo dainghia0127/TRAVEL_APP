@@ -811,192 +811,209 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     );
   }
 
-  // TAB 1: CONTINUOUS TRAIL TIMELINE VIEW
+  // TAB 1: CONTINUOUS TRAIL TIMELINE VIEW (STICKY HEADER CHỌN NGÀY & THÊM MỐC)
   Widget _buildContinuousTimelineView() {
     final currentDayStops = _daysItinerary[_selectedDay] ?? [];
     final availableDays = List.generate(_maxDays, (i) => i + 1);
 
-    return ListView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space16, vertical: 8),
+    return Column(
       children: [
-        // Day Selector Ribbon (Co giãn mượt mà theo số ngày đề xuất động)
-        SizedBox(
-          height: 52,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            itemCount: availableDays.length,
-            separatorBuilder: (context, _) => const SizedBox(width: 8),
-            itemBuilder: (context, idx) {
-              final day = availableDays[idx];
-              final isSelected = _selectedDay == day;
-              final String daySublabel = day == 1
-                  ? 'Khởi hành'
-                  : (day == _maxDays
-                      ? 'Hồi hương'
-                      : (_maxDays <= 3 ? 'Khám phá' : 'Chặng 0${day - 1}'));
-
-              return BouncingButton(
-                onTap: () {
-                  HapticFeedback.selectionClick();
-                  setState(() => _selectedDay = day);
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  constraints: const BoxConstraints(minWidth: 86),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                  decoration: BoxDecoration(
-                    color: isSelected ? AppColors.editorialPine : AppColors.editorialSurface,
-                    borderRadius: AppRadius.roundedMd,
-                    border: Border.all(
-                      color: isSelected ? AppColors.editorialPine : AppColors.editorialBorder,
-                      width: isSelected ? 1.5 : 1,
-                    ),
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: AppColors.editorialPine.withValues(alpha: 0.25),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'NGÀY ${day < 10 ? '0$day' : '$day'}',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          color: isSelected ? Colors.white : AppColors.editorialPine,
-                          letterSpacing: 0.4,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        daySublabel,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                          color: isSelected ? Colors.white : AppColors.editorialInk,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-
-        const SizedBox(height: 10),
-
-        // Lịch thời gian thực của chặng đang chọn
+        // =========================================================================
+        // PHẦN HEADER GHIM CỐ ĐỊNH (STICKY HEADER - KHÔNG BỊ TRÔI KHI VUỐT LÊN)
+        // =========================================================================
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-            color: AppColors.editorialSurface,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.editorialBorder),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          color: AppColors.editorialBg,
+          padding: const EdgeInsets.fromLTRB(AppSpacing.space16, 8, AppSpacing.space16, 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // 1. Day Selector Ribbon
+              SizedBox(
+                height: 52,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: availableDays.length,
+                  separatorBuilder: (context, _) => const SizedBox(width: 8),
+                  itemBuilder: (context, idx) {
+                    final day = availableDays[idx];
+                    final isSelected = _selectedDay == day;
+                    final String daySublabel = day == 1
+                        ? 'Khởi hành'
+                        : (day == _maxDays
+                            ? 'Hồi hương'
+                            : (_maxDays <= 3 ? 'Khám phá' : 'Chặng 0${day - 1}'));
+
+                    return BouncingButton(
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        setState(() => _selectedDay = day);
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        constraints: const BoxConstraints(minWidth: 86),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppColors.editorialPine : AppColors.editorialSurface,
+                          borderRadius: AppRadius.roundedMd,
+                          border: Border.all(
+                            color: isSelected ? AppColors.editorialPine : AppColors.editorialBorder,
+                            width: isSelected ? 1.5 : 1,
+                          ),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: AppColors.editorialPine.withValues(alpha: 0.25),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ]
+                              : null,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'NGÀY ${day < 10 ? '0$day' : '$day'}',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                color: isSelected ? Colors.white : AppColors.editorialPine,
+                                letterSpacing: 0.4,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              daySublabel,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                color: isSelected ? Colors.white : AppColors.editorialInk,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // 2. Lịch thời gian thực của chặng đang chọn
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.editorialSurface,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.editorialBorder),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.calendar_month_outlined, size: 16, color: AppColors.editorialPine),
+                        const SizedBox(width: 8),
+                        Text(
+                          _currentDayDateFormatted,
+                          style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
+                        ),
+                      ],
+                    ),
+                    BouncingButton(
+                      onTap: _selectStartDate,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.editorialSurfaceSubtle,
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: AppColors.editorialBorder),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.edit_calendar, size: 12, color: AppColors.editorialPine),
+                            SizedBox(width: 4),
+                            Text('Đổi ngày', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.editorialPine)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // 3. Action Add Stop Button (Ghim cố định)
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(Icons.calendar_month_outlined, size: 16, color: AppColors.editorialPine),
-                  const SizedBox(width: 8),
                   Text(
-                    _currentDayDateFormatted,
-                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
+                    'Trục Lộ Trình Ngày $_selectedDay (${currentDayStops.length} mốc)',
+                    style: const TextStyle(
+                      fontFamily: 'serif',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.editorialInk,
+                    ),
+                  ),
+                  BouncingButton(
+                    onTap: _addNewDestinationModal,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: AppColors.editorialPine.withValues(alpha: 0.1),
+                        borderRadius: AppRadius.roundedPill,
+                        border: Border.all(color: AppColors.editorialPine.withValues(alpha: 0.3)),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.add, size: 14, color: AppColors.editorialPine),
+                          SizedBox(width: 4),
+                          Text(
+                            'Thêm mốc',
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.editorialPine),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
-              ),
-              BouncingButton(
-                onTap: _selectStartDate,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.editorialSurfaceSubtle,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: AppColors.editorialBorder),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.edit_calendar, size: 12, color: AppColors.editorialPine),
-                      SizedBox(width: 4),
-                      Text('Đổi ngày', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.editorialPine)),
-                    ],
-                  ),
-                ),
               ),
             ],
           ),
         ),
 
-        const SizedBox(height: 14),
-
-        // Action Add Stop Button
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Trục Lộ Trình Ngày $_selectedDay (${currentDayStops.length} mốc)',
-              style: const TextStyle(
-                fontFamily: 'serif',
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-                color: AppColors.editorialInk,
-              ),
-            ),
-            BouncingButton(
-              onTap: _addNewDestinationModal,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: AppColors.editorialPine.withValues(alpha: 0.1),
-                  borderRadius: AppRadius.roundedPill,
-                  border: Border.all(color: AppColors.editorialPine.withValues(alpha: 0.3)),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.add, size: 14, color: AppColors.editorialPine),
-                    SizedBox(width: 4),
-                    Text(
-                      'Thêm mốc',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.editorialPine),
+        // =========================================================================
+        // PHẦN TIMELINE CUỘN ĐƯỢC (CHỈ DANH SÁCH MỐC DI CHUYỂN BÊN DƯỚI)
+        // =========================================================================
+        Expanded(
+          child: ListView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space16, vertical: 4),
+            children: [
+              // Timeline Spine
+              if (currentDayStops.isEmpty)
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  margin: const EdgeInsets.only(top: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.editorialSurface,
+                    borderRadius: AppRadius.roundedMd,
+                    border: Border.all(color: AppColors.editorialBorder),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Chưa có mốc lịch trình cho ngày này. Hãy bấm "Thêm mốc" để lập kế hoạch!',
+                      style: TextStyle(fontSize: 12, color: AppColors.editorialMuted),
+                      textAlign: TextAlign.center,
                     ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 14),
-
-        // Timeline Spine
-        if (currentDayStops.isEmpty)
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.editorialSurface,
-              borderRadius: AppRadius.roundedMd,
-              border: Border.all(color: AppColors.editorialBorder),
-            ),
-            child: const Center(
-              child: Text(
-                'Chưa có mốc lịch trình cho ngày này. Hãy bấm "Thêm mốc" để lập kế hoạch!',
-                style: TextStyle(fontSize: 12, color: AppColors.editorialMuted),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          )
+                  ),
+                )
         else
           ReorderableListView.builder(
             shrinkWrap: true,
@@ -1183,6 +1200,9 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
           ),
 
         const SizedBox(height: 40),
+            ],
+          ),
+        ),
       ],
     );
   }

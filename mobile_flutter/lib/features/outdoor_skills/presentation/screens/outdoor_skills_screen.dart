@@ -14,7 +14,46 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedCategory = 'Tất cả';
   String _searchQuery = '';
-  final Set<String> _bookmarkedIds = {'skill_1', 'skill_2', 'skill_6'};
+  final Set<String> _bookmarkedIds = {'skill_1', 'skill_2', 'skill_6', 'skill_11'};
+
+  final List<Map<String, dynamic>> _quickLifeTips = [
+    {
+      'title': 'Chống say xe không dùng thuốc',
+      'icon': Icons.directions_car,
+      'color': AppColors.alpineCyan,
+      'tip': 'Nhìn cố định vào đường chân trời xa phía trước hoặc bấm huyệt Nội Quan (cách lằn cổ tay 3 ngón tay khép lại) trong 2 phút.',
+    },
+    {
+      'title': 'Phát hiện camera quay lén trong phòng',
+      'icon': Icons.videocam_off_outlined,
+      'color': AppColors.emergencyRed,
+      'tip': 'Tắt hết đèn trong phòng tối om, bật camera điện thoại quét chậm xung quanh; nếu thấy đốm sáng hồng/tím nhấp nháy, đó là đèn hồng ngoại camera ẩn.',
+    },
+    {
+      'title': 'Giữ pin điện thoại trong trời rét buốt',
+      'icon': Icons.battery_charging_full,
+      'color': AppColors.summitGold,
+      'tip': 'Để điện thoại vào túi áo ngực lớp trong cùng; thân nhiệt cơ thể sẽ giữ pin Li-ion trên 15°C, chống sập nguồn đột ngột.',
+    },
+    {
+      'title': 'Mở nắp lọ/hộp bị kẹt chặt',
+      'icon': Icons.lock_open,
+      'color': AppColors.tacticalOrange,
+      'tip': 'Quấn 1 chiếc dây chun cao su vòng quanh mép nắp để tăng lực bám ma sát của bàn tay gấp 3 lần, vặn nhẹ là mở được ngay.',
+    },
+    {
+      'title': 'Lọc nước uống bằng ánh nắng (SODIS)',
+      'icon': Icons.wb_sunny_outlined,
+      'color': AppColors.neonGreen,
+      'tip': 'Đựng nước trong chai nhựa PET trong suốt, đặt nằm ngang phơi nắng gắt 6 tiếng; tia cực tím UV-A và nhiệt độ sẽ tiêu diệt 99.9% mầm bệnh.',
+    },
+    {
+      'title': 'Chống phồng rộp chân khi đi bộ xa',
+      'icon': Icons.hiking,
+      'color': AppColors.editorialPine,
+      'tip': 'Mang 2 lớp tất (lớp trong mỏng trơn, lớp ngoài dày); ma sát sẽ xảy ra giữa 2 lớp vải thay vì cọ sát làm rách da chân.',
+    },
+  ];
 
   final List<Map<String, dynamic>> _skillsList = [
     {
@@ -571,6 +610,322 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
       ],
       'donts': [
         'TUYỆT ĐỐI KHÔNG đốt nến, đun bếp gas hoặc mang than củi vào đóng kín cửa lều (khí độc CO không màu không mùi sẽ gây ngạt thở tử vong trong giấc ngủ).',
+      ],
+    },
+    {
+      'id': 'skill_11',
+      'title': 'Thoát hiểm hỏa hoạn chung cư & nhà cao tầng',
+      'category': 'Kinh nghiệm cuộc sống',
+      'categoryIcon': Icons.local_fire_department,
+      'readTime': '4 phút đọc',
+      'desc': 'Quy tắc vàng sống còn: kiểm tra nhiệt tay nắm cửa, bò sát sàn dưới khói độc và tuyệt đối không đi thang máy.',
+      'priority': 'SỐNG CÒN',
+      'accent': AppColors.emergencyRed,
+      'equipment': [
+        'Khăn mặt / áo thun thấm đẫm nước',
+        'Băng dính bản rộng / chăn dày chèn khe cửa',
+        'Đèn pin điện thoại / áo màu nổi bật',
+        'Dây thoát hiểm khẩn cấp (nếu có)',
+      ],
+      'steps': [
+        {
+          'number': '01',
+          'title': 'Bịt khăn ướt & Bò sát sàn nhà dưới tầng khói',
+          'diagramType': 'fire_crawl',
+          'tag': 'HẠ THẤP TRỌNG TÂM < 30CM',
+          'action': 'Khói độc và khí CO bốc lên trên trần nhà. Không khí có oxy sạch nhất nằm ở độ cao 20 - 30cm so với mặt sàn. Dùng khăn bông hoặc vải áo nhúng ướt bịt kín mũi và miệng (lớp nước giúp lọc hạt bụi mịn và làm mát luồng khí hít vào). Bò sát sàn nhà bằng hai tay và đầu gối di chuyển theo hướng thoát nạn.',
+          'keyRule': 'Chỉ 3 hơi hít phải khói độc đậm đặc có thể khiến bạn hôn mê bất tỉnh.',
+          'tip': 'Nếu không tìm thấy nước, bạn có thể dùng bất kỳ chất lỏng an toàn nào sẵn có (kể cả nước đá hoặc nước trong bình lọc) để làm ướt khăn.',
+        },
+        {
+          'number': '02',
+          'title': 'Kiểm tra nhiệt độ cánh cửa bằng mu bàn tay',
+          'diagramType': 'door_check',
+          'tag': 'DÙNG MU BÀN TAY SỜ CỬA',
+          'action': 'Trước khi mở bất kỳ cánh cửa nào trên đường thoát hiểm, hãy dùng MU BÀN TAY áp nhẹ vào tay nắm cửa và bề mặt cửa. Nếu tay nắm nóng bỏng hoặc ấm, nghĩa là phía bên kia ngọn lửa đang cháy dữ dội — TUYỆT ĐỐI KHÔNG MỞ CỬA vì luồng oxy ùa vào sẽ gây nổ bùng (backdraft).',
+          'keyRule': 'Luôn dùng mu bàn tay, không dùng lòng bàn tay (tránh phản xạ co giật dính chặt khi cửa quá nóng hoặc rò điện).',
+          'tip': 'Nếu cửa mát, hãy hé nhẹ 2-3cm, dùng vai chặn cửa và quan sát; nếu không có lửa khói mới bước ra và lập tức khép cửa lại để chặn khói lùa theo.',
+        },
+        {
+          'number': '03',
+          'title': 'Chặn khói cố thủ trong phòng khi lối thoát bị bít',
+          'diagramType': 'seal_room',
+          'tag': 'CHẶN KHE CỬA CỐ THỦ',
+          'action': 'Nếu hành lang và cầu thang bộ đã ngập kín khói, hãy quay lại phòng, đóng chặt cửa. Dùng khăn ướt, mền ướt hoặc băng keo dán kín toàn bộ các khe hở quanh cửa ra vào để ngăn khói độc xâm nhập. Mở cửa sổ ban công để hít thở khí trời và phát tín hiệu cứu hộ.',
+          'keyRule': 'Tuyệt đối không nhảy lầu từ tầng 3 trở lên nếu không có nệm hơi cứu hỏa phía dưới.',
+          'tip': 'Treo một tấm vải hoặc áo màu sặc sỡ ở ban công và bật đèn flash điện thoại nhấp nháy liên tục để lính cứu hỏa 114 định vị vị trí.',
+        },
+      ],
+      'donts': [
+        'TUYỆT ĐỐI KHÔNG sử dụng thang máy khi có hỏa hoạn (thang máy có thể mất điện đột ngột hoặc biến thành ống khói lò thiêu kẹt người bên trong).',
+        'TUYỆT ĐỐI KHÔNG trốn vào nhà vệ sinh (phòng kín không có lối thông khí sẽ nhanh chóng cạn kiệt oxy và gây ngạt khí).',
+      ],
+    },
+    {
+      'id': 'skill_12',
+      'title': 'Kỹ thuật sơ cứu dị vật đường thở (Heimlich)',
+      'category': 'Kinh nghiệm cuộc sống',
+      'categoryIcon': Icons.health_and_safety,
+      'readTime': '3 phút đọc',
+      'desc': 'Cấp cứu hóc nghẹn dị vật thức ăn cho người lớn, trẻ nhỏ và cách tự cứu bản thân khi ở một mình.',
+      'priority': 'SỐNG CÒN',
+      'accent': AppColors.editorialTerracotta,
+      'equipment': [
+        'Lưng ghế tựa cứng vững chãi (tự cứu)',
+        'Đôi bàn tay thao tác dứt khoát',
+      ],
+      'steps': [
+        {
+          'number': '01',
+          'title': 'Nhận diện dấu hiệu hóc nghẹn khẩn cấp',
+          'diagramType': 'heimlich_sign',
+          'tag': 'DẤU HIỆU ÔM CỔ NGHẸT THỞ',
+          'action': 'Nạn nhân bị tắc nghẽn đường thở hoàn toàn sẽ hai tay ôm lấy cổ họng (dấu hiệu quốc tế), không nói được, không thở được, môi tím tái và ho không ra tiếng. Hỏi nhanh: "Bạn có bị nghẹn không?". Nếu nạn nhân chỉ gật đầu mà không phát ra tiếng nói, cần can thiệp Heimlich ngay lập tức.',
+          'keyRule': 'Nếu nạn nhân vẫn còn ho mạnh được, hãy khuyến khích họ ho tự nhiên, không vỗ lưng làm dị vật tụt sâu hơn.',
+          'tip': 'Hành động trong vòng 3 phút đầu tiên; não bộ bắt đầu tổn thương không thể hồi phục sau 4 phút thiếu oxy.',
+        },
+        {
+          'number': '02',
+          'title': 'Thao tác ép bụng Heimlich cho người lớn',
+          'diagramType': 'heimlich_thrust',
+          'tag': 'GIẬT MẠNH HƯỚNG VÀO TRONG & LÊN TRÊN',
+          'action': 'Đứng phía sau nạn nhân, vòng hai tay ôm eo họ. Nắm một bàn tay lại thành quả đấm, đặt ngón cái quả đấm vào bụng nạn nhân, vị trí TRÊN RỐN một chút và DƯỚI MŨI ỨC. Bàn tay kia nắm chặt lấy quả đấm. Giật mạnh liên tục vào trong và hướng chếch lên trên (như hình chữ J) 5 lần dứt khoát.',
+          'keyRule': 'Lực ép tạo ra áp lực khí phổi như một chiếc pít-tông đẩy văng dị vật ra ngoài.',
+          'tip': 'Với phụ nữ mang thai tháng cuối hoặc người béo phì, chuyển vị trí ép lên giữa xương ức (như vị trí ép tim).',
+        },
+        {
+          'number': '03',
+          'title': 'Tự cứu bản thân khi bị hóc dị vật lúc ở một mình',
+          'diagramType': 'self_heimlich',
+          'tag': 'THÚC BỤNG VÀO LƯNG GHẾ TỰA',
+          'action': 'Nếu bị nghẹn khi ở một mình: Nắm một tay thành quả đấm ấn vào bụng trên rốn, tay kia nắm lấy và giật mạnh lên. Hoặc tìm một chiếc ghế có lưng tựa cứng (hoặc cạnh bàn phẳng), cúi gập bụng đè mạnh vùng thượng vị lên thành ghế và thúc mạnh người xuống để tống dị vật bật ra ngoài.',
+          'keyRule': 'Giữ bình tĩnh, không cố gắng uống nước khi đường thở đang bị chặn hoàn toàn.',
+          'tip': 'Đồng thời bấm gọi 115 và để mở máy loa ngoài; lực lượng cấp cứu có thể định vị cuộc gọi dù bạn không nói được.',
+        },
+      ],
+      'donts': [
+        'TUYỆT ĐỐI KHÔNG dùng ngón tay móc họng mù mờ nếu không nhìn thấy rõ dị vật (hành động này dễ đẩy dị vật lọt sâu hơn vào khí quản).',
+        'TUYỆT ĐỐI KHÔNG cho uống nước hoặc nuốt cơm để trôi dị vật (gây sặc nghẹt thở cấp tính).',
+      ],
+    },
+    {
+      'id': 'skill_13',
+      'title': 'Hồi sinh tim phổi cơ bản (CPR) cứu mạng',
+      'category': 'Kinh nghiệm cuộc sống',
+      'categoryIcon': Icons.favorite,
+      'readTime': '4 phút đọc',
+      'desc': 'Quy trình ép tim ngoài lồng ngực kết hợp thổi ngạt chuẩn hội Tim mạch Quốc tế khi gặp người ngưng tim đột ngột.',
+      'priority': 'SỐNG CÒN',
+      'accent': AppColors.emergencyRed,
+      'equipment': [
+        'Mặt phẳng cứng vững (sàn nhà, nền đất)',
+        'Điện thoại bật loa ngoài gọi cấp cứu 115',
+      ],
+      'steps': [
+        {
+          'number': '01',
+          'title': 'Kiểm tra phản xạ & Gọi cấp cứu 115',
+          'diagramType': 'cpr_check',
+          'tag': 'GỌI 115 & KIỂM TRA MẠCH CỔ',
+          'action': 'Vỗ nhẹ hai vai nạn nhân và gọi to: "Anh/chị ơi có sao không?". Nếu không có phản xạ, ghé sát tai vào mũi miệng nạn nhân để nghe hơi thở và nhìn lồng ngực trong 10 giây. Nếu không thở hoặc chỉ thở ngáp cá: lập tức chỉ định rõ một người xung quanh gọi 115 và lấy máy khử rung tim tự động (AED) nếu có.',
+          'keyRule': 'Đặt nạn nhân nằm ngửa trên mặt sàn phẳng cứng, không nằm đệm mềm.',
+          'tip': 'Hô to: "Bạn áo xanh gọi 115 giúp tôi ngay!" để tránh hiệu ứng bàng quan của đám đông.',
+        },
+        {
+          'number': '02',
+          'title': 'Kỹ thuật ép tim 30 lần chuẩn xác',
+          'diagramType': 'cpr_compress',
+          'tag': 'ÉP TIM ĐỘ SÂU 5 - 6CM (100 - 120 LẦN/PHÚT)',
+          'action': 'Quỳ bên cạnh ngực nạn nhân. Đặt gót một bàn tay vào CHÍNH GIỮA XƯƠNG ỨC (giữa hai núm vú), bàn tay kia đan các ngón lên trên. Hai cánh tay duỗi thẳng đứng 90 độ so với ngực. Dùng trọng lượng nửa thân trên ép mạnh xuống lồng ngực lún sâu 5 - 6cm, sau đó để ngực nở hoàn toàn trước lần ép tiếp theo.',
+          'keyRule': 'Tần số ép 100 - 120 lần/phút (chuẩn theo nhịp bài hát Stayin’ Alive).',
+          'tip': 'Đếm to nhịp: 1, 2, 3... 30 để duy trì nhịp điệu đều đặn và phối hợp nhịp nhàng với người hỗ trợ.',
+        },
+        {
+          'number': '03',
+          'title': 'Khai thông đường thở & Thổi ngạt 2 hơi',
+          'diagramType': 'cpr_breath',
+          'tag': 'CHU KỲ 30 ÉP TIM : 2 THỔI NGẠT',
+          'action': 'Sau 30 lần ép tim, ngửa đầu nâng cằm nạn nhân ra sau để cuống lưỡi không che lấp khí quản. Bịt chặt mũi nạn nhân, áp kín miệng và thổi mạnh hơi trong 1 giây quan sát thấy lồng ngực phồng lên. Thổi liên tiếp 2 hơi rồi lập tức quay lại ép tim 30 lần. Lặp lại chu kỳ 30:2 liên tục cho đến khi cấp cứu 115 tới.',
+          'keyRule': 'Nếu không thể thổi ngạt do điều kiện vệ sinh: hãy duy trì ÉP TIM LIÊN TỤC KHÔNG DỪNG.',
+          'tip': 'Thay phiên người ép tim sau mỗi 2 phút (5 chu kỳ) để tránh kiệt sức làm giảm lực ép tim hiệu quả.',
+        },
+      ],
+      'donts': [
+        'TUYỆT ĐỐI KHÔNG ép tim khi nạn nhân vẫn còn tỉnh táo hoặc thở đều đặn bình thường.',
+        'TUYỆT ĐỐI KHÔNG dừng ép tim quá 10 giây trừ khi máy AED yêu cầu phân tích nhịp tim.',
+      ],
+    },
+    {
+      'id': 'skill_14',
+      'title': 'Sinh tồn khi ô tô ngập nước / rơi xuống sông',
+      'category': 'Kinh nghiệm cuộc sống',
+      'categoryIcon': Icons.directions_car,
+      'readTime': '3 phút đọc',
+      'desc': 'Quy tắc vàng SCCO: Tháo dây -> Mở cửa sổ -> Thoát ra ngoài trong vòng 60 giây trước khi xe chìm hẳn.',
+      'priority': 'SỐNG CÒN',
+      'accent': AppColors.alpineCyan,
+      'equipment': [
+        'Búa phá kính thoát hiểm trên xe',
+        'Cọc tựa đầu ghế ô tô',
+      ],
+      'steps': [
+        {
+          'number': '01',
+          'title': 'Tháo dây an toàn ngay lập tức (Seatbelt)',
+          'diagramType': 'car_seatbelt',
+          'tag': 'THÁO DÂY TRONG 5 GIÂY ĐẦU',
+          'action': 'Khi xe lao xuống nước, xe sẽ nổi trong khoảng 30 - 60 giây trước khi chìm. Không gọi điện thoại, không cố lấy đồ đạc. Lập tức bấm nút tháo dây an toàn. Nếu có trẻ em, hãy tháo dây cho trẻ lớn trước để trẻ tự hỗ trợ, sau đó tháo trẻ nhỏ và đưa về phía mình.',
+          'keyRule': 'Tháo dây an toàn là điều kiện tiên quyết để cơ thể linh hoạt thoát thân.',
+          'tip': 'Bật toàn bộ đèn trần và đèn xe để định hướng không gian trong làn nước đục.',
+        },
+        {
+          'number': '02',
+          'title': 'Hạ cửa kính bên hông (Window) trước khi chập điện',
+          'diagramType': 'car_window',
+          'tag': 'HẠ KÍNH TRONG KHI HỆ THỐNG ĐIỆN CÒN HOẠT ĐỘNG',
+          'action': 'Tuyệt đối KHÔNG cố mở cửa xe lúc này vì áp lực nước bên ngoài sẽ ghì chặt cửa (tương đương khối bê tông hàng trăm kg). Lập tức bấm hạ cửa kính điện bên hông xe. Hệ thống điện ô tô thường vẫn hoạt động được trong vài chục giây đầu dưới nước.',
+          'keyRule': 'Cửa sổ bên hông là lối thoát hiểm duy nhất khả thi nhất.',
+          'tip': 'Nếu kính không hạ được: Dùng đầu nhọn cọc tựa đầu ghế cạy vào góc dưới của kính cửa sổ và bẩy mạnh để làm nổ tung kính.',
+        },
+        {
+          'number': '03',
+          'title': 'Chui qua cửa sổ thoát ra ngoài (Out)',
+          'diagramType': 'car_exit',
+          'tag': 'ĐẨY TRẺ EM RA TRƯỚC RỒI BƠI LÊN',
+          'action': 'Hít một hơi thật sâu, đẩy trẻ em và người già ra ngoài cửa sổ trước, sau đó người lớn chui ra theo. Bám vào thân xe lấy đà đạp mạnh bơi thẳng lên mặt nước theo hướng các bọt khí nổi.',
+          'keyRule': 'Bơi theo hướng bọt khí nổi — đó luôn là hướng mặt nước.',
+          'tip': 'Kính lái phía trước được ép nhựa nhiều lớp không thể phá vỡ bằng búa; luôn nhắm vào kính cửa sổ hông xe.',
+        },
+      ],
+      'donts': [
+        'TUYỆT ĐỐI KHÔNG mở cửa chính khi xe mới rơi xuống nước (nước tràn vào ồ ạt sẽ làm xe lật úp và chìm nhanh gấp 10 lần).',
+        'TUYỆT ĐỐI KHÔNG ngồi chờ nước ngập đầy xe để cân bằng áp suất (hầu hết nạn nhân bị ngạt thở hoặc hoảng loạn trước khi kịp mở cửa).',
+      ],
+    },
+    {
+      'id': 'skill_15',
+      'title': 'Xử lý bỏng nước sôi, bỏng lửa & dầu mỡ',
+      'category': 'Kinh nghiệm cuộc sống',
+      'categoryIcon': Icons.local_fire_department_outlined,
+      'readTime': '3 phút đọc',
+      'desc': 'Quy tắc 20-20 ngâm nước mát liên tục 20 phút chặn đứng tổn thương nhiệt sâu vào lớp biểu bì.',
+      'priority': 'CẦN THIẾT',
+      'accent': AppColors.tacticalOrange,
+      'equipment': [
+        'Vòi nước máy sạch chảy nhẹ',
+        'Màng bọc thực phẩm sạch / gạc vô trùng',
+        'Kéo sạch cắt bỏ quần áo',
+      ],
+      'steps': [
+        {
+          'number': '01',
+          'title': 'Xả nước mát liên tục tối thiểu 20 phút',
+          'diagramType': 'burn_cool',
+          'tag': 'NƯỚC MÁT 15 - 20 ĐỘ C TRONG 20 PHÚT',
+          'action': 'Ngay khi bị bỏng, hãy đưa vùng da bị tổn thương dưới vòi nước máy mát đang chảy nhẹ (hoặc ngâm trong chậu nước sạch) liên tục từ 15 - 20 phút. Nước mát sẽ hạ nhiệt độ tại chỗ, giảm phù nề, giảm đau rát tức thì và ngăn chặn nhiệt lượng tiếp tục nung chín các lớp mô sâu bên dưới.',
+          'keyRule': 'Càng xả nước sớm trong 10 phút đầu, vết sẹo sau này càng mờ và mau lành.',
+          'tip': 'Dùng nước máy thông thường, tuyệt đối không dùng nước đá lạnh buốt.',
+        },
+        {
+          'number': '02',
+          'title': 'Tháo trang sức & Cắt bỏ y phục xung quanh',
+          'diagramType': 'burn_clothes',
+          'tag': 'CẮT XUNG QUANH, KHÔNG GIẬT MẠNH',
+          'action': 'Nhẹ nhàng tháo nhẫn, đồng hồ, vòng tay trước khi chi bị bỏng sưng phồng to làm nghẽn mạch máu. Nếu quần áo dính vào vết bỏng, dùng kéo cắt bỏ phần vải xung quanh; TUYỆT ĐỐI KHÔNG lột mạnh mảnh vải đã dính chặt vào vết thương vì sẽ kéo theo toàn bộ mảng da bị tổn thương.',
+          'keyRule': 'Không để vải dệt dính chặt gây hoại tử da.',
+          'tip': 'Dùng màng bọc thực phẩm nilon sạch che hờ lên vết bỏng để tránh nhiễm khuẩn bụi bẩn và chống dính khi đi viện.',
+        },
+      ],
+      'donts': [
+        'TUYỆT ĐỐI KHÔNG chườm đá lạnh trực tiếp lên vết bỏng (gây co mạch đột ngột và bỏng lạnh làm chết mô da vĩnh viễn).',
+        'TUYỆT ĐỐI KHÔNG bôi kem đánh răng, nước mắm, mỡ trăn, lòng đỏ trứng hoặc bùn đất (nguyên nhân hàng đầu gây nhiễm trùng máu nguy kịch).',
+        'TUYỆT ĐỐI KHÔNG chọc vỡ các bọng nước phồng rộp (lớp da bọng nước là màng chắn sinh học tự nhiên bảo vệ vết thương khỏi vi khuẩn).',
+      ],
+    },
+    {
+      'id': 'skill_16',
+      'title': 'Ứng phó giông sét, sấm sét & ngập lụt đô thị',
+      'category': 'Kinh nghiệm cuộc sống',
+      'categoryIcon': Icons.thunderstorm,
+      'readTime': '3 phút đọc',
+      'desc': 'Quy tắc 30-30 tránh sét đánh lan truyền và kỹ năng di chuyển an toàn trong vùng ngập rò điện ngầm.',
+      'priority': 'CẦN THIẾT',
+      'accent': AppColors.summitGold,
+      'equipment': [
+        'Ủng cao su / giày đế cao su cách điện',
+        'Áo mưa bọc kín người',
+      ],
+      'steps': [
+        {
+          'number': '01',
+          'title': 'Quy tắc 30-30 & Tìm nơi trú ẩn an toàn',
+          'diagramType': 'lightning_rule',
+          'tag': 'QUY TẮC 30 GIÂY - 30 PHÚT',
+          'action': 'Khi thấy tia sét lóe lên và nghe thấy tiếng sấm trong vòng dưới 30 giây, tia sét đang ở cách bạn dưới 10km — hãy lập tức tìm nơi trú ẩn kiên cố. Sau tiếng sấm cuối cùng, hãy ở yên trong nhà thêm 30 phút trước khi tiếp tục ra ngoài đường.',
+          'keyRule': 'Nơi an toàn nhất là trong nhà kiên cố đóng kín cửa hoặc trong ô tô đóng kín kính (lồng Faraday cách điện).',
+          'tip': 'Tuyệt đối không trú mưa dưới gốc cây to cô độc, cột điện, biển quảng cáo kim loại ngoài trời.',
+        },
+        {
+          'number': '02',
+          'title': 'Tư thế ngồi thu nhỏ tiếp xúc khi kẹt giữa bãi đất trống',
+          'diagramType': 'lightning_crouch',
+          'tag': 'NGỒI CHỒM HỔM CHỤM HAI GÓT CHÂN',
+          'action': 'Nếu đang ở bãi đất trống hoặc đỉnh đồi không có chỗ trốn: Ngồi chồm hổm thấp xuống đất, đầu cúi sát gối, hai tay bịt chặt tai. CHỤM HAI GÓT CHÂN VÀO NHAU và chỉ để mũi bàn chân tiếp xúc mặt đất. Không nằm dài trên đất vì dòng điện phân tán dọc mặt đất sẽ chạy qua tim.',
+          'keyRule': 'Hai gót chân chạm nhau tạo thành một mạch ngắn xả dòng điện xuống đất mà không chạy qua nội tạng.',
+          'tip': 'Vứt bỏ cần câu, gậy đánh golf, dù có cán kim loại cách xa người ít nhất 10m.',
+        },
+        {
+          'number': '03',
+          'title': 'Sinh tồn trong dòng nước ngập đô thị',
+          'diagramType': 'flood_urban',
+          'tag': 'TRÁNH XA CỘT ĐÈN & NẮP CỐNG MỞ',
+          'action': 'Khi đi bộ trong dòng nước ngập: Cầm một thanh gậy dài dò đường phía trước để phát hiện hố ga bị bật nắp cuốn xoáy. Tránh xa tuyệt đối các cột đèn đường, trạm biến áp, biển quảng cáo hộp đèn vì nguy cơ rò rỉ điện giật chết người dưới nước là cực kỳ cao.',
+          'keyRule': 'Nếu thấy tê rần ở chân khi bước vào nước: Dừng lại ngay, chụm hai chân lại và nhảy lò cò ngược trở ra.',
+          'tip': 'Không cố lái xe máy hoặc ô tô qua vùng nước ngập sâu quá nửa bánh xe (nguy cơ thủy kích phá hỏng động cơ và xe chết máy trôi tự do).',
+        },
+      ],
+      'donts': [
+        'TUYỆT ĐỐI KHÔNG trú mưa dưới tán cây cổ thụ cao nhất khu vực.',
+        'TUYỆT ĐỐI KHÔNG chạm vào dây điện đứt rơi trên mặt đất hoặc vùng nước xung quanh dây điện trong bán kính 10 mét.',
+      ],
+    },
+    {
+      'id': 'skill_17',
+      'title': 'Kinh nghiệm tự vệ & Xử lý khi bị bám đuôi',
+      'category': 'Kinh nghiệm cuộc sống',
+      'categoryIcon': Icons.security,
+      'readTime': '3 phút đọc',
+      'desc': 'Nhận diện đối tượng khả nghi, quy tắc 4 khúc cua và nghệ thuật thu hút sự trợ giúp tức thì.',
+      'priority': 'CẦN THIẾT',
+      'accent': AppColors.neonGreen,
+      'equipment': [
+        'Còi cứu nạn đa tần số móc chìa khóa',
+        'Bình xịt cay / đèn pin chớp stobe',
+        'Phím bấm khẩn cấp SOS trên điện thoại',
+      ],
+      'steps': [
+        {
+          'number': '01',
+          'title': 'Quy tắc 4 khúc cua rẽ phải để xác minh bám đuôi',
+          'diagramType': 'stalker_verify',
+          'tag': 'RẼ 4 LẦN LIÊN TIẾP TẠO HÌNH VUÔNG',
+          'action': 'Nếu nghi ngờ có người hoặc xe máy bám theo sau: Hãy rẽ phải (hoặc rẽ trái) 4 lần liên tiếp. Vì 4 khúc cua sẽ đưa bạn quay lại đúng con đường ban đầu. Không một ai đi cùng lộ trình nếu họ cũng rẽ vòng tròn 4 lần giống hệt bạn trừ khi họ đang bám đuôi bạn.',
+          'keyRule': 'Xác định chính xác bị bám đuôi để chuyển trạng thái cảnh giác cấp độ đỏ.',
+          'tip': 'Tuyệt đối KHÔNG đi về nhà hoặc rẽ vào các con hẻm cụt, ngõ tối vắng vẻ.',
+        },
+        {
+          'number': '02',
+          'title': 'Tấp vào nơi đông người & Hô to từ khóa "CHÁY!"',
+          'diagramType': 'stalker_escape',
+          'tag': 'HÔ "CHÁY!" THAY VÌ HÔ "CỨU VỚI!"',
+          'action': 'Lập tức đi nhanh vào cửa hàng tiện lợi 24/7 (Circle K, FamilyMart), quán ăn, chi nhánh ngân hàng hoặc cây xăng có đông nhân viên và bảo vệ. Nếu bị đối tượng áp sát khống chế: Hãy hét thật to từ khóa "CHÁY RỒI! CHÁY RỒI!". Theo tâm lý học xã hội, người xung quanh thường ngần ngại khi nghe tiếng "Cứu tôi", nhưng từ "CHÁY" sẽ kích thích 100% người xung quanh quay đầu nhìn và chạy ra can thiệp.',
+          'keyRule': 'Tận dụng camera an ninh của cửa hàng tiện lợi để ghi lại bằng chứng khuôn mặt kẻ bám đuôi.',
+          'tip': 'Nhờ nhân viên bảo vệ hoặc bạn bè người thân đến đón, hoặc gọi trực tiếp Cảnh sát 113 để được can thiệp an toàn.',
+        },
+      ],
+      'donts': [
+        'TUYỆT ĐỐI KHÔNG cắm tai nghe và chăm chú nhìn vào màn hình điện thoại khi đi bộ một mình trên đường vắng ban đêm.',
+        'TUYỆT ĐỐI KHÔNG để kẻ gian dồn bạn vào góc chết không có đường lùi.',
       ],
     },
   ];
@@ -1342,7 +1697,16 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const categories = ['Tất cả', 'Sơ cứu Y tế', 'Sinh tồn thời tiết', 'Dựng trại & Dây', 'Nước sạch', 'Định hướng', 'Kỹ năng sinh tồn'];
+    const categories = [
+      'Tất cả',
+      'Sơ cứu Y tế',
+      'Sinh tồn thời tiết',
+      'Dựng trại & Dây',
+      'Nước sạch',
+      'Định hướng',
+      'Kỹ năng sinh tồn',
+      'Kinh nghiệm cuộc sống',
+    ];
     final filtered = _filteredSkills;
 
     return Scaffold(
@@ -1368,14 +1732,14 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                             borderRadius: AppRadius.roundedPill,
                             border: Border.all(color: AppColors.editorialBorder),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.offline_pin, size: 14, color: AppColors.editorialPine),
-                              SizedBox(width: 6),
+                              const Icon(Icons.offline_pin, size: 14, color: AppColors.editorialPine),
+                              const SizedBox(width: 6),
                               Text(
-                                'Cẩm nang lưu sẵn ngoại tuyến (10 chủ đề)',
-                                style: TextStyle(
+                                'Cẩm nang lưu sẵn ngoại tuyến (${_skillsList.length} chuyên đề)',
+                                style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.editorialInk,
@@ -1406,7 +1770,7 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                     ),
                     const SizedBox(height: 4),
                     const Text(
-                      'Sơ cứu khẩn cấp, kỹ năng dã ngoại & sinh tồn thực chiến rừng sâu',
+                      'Sơ cứu khẩn cấp, kỹ năng dã ngoại & kinh nghiệm sinh tồn đô thị thực chiến',
                       style: TextStyle(
                         fontSize: 13,
                         color: AppColors.editorialMuted,
@@ -1432,7 +1796,7 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                         controller: _searchController,
                         style: const TextStyle(color: AppColors.editorialInk, fontSize: 13),
                         decoration: InputDecoration(
-                          hintText: 'Tìm bài sơ cứu rắn cắn, hạ thân nhiệt, nút dây, nhóm lửa...',
+                          hintText: 'Tìm bài sơ cứu rắn cắn, hạ thân nhiệt, nút dây, nhóm lửa, chữa cháy...',
                           hintStyle: const TextStyle(color: AppColors.editorialMuted, fontSize: 12),
                           prefixIcon: const Icon(Icons.search, color: AppColors.editorialPine, size: 18),
                           border: InputBorder.none,
@@ -1452,6 +1816,124 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
                     ),
                   ],
                 ),
+              ),
+            ),
+
+            // Mẹo Bỏ Túi & Kinh Nghiệm Đời Sống (Quick Life Hacks Carousel)
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(AppSpacing.space16, 4, AppSpacing.space16, 8),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.tips_and_updates, size: 16, color: AppColors.editorialTerracotta),
+                        const SizedBox(width: 6),
+                        const Text(
+                          'Mẹo Bỏ Túi & Kinh Nghiệm Cuộc Sống',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.2,
+                            color: AppColors.editorialInk,
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.editorialTerracotta.withValues(alpha: 0.12),
+                            borderRadius: AppRadius.roundedPill,
+                          ),
+                          child: Text(
+                            '${_quickLifeTips.length} mẹo',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.editorialTerracotta,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 122,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space16),
+                      itemCount: _quickLifeTips.length,
+                      itemBuilder: (context, index) {
+                        final tip = _quickLifeTips[index];
+                        final Color tipColor = tip['color'] as Color;
+                        final IconData tipIcon = tip['icon'] as IconData;
+                        return Container(
+                          width: 250,
+                          margin: const EdgeInsets.only(right: 10),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.editorialSurface,
+                            borderRadius: AppRadius.roundedMd,
+                            border: Border.all(color: AppColors.editorialBorder),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.03),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(5),
+                                    decoration: BoxDecoration(
+                                      color: tipColor.withValues(alpha: 0.15),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(tipIcon, size: 14, color: tipColor),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      tip['title'] as String,
+                                      style: const TextStyle(
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.editorialInk,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Expanded(
+                                child: Text(
+                                  tip['tip'] as String,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: AppColors.editorialMuted,
+                                    height: 1.35,
+                                  ),
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
               ),
             ),
 

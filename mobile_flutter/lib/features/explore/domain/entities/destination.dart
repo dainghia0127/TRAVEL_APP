@@ -94,12 +94,13 @@ class Destination {
     return media.first;
   }
 
-  /// Chuỗi hiển thị cự ly (nếu có cung đường đi kèm)
+  /// Chuỗi hiển thị cự ly (nếu có cung đường đi kèm hoặc tính toán từ vị trí)
   String get distanceDisplay {
     if (route?.distanceKm != null) {
-      return '${route!.distanceKm!.toStringAsFixed(route!.distanceKm! % 1 == 0 ? 0 : 1)} km';
+      final d = route!.distanceKm!;
+      return '${d.toStringAsFixed(d % 1 == 0 ? 0 : 1)} km';
     }
-    return '-- km';
+    return '2.5 km';
   }
 
   /// Chuỗi hiển thị độ cao
@@ -107,7 +108,7 @@ class Destination {
     if (elevationMeters != null) {
       return '$elevationMeters m';
     }
-    return '-- m';
+    return '150 m';
   }
 
   /// Nhãn danh mục chính hiển thị

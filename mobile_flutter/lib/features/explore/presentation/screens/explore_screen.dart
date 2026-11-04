@@ -206,7 +206,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           });
         }
 
-        // 2. Lấy thời tiết vi khí hậu thời gian thực từ Open-Meteo
+        // 2. Lấy thời tiết và khí hậu thời gian thực từ Open-Meteo
         try {
           final forecast = await WeatherService.getForecast(pos.latitude, pos.longitude);
           if (mounted) {

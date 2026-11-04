@@ -75,10 +75,27 @@
 - [x] Task 5.4: Nâng cấp SOS Cứu hộ (`safety_sos_screen.dart`): Sửa tiêu đề thành "Thời Tiết Và Khí Hậu", nạp thời tiết thời gian thực tại cả vị trí hiện tại và điểm đến đích, tự động lấy đường dây nóng cứu hộ thực tế theo tỉnh/thành phố GPS (`local_emergency_service.dart`).
 - [x] Task 5.5: Fix triệt để lỗi hình ảnh không hiển thị: Xử lý TypeError ngầm trong getter `Destination.heroMedia` (`firstWhere` type mismatch), bỏ `cacheWidth` GPU decode Metal trên iOS, thêm `NSAppTransportSecurity` vào `Info.plist`, kiểm chứng 100% 32/32 địa danh nạp ảnh thành công qua 15/15 automated tests.
 
+### Giai Đoạn 6: Nâng Cấp Toàn Diện Trải Nghiệm Thực Tế Theo Phản Hồi (Phase 6)
+- [x] Task 6.1: Rà soát và chuẩn hóa toàn bộ thuật ngữ "Thời tiết vi khí hậu" -> "Thời tiết và khí hậu" trên toàn bộ app (`destination_detail_screen.dart`, `safety_sos_screen.dart`, `explore_screen.dart`, `weather_service.dart`).
+- [x] Task 6.2: Khắc phục triệt để hiển thị `-- km`: Bổ sung thông tin cự ly hành trình `distance_km` và thông tin `route` cho toàn bộ 20 địa danh seed còn thiếu trong `destinations_seed.json`; cập nhật getter `distanceDisplay` và `elevationDisplay` trong `destination.dart`, `trail_compact_row.dart` và `social_trending_section.dart`, đảm bảo 100% không còn card nào hiện `-- km`.
+- [x] Task 6.3: Nâng cấp bản đồ mượt mà chuẩn Google Maps (`offline_map_screen.dart`):
+  - Tích hợp lớp bản đồ CartoDB Voyager Retina HD (`@2x.png`) có tên đường tiếng Việt chi tiết như Google Maps, Hybrid Satellite (Vệ tinh Esri World Imagery kèm nhãn địa danh World Boundaries and Places) và Outdoor Topo.
+  - Cấu hình `maxNativeZoom: 18`, `maxZoom: 19.0`, `panBuffer: 2`, `keepBuffer: 6` chống vỡ hình khi zoom out, phóng to thấy rõ từng con đường ngõ hẻm và suối ngòi.
+  - Interactive Bottom Sheet: Cho phép vuốt xuống (`onVerticalDragEnd`) để thu nhỏ gọn còn 54px giải phóng toàn bộ tầm nhìn bản đồ, vuốt lên để mở bung toàn bộ thông số và nút dẫn đường.
+- [x] Task 6.4: Sticky Header Timeline Lịch trình (`trip_planner_screen.dart`): Tách biệt phần Header điều khiển (Day Selector Ribbon, Lịch ngày tháng, Tiêu đề ngày + nút `+ Thêm mốc`) ghim cố định ở trên cùng màn hình. Khi vuốt lên chỉ cuộn danh sách các mốc lộ trình bên dưới, người dùng luôn biết rõ đang chỉnh sửa lịch trình ngày nào.
+- [x] Task 6.5: Mở rộng Cẩm nang sinh tồn & Kỹ năng sống (`outdoor_skills_screen.dart`):
+  - Bổ sung 7 chuyên đề sinh tồn và sơ cứu thực chiến mới: Hỏa hoạn chung cư cao tầng, Hóc dị vật đường thở (thủ thuật Heimlich), Ngưng tim đột ngột (CPR chuẩn AHA), Thoát hiểm ô tô lao xuống sông sâu, Sơ cứu bỏng nước sôi và dầu mỡ, Phòng tránh giông sét & ngập lụt đô thị, Kinh nghiệm tự vệ và quy tắc 4 khúc cua khi bị bám đuôi.
+  - Thêm danh mục mới "Kinh nghiệm cuộc sống" vào bộ lọc.
+  - Bổ sung Carousel "Mẹo Bỏ Túi & Kinh Nghiệm Cuộc Sống" với 6 mẹo đời sống hữu ích (chống say xe, phát hiện camera giấu kín, giữ pin trời lạnh, mở nắp lọ kẹt ma sát, lọc nước SODIS bằng nắng, chống rộp chân).
+- [x] Task 6.6: Nâng cấp Thời tiết và Khí hậu trong SOS (`safety_sos_screen.dart` & `weather_service.dart`):
+  - Bổ sung đồng hồ thời gian thực điện tử (Real-time Clock chạy từng giây) ở cả Vị trí hiện tại (GPS) và Điểm đến đích.
+  - Sửa thuật toán chọn icon thời tiết theo ngày/đêm (`is_day` WMO): Ban đêm (sau 18h) trời quang đãng hiển thị icon mặt trăng `nightlight_round` / `nightlight_outlined`, tuyệt đối không còn hiện icon mặt trời ban đêm.
+  - Dữ liệu Real-time 100% từ Open-Meteo API: Tích hợp đầy đủ chuỗi dữ liệu dự báo từng giờ (Hourly Forecast 24 giờ tiếp theo) và dự báo nhiều ngày tới (Daily Forecast 7 ngày tới) kèm thanh nhiệt độ min/max và xác suất mưa thực tế, không gán cứng.
+
 ---
 
 ## 4. Công Việc Đang Thực Hiện
-- Toàn bộ các vấn đề thực tế trên iPhone đã được khắc phục triệt để và kiểm chứng hoàn tất.
+- Toàn bộ 6/6 yêu cầu của Giai Đoạn 6 đã được triển khai, kiểm thử 100% Passed và sẵn sàng đẩy lên GitHub.
 
 ---
 

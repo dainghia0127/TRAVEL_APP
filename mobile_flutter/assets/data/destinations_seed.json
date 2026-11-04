@@ -847,7 +847,26 @@
         "Cửa ngõ quân sự hiểm yếu ngàn đời trấn giữ con đường thiên lý Bắc - Nam của các triều đại phong kiến Việt Nam",
         "Ranh giới phân chia khí hậu rõ rệt: rặng Bạch Mã ngăn luồng gió mùa đông bắc tạo nên sự khác biệt thời tiết giữa xứ Huế và đất Quảng Nam Đà Nẵng"
       ],
-      "getting_there_advice": "Từ sân bay hoặc trung tâm TP Đà Nẵng, thuê xe máy đi dọc theo đại lộ biển Nguyễn Tất Thành khoảng 25 km là lên tới chân đèo. Từ Huế, chạy ô tô hoặc xe máy theo QL1A qua thị trấn Lăng Cô rồi leo đèo khoảng 30 km."
+      "getting_there_advice": "Từ sân bay hoặc trung tâm TP Đà Nẵng, thuê xe máy đi dọc theo đại lộ biển Nguyễn Tất Thành khoảng 25 km là lên tới chân đèo. Từ Huế, chạy ô tô hoặc xe máy theo QL1A qua thị trấn Lăng Cô rồi leo đèo khoảng 30 km.",
+      "route": {
+        "id": "route_dest_vn_hai_van",
+        "name": "Cung đèo Hải Vân",
+        "distance_km": 21.0,
+        "elevation_gain_meters": 496,
+        "difficulty_level": 2,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Đèo Hải Vân & Vịnh Lăng Cô.",
+            "distance_km": 21.0,
+            "elevation_gain_meters": 496,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "dest_vn_ta_nang_phan_dung",
@@ -1036,7 +1055,26 @@
         "Thiên tình sử đẫm lệ giữa chàng K'Lang (tộc Lạch) và nàng H'Biang (tộc Chil) minh chứng cho tình yêu bất diệt vượt qua mọi hủ tục dòng tộc",
         "Không gian văn hóa Cồng chiêng Tây Nguyên được UNESCO công nhận là Kiệt tác truyền khẩu và Di sản phi vật thể của nhân loại"
       ],
-      "getting_there_advice": "Từ TP.HCM hoặc Hà Nội bay thẳng đến sân bay Liên Khương (Lâm Đồng) hoặc đi xe khách giường nằm lên Đà Lạt. Từ trung tâm Đà Lạt đi xe máy hoặc taxi về hướng bắc theo đường Phan Đình Phùng - Xô Viết Nghệ Tĩnh khoảng 12 km là đến chân núi Langbiang."
+      "getting_there_advice": "Từ TP.HCM hoặc Hà Nội bay thẳng đến sân bay Liên Khương (Lâm Đồng) hoặc đi xe khách giường nằm lên Đà Lạt. Từ trung tâm Đà Lạt đi xe máy hoặc taxi về hướng bắc theo đường Phan Đình Phùng - Xô Viết Nghệ Tĩnh khoảng 12 km là đến chân núi Langbiang.",
+      "route": {
+        "id": "route_dest_vn_langbiang",
+        "name": "Trekking đỉnh Langbiang",
+        "distance_km": 11.5,
+        "elevation_gain_meters": 2167,
+        "difficulty_level": 2,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Đỉnh Langbiang & Đồi Cỏ Hồng.",
+            "distance_km": 11.5,
+            "elevation_gain_meters": 2167,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "dest_vn_cat_tien",
@@ -1214,7 +1252,26 @@
         "Huyền tích về nàng Lý Thị Thiên Hương (Linh Sơn Thánh Mẫu) tiết liệt linh thiêng che chở cho muôn dân",
         "Quần thể chùa Bà Đen với chùa Linh Sơn Tiên Thạch hơn 300 năm tuổi là trung tâm hành hương Phật giáo lớn nhất phương Nam"
       ],
-      "getting_there_advice": "Từ TP.HCM di chuyển bằng ô tô hoặc xe máy theo Quốc lộ 22 qua Củ Chi, Trảng Bàng đến TP Tây Ninh khoảng 95 km (mất chừng 2 đến 2.5 giờ). Tại chân núi có hệ thống cáp treo hiện đại đưa du khách lên Chùa Bà hoặc thẳng lên đỉnh núi."
+      "getting_there_advice": "Từ TP.HCM di chuyển bằng ô tô hoặc xe máy theo Quốc lộ 22 qua Củ Chi, Trảng Bàng đến TP Tây Ninh khoảng 95 km (mất chừng 2 đến 2.5 giờ). Tại chân núi có hệ thống cáp treo hiện đại đưa du khách lên Chùa Bà hoặc thẳng lên đỉnh núi.",
+      "route": {
+        "id": "route_dest_vn_ba_den",
+        "name": "Trekking Núi Bà Đen",
+        "distance_km": 7.8,
+        "elevation_gain_meters": 986,
+        "difficulty_level": 2,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Núi Bà Đen – Nóc Nhà Nam Bộ.",
+            "distance_km": 7.8,
+            "elevation_gain_meters": 986,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "dest_vn_con_dao",
@@ -1282,7 +1339,26 @@
         "Di tích lịch sử Quốc gia đặc biệt Nhà tù Côn Đảo - 'địa ngục trần gian' suốt 113 năm minh chứng cho lòng yêu nước và ý chí bất khuất của các chiến sĩ cách mạng",
         "Khu bảo tồn biển Côn Đảo lưu giữ quần thể rùa biển (vích) lên đẻ trứng tự nhiên lớn nhất Việt Nam"
       ],
-      "getting_there_advice": "Bay thẳng từ TP.HCM, Hà Nội hoặc Cần Thơ ra Cảng Hàng không Côn Đảo (chỉ từ 45 phút đến 2 giờ bay). Hoặc đi tàu cao tốc xuất phát từ cảng Cầu Đá (Vũng Tàu) hay cảng Trần Đề (Sóc Trăng) vượt biển khoảng 2 đến 4 giờ."
+      "getting_there_advice": "Bay thẳng từ TP.HCM, Hà Nội hoặc Cần Thơ ra Cảng Hàng không Côn Đảo (chỉ từ 45 phút đến 2 giờ bay). Hoặc đi tàu cao tốc xuất phát từ cảng Cầu Đá (Vũng Tàu) hay cảng Trần Đề (Sóc Trăng) vượt biển khoảng 2 đến 4 giờ.",
+      "route": {
+        "id": "route_dest_vn_con_dao",
+        "name": "Khám phá xuyên đảo Côn Đảo",
+        "distance_km": 18.0,
+        "elevation_gain_meters": 577,
+        "difficulty_level": 1,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Quần Đảo Côn Đảo.",
+            "distance_km": 18.0,
+            "elevation_gain_meters": 577,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "dest_vn_phu_quoc",
@@ -1349,7 +1425,26 @@
         "Làng nghề nước mắm Phú Quốc truyền thống hơn 200 năm tuổi với hàng trăm thùng gỗ bời lời khổng lồ",
         "Văn hóa nghề trồng tiêu cay nồng nổi tiếng và các làng chài lâu đời ven biển như Rạch Vẹm, Hàm Ninh"
       ],
-      "getting_there_advice": "Có hàng chục chuyến bay thẳng mỗi ngày từ Hà Nội, TP.HCM, Hải Phòng, Đà Nẵng đáp xuống Sân bay Quốc tế Phú Quốc. Ngoài ra du khách có thể đi tàu cao tốc vượt biển từ bến phà Rạch Giá hoặc Hà Tiên ra đảo Phú Quốc (mất khoảng 1 đến 2.5 giờ)."
+      "getting_there_advice": "Có hàng chục chuyến bay thẳng mỗi ngày từ Hà Nội, TP.HCM, Hải Phòng, Đà Nẵng đáp xuống Sân bay Quốc tế Phú Quốc. Ngoài ra du khách có thể đi tàu cao tốc vượt biển từ bến phà Rạch Giá hoặc Hà Tiên ra đảo Phú Quốc (mất khoảng 1 đến 2.5 giờ).",
+      "route": {
+        "id": "route_dest_vn_phu_quoc",
+        "name": "Khám phá Nam - Bắc Đảo Phú Quốc",
+        "distance_km": 25.0,
+        "elevation_gain_meters": 603,
+        "difficulty_level": 1,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Đảo Ngọc Phú Quốc & Quần Đảo Nam Du.",
+            "distance_km": 25.0,
+            "elevation_gain_meters": 603,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "intl_mount_fuji",
@@ -1520,7 +1615,26 @@
         "Văn hóa phi thường và lòng quả cảm của người Sherpa - những 'vị thần gác cổng' của dãy Himalaya huyền thoại",
         "Hàng ngàn lá cờ cầu nguyện Lungta năm màu rực rỡ tung bay trong gió mang lời chúc bình an và trí tuệ đến muôn loài"
       ],
-      "getting_there_advice": "Bay từ thủ đô Kathmandu (Nepal) đến sân bay Tenzing-Hillary tại Lukla (sân bay nguy hiểm và ngoạn mục nhất thế giới). Bắt đầu hành trình trekking đi bộ 12 - 14 ngày xuyên qua Vườn Quốc gia Sagarmatha dưới sự hướng dẫn của hướng dẫn viên và porter Sherpa."
+      "getting_there_advice": "Bay từ thủ đô Kathmandu (Nepal) đến sân bay Tenzing-Hillary tại Lukla (sân bay nguy hiểm và ngoạn mục nhất thế giới). Bắt đầu hành trình trekking đi bộ 12 - 14 ngày xuyên qua Vườn Quốc gia Sagarmatha dưới sự hướng dẫn của hướng dẫn viên và porter Sherpa.",
+      "route": {
+        "id": "route_intl_everest_base_camp",
+        "name": "Everest Base Camp Trek",
+        "distance_km": 130.0,
+        "elevation_gain_meters": 5364,
+        "difficulty_level": 3,
+        "estimated_duration_days": 3,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Everest Base Camp (EBC).",
+            "distance_km": 130.0,
+            "elevation_gain_meters": 5364,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "intl_taj_mahal",
@@ -1585,7 +1699,26 @@
         "Bản tình ca bất diệt tạc bằng đá của Hoàng đế Shah Jahan dành cho người vợ yêu quý Mumtaz Mahal",
         "Đỉnh cao của kiến trúc Hồi giáo Mughal kết hợp hài hòa các phong cách kiến trúc Ba Tư, Ottoman và Ấn Độ cổ điển"
       ],
-      "getting_there_advice": "Từ thủ đô New Delhi, đón tàu cao tốc Gatimaan Express chỉ mất 1 giờ 40 phút là đến ga Agra Cantt. Từ ga đi xe tuk-tuk hoặc xe điện thân thiện môi trường để vào cổng di tích."
+      "getting_there_advice": "Từ thủ đô New Delhi, đón tàu cao tốc Gatimaan Express chỉ mất 1 giờ 40 phút là đến ga Agra Cantt. Từ ga đi xe tuk-tuk hoặc xe điện thân thiện môi trường để vào cổng di tích.",
+      "route": {
+        "id": "route_intl_taj_mahal",
+        "name": "Đi bộ tham quan quần thể Taj Mahal",
+        "distance_km": 2.5,
+        "elevation_gain_meters": 171,
+        "difficulty_level": 1,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Quần Thể Taj Mahal & Agra.",
+            "distance_km": 2.5,
+            "elevation_gain_meters": 171,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "intl_tour_du_mont_blanc",
@@ -1771,7 +1904,26 @@
         "Truyền thống đánh bắt cá tuyết mùa đông của người Viking kéo dài hơn 1.000 năm với những giàn phơi cá gỗ khổng lồ",
         "Nơi mặt trời không bao giờ lặn vào mùa hè (Hiện tượng Mặt trời nửa đêm - Midnight Sun)"
       ],
-      "getting_there_advice": "Bay từ Oslo (Na Uy) đến sân bay Bodø, sau đó đi phà vượt biển đến làng Moskenes hoặc bay chuyến bay nhỏ của hãng Widerøe đến sân bay Leknes hoặc Svolvær trên đảo Lofoten."
+      "getting_there_advice": "Bay từ Oslo (Na Uy) đến sân bay Bodø, sau đó đi phà vượt biển đến làng Moskenes hoặc bay chuyến bay nhỏ của hãng Widerøe đến sân bay Leknes hoặc Svolvær trên đảo Lofoten.",
+      "route": {
+        "id": "route_intl_lofoten_islands",
+        "name": "Trekking quần đảo Lofoten",
+        "distance_km": 32.0,
+        "elevation_gain_meters": 1161,
+        "difficulty_level": 2,
+        "estimated_duration_days": 3,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Quần Đảo Lofoten (Bắc Cực).",
+            "distance_km": 32.0,
+            "elevation_gain_meters": 1161,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "intl_banff_rockies",
@@ -1837,7 +1989,26 @@
         "Vườn quốc gia đầu tiên của Canada thành lập năm 1885, cái nôi của phong trào bảo tồn thiên nhiên Bắc Mỹ",
         "Vùng đất tổ của các bộ tộc bản địa First Nations tôn kính linh hồn núi đá và các dòng nước băng hà"
       ],
-      "getting_there_advice": "Bay đến Sân bay Quốc tế Calgary (tỉnh Alberta, Canada). Từ sân bay thuê xe tự lái hoặc bắt xe buýt đưa đón Banff Airporter chạy theo đường cao tốc xuyên Canada (Trans-Canada Highway) khoảng 1.5 giờ (140 km) là đến thị trấn Banff."
+      "getting_there_advice": "Bay đến Sân bay Quốc tế Calgary (tỉnh Alberta, Canada). Từ sân bay thuê xe tự lái hoặc bắt xe buýt đưa đón Banff Airporter chạy theo đường cao tốc xuyên Canada (Trans-Canada Highway) khoảng 1.5 giờ (140 km) là đến thị trấn Banff.",
+      "route": {
+        "id": "route_intl_banff_rockies",
+        "name": "Cung hồ Moraine & VQG Banff",
+        "distance_km": 24.0,
+        "elevation_gain_meters": 1400,
+        "difficulty_level": 2,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Vườn Quốc Gia Banff & Dãy Rockies.",
+            "distance_km": 24.0,
+            "elevation_gain_meters": 1400,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "intl_milford_track",
@@ -1970,7 +2141,26 @@
         "Kỹ thuật ghép đá Ashlar phi thường của nền văn minh Inca: những khối đá nặng hàng tấn được mài khít khao không dùng vữa nhưng trụ vững qua bao trận động đất",
         "Thành phố thiêng ẩn mình trên mây bị lãng quên suốt gần 400 năm cho đến khi được Hiram Bingham tái phát hiện năm 1911"
       ],
-      "getting_there_advice": "Bay đến thủ đô Lima (Peru), bay tiếp đến thành phố cổ Cusco (3.400m). Từ Cusco đi tàu hỏa ngắm cảnh Hiram Bingham hoặc PeruRail dọc sông Urubamba đến thị trấn Aguas Calientes, sau đó đi xe buýt 20 phút lên cổng di tích."
+      "getting_there_advice": "Bay đến thủ đô Lima (Peru), bay tiếp đến thành phố cổ Cusco (3.400m). Từ Cusco đi tàu hỏa ngắm cảnh Hiram Bingham hoặc PeruRail dọc sông Urubamba đến thị trấn Aguas Calientes, sau đó đi xe buýt 20 phút lên cổng di tích.",
+      "route": {
+        "id": "route_intl_machu_picchu",
+        "name": "Inca Trail to Machu Picchu",
+        "distance_km": 42.0,
+        "elevation_gain_meters": 2430,
+        "difficulty_level": 3,
+        "estimated_duration_days": 3,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Thành Phố Cổ Machu Picchu.",
+            "distance_km": 42.0,
+            "elevation_gain_meters": 2430,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "intl_kilimanjaro",
@@ -2036,7 +2226,26 @@
         "Văn hóa và niềm tin tín ngưỡng của người Chagga bản địa xem ngọn núi là nơi ngự trị của các vị thần tối cao",
         "Kỳ quan địa chất: ngọn núi lửa đứng độc lập không thuộc bất kỳ dãy núi nào cao nhất thế giới"
       ],
-      "getting_there_advice": "Bay đến Sân bay Quốc tế Kilimanjaro (JRO) ở Tanzania. Xe đưa đón sẽ chở về thị trấn Moshi hoặc Arusha nghỉ ngơi một đêm chuẩn bị trang thiết bị trước khi bắt đầu hành trình leo núi 6 - 8 ngày theo các tuyến Machame hoặc Marangu."
+      "getting_there_advice": "Bay đến Sân bay Quốc tế Kilimanjaro (JRO) ở Tanzania. Xe đưa đón sẽ chở về thị trấn Moshi hoặc Arusha nghỉ ngơi một đêm chuẩn bị trang thiết bị trước khi bắt đầu hành trình leo núi 6 - 8 ngày theo các tuyến Machame hoặc Marangu.",
+      "route": {
+        "id": "route_intl_kilimanjaro",
+        "name": "Chinh phục đỉnh Kilimanjaro",
+        "distance_km": 62.0,
+        "elevation_gain_meters": 5895,
+        "difficulty_level": 3,
+        "estimated_duration_days": 3,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Núi Kilimanjaro & Vườn Quốc Gia.",
+            "distance_km": 62.0,
+            "elevation_gain_meters": 5895,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "trend_hcm_bach_dang_waterbus",
@@ -2101,7 +2310,26 @@
           "aspect_ratio": 1.77,
           "is_hero": true
         }
-      ]
+      ],
+      "route": {
+        "id": "route_trend_hcm_bach_dang_waterbus",
+        "name": "Lộ trình buýt sông Sài Gòn",
+        "distance_km": 10.8,
+        "elevation_gain_meters": 8,
+        "difficulty_level": 1,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Bến Bạch Đằng & Saigon Waterbus.",
+            "distance_km": 10.8,
+            "elevation_gain_meters": 8,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "trend_hcm_thu_thiem_park",
@@ -2165,7 +2393,26 @@
           "aspect_ratio": 1.77,
           "is_hero": true
         }
-      ]
+      ],
+      "route": {
+        "id": "route_trend_hcm_thu_thiem_park",
+        "name": "Dạo bộ công viên bờ sông Thủ Thiêm",
+        "distance_km": 2.5,
+        "elevation_gain_meters": 6,
+        "difficulty_level": 1,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Công Viên Bờ Sông Thủ Thiêm & Cánh Đồng Hoa Hướng Dương.",
+            "distance_km": 2.5,
+            "elevation_gain_meters": 6,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "trend_hcm_42_nguyen_hue",
@@ -2229,7 +2476,26 @@
           "aspect_ratio": 1.77,
           "is_hero": true
         }
-      ]
+      ],
+      "route": {
+        "id": "route_trend_hcm_42_nguyen_hue",
+        "name": "Check-in chung cư cafe & phố đi bộ",
+        "distance_km": 1.2,
+        "elevation_gain_meters": 35,
+        "difficulty_level": 1,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Chung Cư Cà Phê 42 Nguyễn Huệ & Phố Đi Bộ.",
+            "distance_km": 1.2,
+            "elevation_gain_meters": 35,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "trend_hcm_ho_con_rua",
@@ -2293,7 +2559,26 @@
           "aspect_ratio": 1.77,
           "is_hero": true
         }
-      ]
+      ],
+      "route": {
+        "id": "route_trend_hcm_ho_con_rua",
+        "name": "Dạo bộ ẩm thực Hồ Con Rùa",
+        "distance_km": 1.0,
+        "elevation_gain_meters": 10,
+        "difficulty_level": 1,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Hồ Con Rùa & Phố Ẩm Thực Vỉa Hè.",
+            "distance_km": 1.0,
+            "elevation_gain_meters": 10,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "trend_hcm_cau_anh_sao",
@@ -2356,7 +2641,26 @@
           "aspect_ratio": 1.77,
           "is_hero": true
         }
-      ]
+      ],
+      "route": {
+        "id": "route_trend_hcm_cau_anh_sao",
+        "name": "Cung đường ven hồ Bán Nguyệt & Cầu Ánh Sao",
+        "distance_km": 2.2,
+        "elevation_gain_meters": 12,
+        "difficulty_level": 1,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Cầu Ánh Sao & Hồ Bán Nguyệt (Phú Mỹ Hưng).",
+            "distance_km": 2.2,
+            "elevation_gain_meters": 12,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "trend_hcm_can_gio",
@@ -2420,7 +2724,26 @@
           "aspect_ratio": 1.77,
           "is_hero": true
         }
-      ]
+      ],
+      "route": {
+        "id": "route_trend_hcm_can_gio",
+        "name": "Khám phá rừng ngập mặn Cần Giờ",
+        "distance_km": 15.0,
+        "elevation_gain_meters": 5,
+        "difficulty_level": 1,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Rừng Sác & Đảo Khỉ Cần Giờ.",
+            "distance_km": 15.0,
+            "elevation_gain_meters": 5,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "trend_dl_thung_lung_den",
@@ -2482,7 +2805,26 @@
           "aspect_ratio": 1.77,
           "is_hero": true
         }
-      ]
+      ],
+      "route": {
+        "id": "route_trend_dl_thung_lung_den",
+        "name": "Cung đường săn đêm thung lũng đèn Đà Lạt",
+        "distance_km": 3.5,
+        "elevation_gain_meters": 1520,
+        "difficulty_level": 1,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Khu Cà Phê Xóm Lèo & Thung Lũng Đèn Đà Lạt.",
+            "distance_km": 3.5,
+            "elevation_gain_meters": 1520,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "trend_hn_train_street",
@@ -2544,7 +2886,26 @@
           "aspect_ratio": 1.77,
           "is_hero": true
         }
-      ]
+      ],
+      "route": {
+        "id": "route_trend_hn_train_street",
+        "name": "Dạo bộ phố đường tàu Hà Nội",
+        "distance_km": 1.5,
+        "elevation_gain_meters": 15,
+        "difficulty_level": 1,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Cà Phê Phố Đường Tàu & Phố Cổ Hà Nội.",
+            "distance_km": 1.5,
+            "elevation_gain_meters": 15,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     },
     {
       "id": "trend_dn_cau_vang",
@@ -2607,7 +2968,26 @@
           "aspect_ratio": 1.77,
           "is_hero": true
         }
-      ]
+      ],
+      "route": {
+        "id": "route_trend_dn_cau_vang",
+        "name": "Tham quan Cầu Vàng & Bà Nà Hills",
+        "distance_km": 5.0,
+        "elevation_gain_meters": 1414,
+        "difficulty_level": 1,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Hành trình trọn vẹn",
+            "description": "Khám phá cung đường tiêu biểu tại Cầu Vàng Bàn Tay Phật (Bà Nà Hills).",
+            "distance_km": 5.0,
+            "elevation_gain_meters": 1414,
+            "terrain_type": "Đa dạng"
+          }
+        ]
+      }
     }
   ]
 }

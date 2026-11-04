@@ -801,7 +801,7 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                           )),
                         ],
 
-                        // THỜI TIẾT VI KHÍ HẬU THỜI GIAN THỰC TẠI ĐIỂM ĐẾN
+                        // THỜI TIẾT VÀ KHÍ HẬU THỜI GIAN THỰC TẠI ĐIỂM ĐẾN
                         const SizedBox(height: 22),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -811,7 +811,7 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
                                 Icon(Icons.cloud_outlined, size: 18, color: AppColors.editorialTerracotta),
                                 SizedBox(width: 8),
                                 Text(
-                                  'Thời tiết vi khí hậu thời gian thực',
+                                  'Thời tiết và khí hậu thời gian thực',
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
                                 ),
                               ],

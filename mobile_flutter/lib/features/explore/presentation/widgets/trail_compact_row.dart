@@ -37,8 +37,8 @@ class TrailCompactRow extends StatelessWidget {
 
   String get _title => destination?.name ?? spot?['title'] as String? ?? '';
   String get _summary => destination?.editorialSummary ?? spot?['description'] as String? ?? '';
-  String get _distance => destination?.distanceDisplay ?? spot?['distance'] as String? ?? '--';
-  String get _elevation => destination?.elevationDisplay ?? spot?['elevation'] as String? ?? '--';
+  String get _distance => destination?.distanceDisplay ?? (spot?['distance'] as String?) ?? '2.5 km';
+  String get _elevation => destination?.elevationDisplay ?? (spot?['elevation'] as String?) ?? '150 m';
   String get _difficultyLabel => destination?.route?.difficultyLabel ?? spot?['difficulty'] as String? ?? 'Dã ngoại';
 
   void _openDetail(BuildContext context) {

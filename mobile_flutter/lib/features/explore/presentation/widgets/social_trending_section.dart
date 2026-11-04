@@ -56,7 +56,7 @@ class SocialTrendingSection extends StatelessWidget {
       }
       return '${dist.round()} km';
     }
-    return '-- km';
+    return dest.distanceDisplay;
   }
 
   @override

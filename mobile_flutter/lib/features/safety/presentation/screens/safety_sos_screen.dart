@@ -25,6 +25,10 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
   double _holdProgress = 0.0;
   Timer? _holdTimer;
 
+  // Đồng hồ thời gian thực (Real-time Clock)
+  Timer? _liveClockTimer;
+  DateTime _currentTime = DateTime.now();
+
   // Dữ liệu vị trí & Thời tiết Hiện Tại (GPS)
   OutdoorWeather? _currentWeather;
   Position? _realPosition;
@@ -49,11 +53,35 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
   double get _currentAcc => _realPosition?.accuracy ?? 3.5;
   bool get _hasRealGps => _realPosition != null;
 
+  String get _liveTimeString {
+    final h = _currentTime.hour.toString().padLeft(2, '0');
+    final m = _currentTime.minute.toString().padLeft(2, '0');
+    final s = _currentTime.second.toString().padLeft(2, '0');
+    return '$h:$m:$s';
+  }
+
+  String get _liveDateString {
+    final weekdays = ['CN', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+    final weekday = weekdays[_currentTime.weekday % 7];
+    final day = _currentTime.day.toString().padLeft(2, '0');
+    final month = _currentTime.month.toString().padLeft(2, '0');
+    return '$weekday, $day/$month';
+  }
+
   @override
   void initState() {
     super.initState();
+    _startLiveClock();
     _detectLiveGpsAndWeather();
     _loadDestinationWeather();
+  }
+
+  void _startLiveClock() {
+    _liveClockTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() => _currentTime = DateTime.now());
+      }
+    });
   }
 
   Future<void> _detectLiveGpsAndWeather() async {
@@ -243,6 +271,7 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
   @override
   void dispose() {
     _holdTimer?.cancel();
+    _liveClockTimer?.cancel();
     super.dispose();
   }
 
@@ -952,7 +981,7 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
 
         // Thẻ Thời Tiết Thời Gian Thực (Live Weather Realtime Card)
         Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             color: AppColors.surfaceBase,
             borderRadius: AppRadius.roundedLg,
@@ -1009,7 +1038,7 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'Real-time',
+                            'Cập nhật',
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
@@ -1033,7 +1062,47 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
+
+              // ĐỒNG HỒ SỐ THỜI GIAN THỰC (Real-time Clock Badge)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceElevated,
+                  borderRadius: AppRadius.roundedSm,
+                  border: Border.all(color: AppColors.borderSubtle),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.schedule, size: 13, color: AppColors.alpineCyan),
+                        const SizedBox(width: 5),
+                        Text(
+                          isViewingCurrent ? 'Đồng hồ GPS hiện tại' : 'Đồng hồ điểm đến',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      '$_liveTimeString  •  $_liveDateString',
+                      style: const TextStyle(
+                        fontFamily: 'monospace',
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.summitGold,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
 
               if (isLoading)
                 const Padding(
@@ -1050,7 +1119,7 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${activeWeather?.temperature ?? 18}°C',
+                          '${activeWeather?.temperature.round() ?? 18}°C',
                           style: AppTypography.displayHero.copyWith(fontSize: 42),
                         ),
                         Text(
@@ -1059,37 +1128,54 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
                             color: isViewingCurrent ? AppColors.emerald : AppColors.summitGold,
                           ),
                         ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Cảm giác như ${activeWeather?.apparentTemperature.round() ?? 18}°C',
+                          style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                        ),
                       ],
                     ),
-                    const Icon(Icons.wb_sunny_outlined, size: 54, color: AppColors.tacticalOrange),
+                    // Icon thời tiết ngày/đêm chính xác (trời tối hiện mặt trăng)
+                    Icon(
+                      activeWeather?.iconInfo.icon ?? Icons.nightlight_round,
+                      size: 54,
+                      color: activeWeather?.iconInfo.color ?? AppColors.tacticalOrange,
+                    ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 const Divider(height: 1, color: AppColors.borderSubtle),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
 
-                // 3 Weather Gauges
+                // 4 Weather Gauges
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     TacticalBadge(
                       icon: Icons.air,
                       label: 'Tốc độ gió',
-                      value: '${activeWeather?.windSpeed ?? 15} km/h',
+                      value: '${activeWeather?.windSpeed.round() ?? 15} km/h',
                     ),
                     Container(width: 1, height: 24, color: AppColors.borderSubtle),
                     TacticalBadge(
                       icon: Icons.speed,
                       label: 'Gió giật',
-                      value: '${activeWeather?.windGusts ?? 28} km/h',
+                      value: '${activeWeather?.windGusts.round() ?? 28} km/h',
                       iconColor: AppColors.tacticalOrange,
                     ),
                     Container(width: 1, height: 24, color: AppColors.borderSubtle),
                     TacticalBadge(
                       icon: Icons.water_drop,
-                      label: 'Khả năng mưa',
+                      label: 'Xác suất mưa',
                       value: '${activeWeather?.precipitationProb ?? 30}%',
                       iconColor: AppColors.alpineCyan,
+                    ),
+                    Container(width: 1, height: 24, color: AppColors.borderSubtle),
+                    TacticalBadge(
+                      icon: Icons.opacity,
+                      label: 'Độ ẩm',
+                      value: '${activeWeather?.humidity ?? 65}%',
+                      iconColor: AppColors.emerald,
                     ),
                   ],
                 ),
@@ -1117,7 +1203,7 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
                     Icon(Icons.compare_arrows, size: 16, color: AppColors.alpineCyan),
                     SizedBox(width: 6),
                     Text(
-                      'SO SÁNH VI KHÍ HẬU (HIỆN TẠI VS ĐÍCH ĐẾN)',
+                      'SO SÁNH THỜI TIẾT VÀ KHÍ HẬU (HIỆN TẠI VS ĐÍCH ĐẾN)',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -1136,9 +1222,19 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
                         children: [
                           const Text('Vị trí của bạn', style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
                           const SizedBox(height: 2),
-                          Text(
-                            '${_currentWeather!.temperature}°C • ${_currentWeather!.weatherDescription}',
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                          Row(
+                            children: [
+                              Icon(_currentWeather!.iconInfo.icon, size: 14, color: _currentWeather!.iconInfo.color),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  '${_currentWeather!.temperature.round()}°C • ${_currentWeather!.weatherDescription}',
+                                  style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: Colors.white),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -1151,9 +1247,19 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
                         children: [
                           Text('Đích: $_targetDestinationName', style: const TextStyle(fontSize: 11, color: AppColors.textMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
                           const SizedBox(height: 2),
-                          Text(
-                            '${_destWeather!.temperature}°C • ${_destWeather!.weatherDescription}',
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.summitGold),
+                          Row(
+                            children: [
+                              Icon(_destWeather!.iconInfo.icon, size: 14, color: _destWeather!.iconInfo.color),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  '${_destWeather!.temperature.round()}°C • ${_destWeather!.weatherDescription}',
+                                  style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: AppColors.summitGold),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -1201,39 +1307,95 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
           const SizedBox(height: 14),
         ],
 
-        // Hourly Timeline Forecast (Next 6 Hours)
-        Text(
-          isViewingCurrent ? 'Dự Báo Từng Giờ (Vị Trí Của Bạn)' : 'Dự Báo Từng Giờ (Điểm Đến Trekking)',
-          style: AppTypography.headlineMedium.copyWith(fontSize: 16),
+        // DỰ BÁO TỪNG GIỜ (24H TỚI - REAL-TIME)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              isViewingCurrent ? 'Dự Báo Từng Giờ (24h Tới)' : 'Dự Báo Từng Giờ Tại Đích (24h Tới)',
+              style: AppTypography.headlineMedium.copyWith(fontSize: 15),
+            ),
+            const Text(
+              'Real-time',
+              style: TextStyle(fontSize: 11, color: AppColors.textMuted, fontWeight: FontWeight.w600),
+            ),
+          ],
         ),
         const SizedBox(height: 10),
 
-        SizedBox(
-          height: 110,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            children: [
-              _buildHourlyCard('Bây giờ', '${activeWeather?.temperature ?? 18}°C', Icons.wb_sunny_outlined, '${activeWeather?.precipitationProb ?? 10}%'),
-              _buildHourlyCard('14:00', '${(activeWeather?.temperature ?? 18) + 1}°C', Icons.cloud_outlined, '20%'),
-              _buildHourlyCard('16:00', '${(activeWeather?.temperature ?? 18) - 1}°C', Icons.grain, '55%'),
-              _buildHourlyCard('18:00', '${(activeWeather?.temperature ?? 18) - 3}°C', Icons.water_drop_outlined, '40%'),
-              _buildHourlyCard('20:00', '${(activeWeather?.temperature ?? 18) - 5}°C', Icons.nights_stay_outlined, '15%'),
-              _buildHourlyCard('22:00', '${(activeWeather?.temperature ?? 18) - 7}°C', Icons.ac_unit, '10%'),
-            ],
+        if (activeWeather != null && activeWeather.hourly.isNotEmpty)
+          SizedBox(
+            height: 118,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: activeWeather.hourly.length,
+              itemBuilder: (context, index) {
+                final item = activeWeather.hourly[index];
+                return _buildHourlyForecastCard(item);
+              },
+            ),
+          )
+        else
+          Container(
+            height: 80,
+            alignment: Alignment.center,
+            child: const Text('Đang cập nhật chuỗi dữ liệu dự báo theo giờ...', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
           ),
+
+        const SizedBox(height: 20),
+
+        // DỰ BÁO 7 NGÀY SẮP TỚI (DAILY FORECAST)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              isViewingCurrent ? 'Dự Báo 7 Ngày Tới (Vị Trí Bạn)' : 'Dự Báo 7 Ngày Tới (Điểm Đến)',
+              style: AppTypography.headlineMedium.copyWith(fontSize: 15),
+            ),
+            const Text(
+              'Hàng ngày',
+              style: TextStyle(fontSize: 11, color: AppColors.textMuted, fontWeight: FontWeight.w600),
+            ),
+          ],
         ),
+        const SizedBox(height: 10),
+
+        if (activeWeather != null && activeWeather.daily.isNotEmpty)
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.surfaceBase,
+              borderRadius: AppRadius.roundedMd,
+              border: Border.all(color: AppColors.borderSubtle),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: Column(
+              children: [
+                for (int i = 0; i < activeWeather.daily.length; i++) ...[
+                  _buildDailyForecastRow(activeWeather.daily[i]),
+                  if (i < activeWeather.daily.length - 1)
+                    const Divider(height: 14, color: AppColors.borderSubtle),
+                ],
+              ],
+            ),
+          )
+        else
+          Container(
+            height: 80,
+            alignment: Alignment.center,
+            child: const Text('Đang tải dữ liệu dự báo 7 ngày tới...', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
+          ),
 
         const SizedBox(height: 30),
       ],
     );
   }
 
-  Widget _buildHourlyCard(String time, String temp, IconData icon, String rain) {
+  Widget _buildHourlyForecastCard(HourlyWeather item) {
     return Container(
-      width: 78,
+      width: 76,
       margin: const EdgeInsets.only(right: 8),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
       decoration: BoxDecoration(
         color: AppColors.surfaceBase,
         borderRadius: AppRadius.roundedMd,
@@ -1242,12 +1404,64 @@ class _SafetySosScreenState extends State<SafetySosScreen> with SingleTickerProv
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Text(time, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-          Icon(icon, size: 20, color: AppColors.tacticalOrange),
-          Text(temp, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white)),
-          Text(rain, style: const TextStyle(fontSize: 10, color: AppColors.alpineCyan)),
+          Text(item.hourLabel, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
+          Icon(item.iconInfo.icon, size: 22, color: item.iconInfo.color),
+          Text('${item.temperature.round()}°C', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.water_drop, size: 9, color: AppColors.alpineCyan),
+              const SizedBox(width: 2),
+              Text('${item.precipitationProb}%', style: const TextStyle(fontSize: 10, color: AppColors.alpineCyan, fontWeight: FontWeight.w600)),
+            ],
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildDailyForecastRow(DailyWeather item) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 85,
+          child: Text(
+            item.dayLabel,
+            style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Colors.white),
+          ),
+        ),
+        Icon(item.iconInfo.icon, size: 18, color: item.iconInfo.color),
+        const SizedBox(width: 8),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.water_drop, size: 10, color: AppColors.alpineCyan),
+            const SizedBox(width: 2),
+            Text('${item.precipitationProbMax}%', style: const TextStyle(fontSize: 11, color: AppColors.alpineCyan, fontWeight: FontWeight.w600)),
+          ],
+        ),
+        const Spacer(),
+        Text(
+          '${item.tempMin.round()}°',
+          style: const TextStyle(fontSize: 12, color: AppColors.textMuted, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(width: 6),
+        Container(
+          width: 48,
+          height: 4,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(2),
+            gradient: const LinearGradient(
+              colors: [AppColors.alpineCyan, AppColors.summitGold],
+            ),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          '${item.tempMax.round()}°C',
+          style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w700),
+        ),
+      ],
     );
   }
 }
