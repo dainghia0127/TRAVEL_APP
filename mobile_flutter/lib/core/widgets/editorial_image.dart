@@ -40,18 +40,13 @@ class EditorialImage extends StatelessWidget {
         (image.url.startsWith('http://') || image.url.startsWith('https://')) &&
         image.url != OutdoorImage.defaultNature.url;
 
-    // Giới hạn giải mã bộ nhớ an toàn (Safe GPU Decoding)
-    final int? targetMemWidth = (width != null && width!.isFinite && width! > 0)
-        ? (width! * 2.0).round().clamp(180, 800)
-        : null;
-
     Widget imageContent;
 
     if (hasSpecificLocalAsset) {
       // =========================================================================
       // [1] ƯU TIÊN BUNDLED SEEDS (Bộ ảnh đóng gói sẵn trong App):
-      // - Nạp tức thì 0ms, không tốn data 4G/5G, hoạt động 100% offline trong rừng.
-      // - Fallback an toàn tới ảnh thiên nhiên mặc định nếu asset gặp sự cố giải mã.
+      // - Nạp tức thì 0ms từ disk/bundle, 100% offline trong rừng.
+      // - Không ép cacheWidth để GPU Metal iOS giải mã tự nhiên, tránh lỗi decode.
       // =========================================================================
       imageContent = Image.asset(
         image.localAsset,
@@ -60,22 +55,6 @@ class EditorialImage extends StatelessWidget {
         height: height,
         fit: fit,
         alignment: image.focalPoint,
-        cacheWidth: targetMemWidth,
-        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-          if (wasSynchronouslyLoaded || frame != null) return child;
-          return Container(
-            width: width,
-            height: height,
-            color: const Color(0xFF1E293B),
-            child: const Center(
-              child: SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF10B981)),
-              ),
-            ),
-          );
-        },
         errorBuilder: (context, error, stackTrace) => _buildNetworkFallback(radius),
       );
     } else if (!kIsWeb && hasValidNetworkUrl) {
@@ -95,7 +74,6 @@ class EditorialImage extends StatelessWidget {
         fit: fit,
         alignment: image.focalPoint,
         fadeInDuration: const Duration(milliseconds: 150),
-        memCacheWidth: targetMemWidth,
         maxWidthDiskCache: 1200,
         maxHeightDiskCache: 1200,
         placeholder: (context, url) => Container(
@@ -123,22 +101,6 @@ class EditorialImage extends StatelessWidget {
         height: height,
         fit: fit,
         alignment: image.focalPoint,
-        cacheWidth: targetMemWidth,
-        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-          if (wasSynchronouslyLoaded || frame != null) return child;
-          return Container(
-            width: width,
-            height: height,
-            color: const Color(0xFF1E293B),
-            child: const Center(
-              child: SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF10B981)),
-              ),
-            ),
-          );
-        },
         errorBuilder: (context, error, stackTrace) => _buildAssetOrPlaceholder(hasSpecificLocalAsset),
       );
     } else {
@@ -151,7 +113,7 @@ class EditorialImage extends StatelessWidget {
       child: Container(
         width: width,
         height: height,
-        color: const Color(0xFFE2E8F0),
+        color: const Color(0xFF0F172A),
         child: Stack(
           fit: StackFit.passthrough,
           children: [
@@ -192,7 +154,6 @@ class EditorialImage extends StatelessWidget {
         height: height,
         fit: fit,
         alignment: image.focalPoint,
-        cacheWidth: 800,
         errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
       );
     }

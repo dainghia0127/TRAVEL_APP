@@ -88,10 +88,10 @@ class Destination {
   /// Lấy ảnh Hero đại diện
   DestinationMedia? get heroMedia {
     if (media.isEmpty) return null;
-    return media.firstWhere(
-      (m) => m.isHero,
-      orElse: () => media.first,
-    );
+    for (final m in media) {
+      if (m.isHero) return m;
+    }
+    return media.first;
   }
 
   /// Chuỗi hiển thị cự ly (nếu có cung đường đi kèm)

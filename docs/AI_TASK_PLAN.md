@@ -73,17 +73,18 @@
 - [x] Task 5.2: Khắc phục triệt để lỗi ảnh địa điểm biến mất (`editorial_image.dart` - sửa HTTP header & cacheWidth), lỗi không nhấp được địa điểm do cử chỉ ScrollView iOS (`bouncing_button.dart` - gán trực tiếp onTap cho GestureDetector), và tối ưu cuộn vô tận (`trending_grid_section.dart` - phân trang Top 8 kèm nút Xem thêm).
 - [x] Task 5.3: Thêm chức năng Bản Đồ Online tách biệt với Bản Đồ Offline, cơ chế đồng bộ ngầm định kỳ mỗi 8s, hiển thị icon tín hiệu định vị vệ tinh GPS Live (xanh neon / cam nhấp nháy), cập nhật line và hiển thị HUD số km còn lại theo thời gian thực khi di chuyển (`offline_map_screen.dart`).
 - [x] Task 5.4: Nâng cấp SOS Cứu hộ (`safety_sos_screen.dart`): Sửa tiêu đề thành "Thời Tiết Và Khí Hậu", nạp thời tiết thời gian thực tại cả vị trí hiện tại và điểm đến đích, tự động lấy đường dây nóng cứu hộ thực tế theo tỉnh/thành phố GPS (`local_emergency_service.dart`).
+- [x] Task 5.5: Fix triệt để lỗi hình ảnh không hiển thị: Xử lý TypeError ngầm trong getter `Destination.heroMedia` (`firstWhere` type mismatch), bỏ `cacheWidth` GPU decode Metal trên iOS, thêm `NSAppTransportSecurity` vào `Info.plist`, kiểm chứng 100% 32/32 địa danh nạp ảnh thành công qua 15/15 automated tests.
 
 ---
 
 ## 4. Công Việc Đang Thực Hiện
-- Toàn bộ 4 vấn đề thực tế trên iPhone đã được khắc phục triệt để và kiểm chứng hoàn tất.
+- Toàn bộ các vấn đề thực tế trên iPhone đã được khắc phục triệt để và kiểm chứng hoàn tất.
 
 ---
 
 ## 5. Kết Quả Kiểm Thử Thực Tế
 - **`flutter analyze`**: **`No issues found!`** (0 lỗi, 0 cảnh báo - 100% clean).
-- **`flutter test`**: **`All tests passed!`** (12/12 unit & widget test pass 100%).
+- **`flutter test`**: **`All tests passed!`** (15/15 unit & widget test pass 100%).
 - **`flutter build web`**: **Biên dịch thành công** thư mục phân phối web tại `TRAVEL_APP/mobile_flutter/build/web`.
 
 ---
