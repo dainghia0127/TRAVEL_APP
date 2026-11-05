@@ -239,7 +239,16 @@
     - Bổ sung 2 chế độ áp dụng trực quan: **`Mỗi người`** (mặc định, cộng thẳng vào chi phí/người) và **`Chia cả đoàn`** (chia đều theo số người tham gia trong đoàn).
     - Khắc phục lỗi nhập số tiền rồi bấm luôn "Lưu thay đổi": Tự động gom khoản chi đang gõ dở kể cả khi để trống tiêu đề (tự gán tên `'Khoản chi khác'`), tuyệt đối không làm mất số tiền người dùng vừa nhập.
     - Hiển thị chi tiết trên Thẻ Dự Toán Chi Phí kèm huy hiệu `Mỗi người` hoặc `Chia cả đoàn` để minh bạch cách tính.
-- [x] Task 12.3: Kiểm thử tự động toàn diện:
+- [x] Task 12.3: Bổ sung Nút Bấm & Modal Giải Trình Công Thức Dự Toán Chi Phí Tường Minh (`trip_planner_screen.dart`):
+  - Bổ sung nút bấm trực quan `[Công thức]` (Summit Gold) và icon trợ giúp `[?]` ngay cạnh tiêu đề "Dự Toán Chi Phí" và giá tiền tổng.
+  - Cho phép chạm vào bất kỳ mục nào trên Legend (Nhiên liệu, Ăn uống, Trại bãi) hoặc đường dẫn trong hộp thoại Tùy chỉnh để mở ngay Modal giải trình.
+  - Xây dựng Modal Bottom Sheet `_showCostBreakdownExplanationModal()` giải thích chi tiết, minh bạch từng khoản chi:
+    - **Nhiên liệu**: Phương tiện, mức tiêu hao (L/100km), cự ly khứ hồi, hệ số đèo dốc x1.30, lượng xăng tiêu thụ, tổng tiền xăng cả xe và số tiền chia theo số người trong đoàn.
+    - **Ăn uống**: Số ngày chuyến đi x đơn giá ăn uống/người/ngày = thành tiền.
+    - **Trại & Bãi**: Số đêm cắm trại x đơn giá bãi/người/đêm = thành tiền (nêu rõ số ngày và số đêm).
+    - **Khoản chi tự thêm**: Chi tiết từng khoản kèm công thức tính (mỗi người hay chia đoàn).
+    - **Tổng dự toán**: Hiển thị rõ ràng phép cộng tổng và tổng chi phí toàn đoàn.
+- [x] Task 12.4: Kiểm thử tự động toàn diện:
   - Bổ sung test cases trong `custom_route_and_geocoding_test.dart` kiểm tra cả 2 phương thức tính phí bãi trại (xóa về 0, đi 1 ngày, đi nhiều ngày) và khoản chi tự thêm (mỗi người vs chia đoàn).
   - Đạt 31/31 automated tests pass 100% và `flutter analyze` 0 issues.
 

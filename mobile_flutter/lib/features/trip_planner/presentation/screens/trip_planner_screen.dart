@@ -125,6 +125,37 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      InkWell(
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          _showCostBreakdownExplanationModal();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: AppColors.summitGold.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: AppColors.summitGold.withValues(alpha: 0.4)),
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.calculate_outlined, color: AppColors.summitGold, size: 16),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    'Xem minh bạch công thức tính toán',
+                                    style: TextStyle(color: AppColors.summitGold, fontSize: 11.5, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                              Icon(Icons.chevron_right, color: AppColors.summitGold, size: 16),
+                            ],
+                          ),
+                        ),
+                      ),
                       const Text(
                         'ĐỊNH MỨC CƠ BẢN (TỰ ĐỘNG TÍNH TOÁN)',
                         style: TextStyle(color: AppColors.summitGold, fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.5),
@@ -413,6 +444,359 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
           },
         );
       },
+    );
+  }
+
+  void _showCostBreakdownExplanationModal() {
+    HapticFeedback.mediumImpact();
+    final fuel = _fuelCostPerPerson;
+    final food = _foodCostPerPerson;
+    final camp = _campFeePerPerson;
+    final custom = _customCostsPerPerson;
+    final total = _totalCostPerPerson;
+
+    final totalRoundTripKm = (_distanceFromUserKm * 2).clamp(30.0, 3500.0);
+    const double passMultiplier = 1.30;
+    final selectedVehicle = _vehicles.firstWhere(
+      (v) => v['title'] == _selectedVehicle,
+      orElse: () => _vehicles[0],
+    );
+    final rate = selectedVehicle['rate'] as double;
+    final effectiveKm = totalRoundTripKm * passMultiplier;
+    final totalLiters = (effectiveKm / 100.0) * rate;
+    final totalFuelAllVehicle = (totalLiters * _gasPrice).round();
+
+    String formatVnd(num amount) {
+      return '${amount.round().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} đ';
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF131A16),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        side: BorderSide(color: AppColors.editorialPine, width: 1.2),
+      ),
+      builder: (bctx) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.82,
+          minChildSize: 0.5,
+          maxChildSize: 0.95,
+          expand: false,
+          builder: (context, scrollController) {
+            return Container(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+              child: ListView(
+                controller: scrollController,
+                physics: const BouncingScrollPhysics(),
+                children: [
+                  // Handle bar
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.calculate_rounded, color: AppColors.summitGold, size: 22),
+                          SizedBox(width: 8),
+                          Text(
+                            'Minh Bạch Dự Toán Chi Phí',
+                            style: TextStyle(
+                              fontFamily: 'serif',
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: AppColors.textMuted, size: 20),
+                        onPressed: () => Navigator.pop(bctx),
+                      ),
+                    ],
+                  ),
+                  const Text(
+                    'Chi tiết công thức tính toán tường minh để ra số tiền dự toán:',
+                    style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Hero Summary Card
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF1B3B2B), Color(0xFF14291F)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: AppColors.emerald.withValues(alpha: 0.4)),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'TỔNG DỰ TOÁN / NGƯỜI:',
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.emerald, letterSpacing: 0.5),
+                            ),
+                            Text(
+                              formatVnd(total),
+                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Colors.white),
+                            ),
+                          ],
+                        ),
+                        const Divider(height: 16, color: Colors.white12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Đoàn $_participants người • $_maxDays ngày $_campFeeNights đêm',
+                              style: const TextStyle(fontSize: 11.5, color: Colors.white70),
+                            ),
+                            Text(
+                              'Tổng đoàn: ${formatVnd(total * _participants)}',
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.summitGold),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Mục 1: Nhiên liệu
+                  _buildCostItemExplanationCard(
+                    icon: Icons.local_gas_station_rounded,
+                    accentColor: AppColors.editorialTerracotta,
+                    title: '1. Chi phí nhiên liệu di chuyển',
+                    costPerPerson: fuel,
+                    formulaSummary: rate == 0
+                        ? 'Đi bộ Trekking: Không tốn nhiên liệu'
+                        : 'Quãng đường khứ hồi x Hệ số đèo dốc x Mức ăn xăng x Giá xăng ÷ $_participants người',
+                    bulletDetails: [
+                      'Phương tiện: $_selectedVehicle (${rate > 0 ? '$rate lít/100km' : 'Không dùng xăng'})',
+                      'Cự ly 1 chiều: ${_distanceFromUserKm.toStringAsFixed(1)} km ➔ Khứ hồi (2 chiều): ${totalRoundTripKm.toStringAsFixed(1)} km',
+                      'Hệ số đèo dốc & an toàn dã ngoại: x 1.30 ➔ Quãng đường tính toán: ${effectiveKm.toStringAsFixed(1)} km',
+                      if (rate > 0) ...[
+                        'Lượng xăng tiêu thụ cả xe: (${effectiveKm.toStringAsFixed(1)} ÷ 100) x $rate = ${totalLiters.toStringAsFixed(1)} lít',
+                        'Đơn giá xăng RON95: ${formatVnd(_gasPrice)} / lít',
+                        'Tổng tiền xăng cả xe: ${totalLiters.toStringAsFixed(1)} L x ${formatVnd(_gasPrice)} = ${formatVnd(totalFuelAllVehicle)}',
+                        'Chia đều cho đoàn $_participants người: ${formatVnd(totalFuelAllVehicle)} ÷ $_participants = ${formatVnd(fuel)}/người',
+                      ],
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Mục 2: Ăn uống
+                  _buildCostItemExplanationCard(
+                    icon: Icons.restaurant_rounded,
+                    accentColor: AppColors.editorialPine,
+                    title: '2. Chi phí ăn uống dã ngoại',
+                    costPerPerson: food,
+                    formulaSummary: '$_maxDays ngày x ${formatVnd(_foodPerDay)}/ngày = ${formatVnd(food)}/người',
+                    bulletDetails: [
+                      'Thời gian chuyến đi: $_maxDays ngày',
+                      'Định mức ăn uống trung bình: ${formatVnd(_foodPerDay)} / người / ngày',
+                      'Công thức: $_maxDays ngày x ${formatVnd(_foodPerDay)} = ${formatVnd(food)}/người',
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Mục 3: Trại & Bãi
+                  _buildCostItemExplanationCard(
+                    icon: Icons.night_shelter_rounded,
+                    accentColor: const Color(0xFF638C6D),
+                    title: '3. Phí bãi cắm trại / lưu trú',
+                    costPerPerson: camp,
+                    formulaSummary: _campFeePerNight <= 0
+                        ? 'Miễn phí (Không lưu trú hoặc bãi cắm tự do 0 đ)'
+                        : '$_campFeeNights đêm x ${formatVnd(_campFeePerNight)}/đêm = ${formatVnd(camp)}/người',
+                    bulletDetails: [
+                      'Số đêm lưu trú: $_campFeeNights đêm (hành trình $_maxDays ngày)',
+                      'Đơn giá bãi trại / lưu trú: ${formatVnd(_campFeePerNight)} / người / đêm',
+                      if (_campFeePerNight > 0)
+                        'Công thức: $_campFeeNights đêm x ${formatVnd(_campFeePerNight)} = ${formatVnd(camp)}/người'
+                      else
+                        'Đã xóa phí hoặc cắm trại tự do miễn phí: 0 đ/người',
+                    ],
+                  ),
+
+                  if (_customCostItems.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    // Mục 4: Khoản chi tự thêm
+                    _buildCostItemExplanationCard(
+                      icon: Icons.receipt_long_rounded,
+                      accentColor: const Color(0xFFD97706),
+                      title: '4. Khoản chi tùy chọn tự thêm',
+                      costPerPerson: custom,
+                      formulaSummary: 'Tổng các khoản tự thêm = ${formatVnd(custom)}/người',
+                      bulletDetails: _customCostItems.map((item) {
+                        final title = item['title'] as String? ?? 'Khoản chi';
+                        final amt = (item['amount'] as num?)?.toInt() ?? 0;
+                        final isPerPerson = item['isPerPerson'] != false;
+                        final costPerPerson = isPerPerson ? amt : (_participants > 0 ? (amt / _participants).round() : amt);
+                        if (isPerPerson) {
+                          return '$title: ${formatVnd(amt)}/người';
+                        } else {
+                          return '$title: ${formatVnd(amt)} cả đoàn ÷ $_participants người = ${formatVnd(costPerPerson)}/người';
+                        }
+                      }).toList(),
+                    ),
+                  ],
+
+                  const SizedBox(height: 16),
+
+                  // Phép cộng tổng
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1B231F),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppColors.borderSubtle),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'CÔNG THỨC CỘNG TỔNG DỰ TOÁN:',
+                          style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.summitGold, letterSpacing: 0.5),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Nhiên liệu (${(fuel / 1000).toInt()}k) + Ăn uống (${(food / 1000).toInt()}k) + Trại bãi (${(camp / 1000).toInt()}k)${custom > 0 ? ' + Khoản khác (${(custom / 1000).toInt()}k)' : ''} = ${formatVnd(total)}/người',
+                          style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Colors.white, height: 1.4),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.editorialPine,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(bctx);
+                      _showCostConfigDialog();
+                    },
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.tune, size: 16, color: Colors.white),
+                        SizedBox(width: 8),
+                        Text('Thay Đổi Định Mức & Tính Lại', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildCostItemExplanationCard({
+    required IconData icon,
+    required Color accentColor,
+    required String title,
+    required int costPerPerson,
+    required String formulaSummary,
+    required List<String> bulletDetails,
+  }) {
+    String formatVnd(num amount) {
+      return '${amount.round().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} đ';
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF18201B),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: accentColor.withValues(alpha: 0.35), width: 1.2),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: accentColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Icon(icon, size: 16, color: accentColor),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    title,
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ],
+              ),
+              Text(
+                formatVnd(costPerPerson),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: accentColor),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: accentColor.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              formulaSummary,
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: accentColor),
+            ),
+          ),
+          const SizedBox(height: 8),
+          ...bulletDetails.map((b) => Padding(
+                padding: const EdgeInsets.only(bottom: 3),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('• ', style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                    Expanded(
+                      child: Text(
+                        b,
+                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 11.5, height: 1.3),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+        ],
+      ),
     );
   }
 
@@ -875,10 +1259,10 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   }
 
   int get _foodCostPerPerson => _maxDays * _foodPerDay;
+  int get _campFeeNights => _maxDays > 1 ? (_maxDays - 1) : (_campFeePerNight > 0 ? 1 : 0);
   int get _campFeePerPerson {
     if (_campFeePerNight <= 0) return 0;
-    final nights = _maxDays > 1 ? (_maxDays - 1) : 1;
-    return nights * _campFeePerNight;
+    return _campFeeNights * _campFeePerNight;
   }
   int get _customCostsPerPerson {
     if (_customCostItems.isEmpty) return 0;
@@ -2396,14 +2780,44 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                           ),
                         ),
                       ),
+                      const SizedBox(width: 5),
+                      BouncingButton(
+                        onTap: _showCostBreakdownExplanationModal,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.summitGold.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: AppColors.summitGold.withValues(alpha: 0.35)),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.calculate_outlined, size: 12, color: AppColors.summitGold),
+                              SizedBox(width: 2),
+                              Text('Công thức', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.summitGold)),
+                            ],
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                  Text(
-                    '${total.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} đ/người',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.editorialPine,
+                  BouncingButton(
+                    onTap: _showCostBreakdownExplanationModal,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '${total.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} đ/người',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.editorialPine,
+                          ),
+                        ),
+                        const SizedBox(width: 3),
+                        const Icon(Icons.help_outline, size: 14, color: AppColors.summitGold),
+                      ],
                     ),
                   ),
                 ],
@@ -2723,21 +3137,29 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   }
 
   Widget _buildLegendItem(String title, Color color, int cost) {
-    return Row(
-      children: [
-        Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-        const SizedBox(width: 5),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      onTap: _showCostBreakdownExplanationModal,
+      borderRadius: BorderRadius.circular(6),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(title, style: const TextStyle(fontSize: 10, color: AppColors.editorialMuted)),
-            Text(
-              '${(cost / 1000).toInt()}k',
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.editorialInk),
+            Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+            const SizedBox(width: 5),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontSize: 10, color: AppColors.editorialMuted)),
+                Text(
+                  '${(cost / 1000).toInt()}k',
+                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.editorialInk),
+                ),
+              ],
             ),
           ],
         ),
-      ],
+      ),
     );
   }
 }
