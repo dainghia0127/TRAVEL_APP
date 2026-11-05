@@ -10,6 +10,7 @@ class StorageService {
   static const String _keyLastSyncTimestamp = 'travel_last_sync_timestamp';
   static const String _keyCustomRoutesPrefix = 'travel_custom_route_';
   static const String _keyCustomRouteIds = 'travel_custom_route_ids';
+  static const String _keyCustomRouteDetailPrefix = 'travel_custom_route_detail_';
 
   /// Lưu chuỗi JSON địa danh đồng bộ từ Cloud về máy
   static Future<bool> saveSyncedDestinationsJson(String jsonString) async {
@@ -68,19 +69,24 @@ class StorageService {
   }
 
   /// Lấy danh sách địa điểm đã thêm vào chuyến đi
-  /// Nếu người dùng đã từng thao tác (kể cả xóa hết thành []), giữ nguyên []
-  /// Chỉ cấp 2 điểm mặc định trong lần đầu tiên mở ứng dụng
+  /// Mặc định trả về danh sách rỗng [] để người dùng tự do khám phá và tạo chuyến đi sạch sẽ
   static Future<List<String>> getTripDestinations() async {
     final prefs = await SharedPreferences.getInstance();
     final isInitialized = prefs.getBool(_keyTripInitialized) ?? false;
     if (!isInitialized) {
-      // Lần đầu mở app: nạp 2 điểm khám phá mẫu và đánh dấu đã khởi tạo
       await prefs.setBool(_keyTripInitialized, true);
-      const initial = ['vn_ta_nang_phan_dung', 'vn_lake_tuyen_lam'];
-      await prefs.setStringList(_keyTripDestinations, initial);
-      return initial;
+      await prefs.setStringList(_keyTripDestinations, []);
+      return [];
     }
     return prefs.getStringList(_keyTripDestinations) ?? [];
+  }
+
+  /// Xóa sạch toàn bộ địa điểm trong chuyến đi
+  static Future<void> clearAllTripDestinations() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyTripInitialized, true);
+    await prefs.setStringList(_keyTripDestinations, []);
+    await prefs.remove(_keySelectedTripDestId);
   }
 
   /// Thêm 1 địa điểm vào chuyến đi và tự động chọn nó
@@ -163,10 +169,23 @@ class StorageService {
     return result;
   }
 
+  /// Lưu metadata chi tiết của Lộ trình A-B (tọa độ A, B, tên A, B, và line points)
+  static Future<void> saveCustomRouteDetail(String id, String jsonString) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('$_keyCustomRouteDetailPrefix$id', jsonString);
+  }
+
+  /// Lấy metadata chi tiết của Lộ trình A-B
+  static Future<String?> getCustomRouteDetail(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('$_keyCustomRouteDetailPrefix$id');
+  }
+
   /// Xóa tuyến đường tự chọn A-B
   static Future<void> removeCustomRouteJson(String id) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('$_keyCustomRoutesPrefix$id');
+    await prefs.remove('$_keyCustomRouteDetailPrefix$id');
     final ids = prefs.getStringList(_keyCustomRouteIds) ?? [];
     ids.remove(id);
     await prefs.setStringList(_keyCustomRouteIds, ids);

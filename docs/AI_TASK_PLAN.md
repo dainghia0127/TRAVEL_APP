@@ -20,8 +20,8 @@
 ---
 
 ## 2. Giai Đoạn Hiện Tại & Trạng Thái Tổng Thể
-- **Giai đoạn hiện tại**: **GIAI ĐOẠN 10 — TỐI ƯU HÓA HIỆU NĂNG LỊCH TRÌNH, BỎ CHẶN GPS, DYNAMIC CACHE CUSTOM ROUTE & CĂN CHỈNH CAMERA BOUNDS BẢN ĐỒ CHUẨN GOOGLE MAPS**.
-- **Trạng thái tổng thể**: `[x]` **Đã hoàn thành và kiểm chứng 100% qua 25/25 unit & widget tests.**
+- **Giai đoạn hiện tại**: **GIAI ĐOẠN 11 — TỐI ƯU HÓA TRẢI NGHIỆM LỘ TRÌNH TỰ CHỌN A-B, KHỞI TẠO CHUYẾN ĐI SẠCH SẼ, MINI DOCK POP-UP VÀ TỰ THÊM HÀNH TRANG**.
+- **Trạng thái tổng thể**: `[x]` **Đã hoàn thành và kiểm chứng 100% qua 27/27 unit & widget tests.**
 
 ---
 
@@ -200,6 +200,32 @@
 
 ---
 
+### Giai Đoạn 11: Tối Ưu Hóa Trải Nghiệm Lộ Trình Tự Chọn A-B & Tự Do Thêm Hành Trang (Phase 11)
+- [x] Task 11.1: Khởi tạo danh sách chuyến đi rỗng ban đầu & Nút "Xóa tất cả":
+  - Sửa `StorageService.getTripDestinations()`: Mặc định trả về `[]` sạch sẽ, không tự ý nạp 2 điểm mẫu `vn_ta_nang_phan_dung` và `vn_lake_tuyen_lam`.
+  - Thêm phương thức `StorageService.clearAllTripDestinations()` và nút "Xóa tất cả" kèm hộp thoại xác nhận trên Header của Lịch Trình, cho phép 1 chạm dọn sạch toàn bộ các điểm cũ.
+- [x] Task 11.2: Vẽ ngay Line chỉ đường trong 0.01 giây khi chọn xong Điểm A và Điểm B:
+  - Ngay khi có tọa độ A và B, vẽ ngay đường line định hướng trực tiếp tạm thời và căn chỉnh camera bao quát ngay lập tức trong 0.01s.
+  - Khi OSRM hoàn tất, cập nhật mượt mà đè lên thành hàng trăm điểm bám sát mặt đường thực tế.
+- [x] Task 11.3: Thu gọn Pop-up Card nhưng vẫn giữ nguyên Line và 2 Điểm A, B (`offline_map_screen.dart`):
+  - Nhấn nút `(X)` trên Pop-up Card Lộ trình A-B chỉ thu nhỏ card (`_isCustomRouteCardCollapsed = true`), tuyệt đối không xóa route.
+  - Line màu xanh và 2 marker A, B vẫn hiển thị đầy đủ trên bản đồ.
+  - Hiển thị Mini Dock Floating Pill ở cạnh dưới kèm nút "Mở lại" để người dùng mở bung lại pop-up card bất cứ lúc nào.
+- [x] Task 11.4: Khôi phục nguyên vẹn Lộ trình A-B khi chuyển tab quay lại Bản Đồ:
+  - Lưu metadata chi tiết qua `StorageService.saveCustomRouteDetail(...)` (tên A, B, tọa độ A, B, cự ly, thời gian, và mảng tọa độ line).
+  - Khi quay lại Bản đồ hoặc chọn Custom Route trong chuyến đi, tự động phục hồi `_isCustomRouteMode = true`, nạp lại đầy đủ 2 điểm A, B và vẽ lại vệt đường màu xanh.
+- [x] Task 11.5: Tùy biến Lịch Trình cho Lộ trình tự chọn A-B (`trip_planner_screen.dart`):
+  - Xóa sạch các mốc trekking rừng núi giả định.
+  - Tự động tạo 2 mốc khởi đầu sạch sẽ: `Khởi hành: A` và `Đến đích: B`.
+  - Cung cấp nút "+ Thêm mốc" để người dùng tự do thêm bất kỳ trạm dừng chân nào dọc đường.
+  - Hành trang: Đưa vào danh sách vật dụng đi đường cơ bản, không chèn đồ sinh tồn leo núi cực đoan.
+  - Bổ sung nút "+ Thêm đồ" (`_showAddChecklistItemDialog`) cho phép người dùng tự gõ thêm bất kỳ đồ dùng cá nhân nào và có nút xóa từng món đồ.
+- [x] Task 11.6: Kiểm thử tự động toàn diện:
+  - Bổ sung 2 test cases mới trong `custom_route_and_geocoding_test.dart` kiểm thử `clearAllTripDestinations` và `saveCustomRouteDetail`.
+  - Đạt 27/27 automated tests pass 100% và `flutter analyze` 0 issues.
+
+---
+
 ## 4. Công Việc Đang Thực Hiện
 - Hoàn thành toàn diện 4/4 yêu cầu người dùng, kiểm chứng 100% qua Flutter Analyze & Automated Tests.
 - Sẵn sàng bàn giao và hướng dẫn người dùng vận hành.
@@ -208,7 +234,7 @@
 
 ## 5. Kết Quả Kiểm Thử Thực Tế
 - **`flutter analyze`**: **`No issues found!`** (0 lỗi, 0 cảnh báo - 100% clean).
-- **`flutter test`**: **`All tests passed!`** (25/25 unit & widget test pass 100%).
+- **`flutter test`**: **`All tests passed!`** (27/27 unit & widget test pass 100%).
 - **`flutter build web`**: Sẵn sàng biên dịch khi cần.
 
 ---

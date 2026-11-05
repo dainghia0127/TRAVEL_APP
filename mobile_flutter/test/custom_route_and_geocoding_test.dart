@@ -146,5 +146,40 @@ void main() {
       final all = await datasource.getSeedDestinations();
       expect(all.any((d) => d.id == 'custom_test_999'), isTrue);
     });
+
+    test('StorageService.clearAllTripDestinations clears all destinations and reset', () async {
+      await StorageService.addTripDestination('vn_ta_nang_phan_dung');
+      await StorageService.setSelectedTripDestination('vn_ta_nang_phan_dung');
+      expect((await StorageService.getTripDestinations()).length, equals(1));
+
+      await StorageService.clearAllTripDestinations();
+      expect(await StorageService.getTripDestinations(), isEmpty);
+      expect(await StorageService.getSelectedTripDestination(), isNull);
+    });
+
+    test('StorageService saves and retrieves custom route detail metadata', () async {
+      final detail = {
+        'id': 'custom_test_detail_1',
+        'startName': 'Vị trí hiện tại',
+        'destName': 'Vinhomes Grand Park',
+        'startLat': 10.823,
+        'startLng': 106.629,
+        'destLat': 10.837,
+        'destLng': 106.832,
+        'distanceKm': 25.4,
+        'durationText': '35 phút',
+        'polyline': [
+          [10.823, 106.629],
+          [10.837, 106.832],
+        ],
+      };
+      await StorageService.saveCustomRouteDetail('custom_test_detail_1', jsonEncode(detail));
+
+      final fetchedStr = await StorageService.getCustomRouteDetail('custom_test_detail_1');
+      expect(fetchedStr, isNotNull);
+      final fetched = jsonDecode(fetchedStr!) as Map<String, dynamic>;
+      expect(fetched['destName'], equals('Vinhomes Grand Park'));
+      expect(fetched['distanceKm'], equals(25.4));
+    });
   });
 }

@@ -278,6 +278,68 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     final target = LatLng(dest.centerLatitude ?? 11.6420, dest.centerLongitude ?? 108.4230);
     final directDist = const Distance().as(LengthUnit.Kilometer, _userLocation, target);
 
+    // XỬ LÝ LỘ TRÌNH TỰ CHỌN A-B: Xóa sạch các mốc trekking giả định, chỉ tạo 2 mốc khởi hành và đến đích
+    final isCustomRoute = dest.id.startsWith('custom_route_') || dest.categoryIds.contains('custom_route');
+    if (isCustomRoute) {
+      String startName = 'Điểm khởi hành (A)';
+      String destName = 'Điểm đến (B)';
+      String durationText = '';
+      double distanceKm = dest.route?.distanceKm ?? directDist;
+
+      try {
+        final detailStr = await StorageService.getCustomRouteDetail(dest.id);
+        if (detailStr != null && detailStr.isNotEmpty) {
+          final decoded = jsonDecode(detailStr) as Map<String, dynamic>;
+          startName = decoded['startName'] as String? ?? startName;
+          destName = decoded['destName'] as String? ?? destName;
+          durationText = decoded['durationText'] as String? ?? durationText;
+          distanceKm = (decoded['distanceKm'] as num?)?.toDouble() ?? distanceKm;
+        } else {
+          final parts = dest.name.split('➔').map((s) => s.trim()).toList();
+          if (parts.isNotEmpty) startName = parts[0];
+          if (parts.length > 1) destName = parts[1];
+        }
+      } catch (_) {}
+
+      final customItinerary = {
+        1: [
+          {
+            'time': '07:30',
+            'title': 'Khởi hành: $startName',
+            'location': 'Điểm xuất phát A',
+            'distance': '0 km',
+            'desc': 'Bắt đầu chuyến đi theo lộ trình',
+            'type': 'start',
+            'isCompleted': false,
+          },
+          {
+            'time': '11:00',
+            'title': 'Đến đích: $destName',
+            'location': 'Điểm đến B',
+            'distance': '${distanceKm.toStringAsFixed(1)} km',
+            'desc': durationText.isNotEmpty ? 'Thời gian dự kiến: $durationText' : 'Dự kiến tới đích an toàn',
+            'type': 'destination',
+            'isCompleted': false,
+          },
+        ],
+      };
+
+      setState(() {
+        _selectedDestination = dest;
+        _distanceFromUserKm = distanceKm;
+        _maxDays = 1;
+        _selectedDay = 1;
+        _daysItinerary = customItinerary;
+      });
+
+      StorageService.setSelectedTripDestination(dest.id);
+
+      if (updateChecklist) {
+        _loadChecklistForDestination(dest);
+      }
+      return;
+    }
+
     // Tính số ngày đề xuất sơ bộ qua ItineraryEngine
     final suggestedDays = ItineraryEngine.calculateSuggestedDays(directDist, dest.route?.estimatedDurationDays);
     final initialItinerary = ItineraryEngine.generateDynamicItinerary(
@@ -328,6 +390,25 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   }
 
   Future<void> _loadChecklistForDestination(Destination dest) async {
+    // Đối với Lộ trình tự chọn A-B: Chỉ đưa danh sách vật dụng cơ bản, không sinh đồ leo núi cực đoan
+    if (dest.id.startsWith('custom_route_') || dest.categoryIds.contains('custom_route')) {
+      final customList = [
+        'Giấy tờ tùy thân (CCCD & Bằng lái xe)',
+        'Tiền mặt & Thẻ ngân hàng',
+        'Điện thoại & Sạc pin dự phòng',
+        'Nước uống & Đồ ăn nhẹ',
+        'Áo mưa & Kính râm',
+      ];
+      final savedChecked = await StorageService.getChecklist();
+      if (mounted) {
+        setState(() {
+          _checklistItems = customList;
+          _checkedItems = savedChecked.toSet();
+        });
+      }
+      return;
+    }
+
     final weather = await WeatherService.getForecast(
       dest.centerLatitude ?? 11.9404,
       dest.centerLongitude ?? 108.4583,
@@ -352,6 +433,135 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
         _checkedItems = savedChecked.toSet();
       });
     }
+  }
+
+  /// Dialog thêm món đồ hành trang tùy chỉnh
+  void _showAddChecklistItemDialog() {
+    final textController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.editorialSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: AppRadius.roundedLg,
+          side: const BorderSide(color: AppColors.editorialBorder),
+        ),
+        title: const Row(
+          children: [
+            Icon(Icons.add_task, color: AppColors.editorialPine, size: 20),
+            SizedBox(width: 8),
+            Text(
+              'Thêm Món Đồ Chuẩn Bị',
+              style: TextStyle(fontFamily: 'serif', fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.editorialInk),
+            ),
+          ],
+        ),
+        content: TextField(
+          controller: textController,
+          autofocus: true,
+          style: const TextStyle(color: AppColors.editorialInk, fontSize: 14),
+          decoration: InputDecoration(
+            hintText: 'Nhập tên đồ dùng (VD: Áo gió, Kính râm...)',
+            hintStyle: const TextStyle(color: AppColors.editorialMuted, fontSize: 12.5),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Hủy', style: TextStyle(color: AppColors.editorialMuted)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.editorialPine,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () {
+              final text = textController.text.trim();
+              if (text.isNotEmpty) {
+                setState(() {
+                  if (!_checklistItems.contains(text)) {
+                    _checklistItems.add(text);
+                  }
+                });
+                Navigator.pop(ctx);
+              }
+            },
+            child: const Text('Thêm ngay', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Xóa 1 món đồ khỏi danh sách hành trang
+  void _removeChecklistItem(String item) {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _checklistItems.remove(item);
+      _checkedItems.remove(item);
+    });
+    StorageService.saveChecklist(_checkedItems.toList());
+  }
+
+  /// Dialog xác nhận xóa sạch toàn bộ địa điểm chuyến đi
+  void _showClearAllDestinationsDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.editorialSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: AppRadius.roundedLg,
+          side: const BorderSide(color: AppColors.editorialBorder),
+        ),
+        title: const Row(
+          children: [
+            Icon(Icons.delete_sweep_rounded, color: AppColors.emergencyRed, size: 22),
+            SizedBox(width: 8),
+            Text(
+              'Xóa Toàn Bộ Chuyến Đi?',
+              style: TextStyle(fontFamily: 'serif', fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.editorialInk),
+            ),
+          ],
+        ),
+        content: const Text(
+          'Hành động này sẽ dọn sạch tất cả địa điểm và lộ trình hiện tại để bạn bắt đầu lập kế hoạch mới từ đầu.',
+          style: TextStyle(fontSize: 13, color: AppColors.editorialMuted, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Giữ lại', style: TextStyle(color: AppColors.editorialMuted)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.emergencyRed,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              HapticFeedback.heavyImpact();
+              await StorageService.clearAllTripDestinations();
+              if (mounted) {
+                setState(() {
+                  _tripDestinations = [];
+                  _selectedDestination = null;
+                  _daysItinerary = {};
+                  _checklistItems = [];
+                  _checkedItems = {};
+                  _isJourneyActive = false;
+                  _distanceFromUserKm = 0.0;
+                });
+              }
+            },
+            child: const Text('Xóa sạch', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _removeDestination(Destination dest) async {
@@ -783,7 +993,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         physics: const BouncingScrollPhysics(),
-                        itemCount: _tripDestinations.length + 1,
+                        itemCount: _tripDestinations.length + 2,
                         itemBuilder: (context, index) {
                           if (index == _tripDestinations.length) {
                             return Padding(
@@ -804,6 +1014,33 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                                       Text(
                                         'Thêm điểm',
                                         style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.editorialPine),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+
+                          if (index == _tripDestinations.length + 1) {
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 6),
+                              child: BouncingButton(
+                                onTap: _showClearAllDestinationsDialog,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.emergencyRed.withValues(alpha: 0.1),
+                                    borderRadius: AppRadius.roundedPill,
+                                    border: Border.all(color: AppColors.emergencyRed.withValues(alpha: 0.3)),
+                                  ),
+                                  child: const Row(
+                                    children: [
+                                      Icon(Icons.delete_outline, size: 14, color: AppColors.emergencyRed),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'Xóa tất cả',
+                                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.emergencyRed),
                                       ),
                                     ],
                                   ),
@@ -1998,55 +2235,106 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
 
         const SizedBox(height: 18),
 
-        // Packing Checklist
-        Text(
-          'Hành Trang Chuẩn Bị (${_checkedItems.length}/${_checklistItems.length})',
-          style: const TextStyle(
-            fontFamily: 'serif',
-            fontSize: 17,
-            fontWeight: FontWeight.w800,
-            color: AppColors.editorialInk,
-          ),
+        // Packing Checklist Header with "+ Thêm đồ" button
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Hành Trang Chuẩn Bị (${_checkedItems.length}/${_checklistItems.length})',
+              style: const TextStyle(
+                fontFamily: 'serif',
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+                color: AppColors.editorialInk,
+              ),
+            ),
+            BouncingButton(
+              onTap: _showAddChecklistItemDialog,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: AppColors.editorialPine.withValues(alpha: 0.12),
+                  borderRadius: AppRadius.roundedPill,
+                  border: Border.all(color: AppColors.editorialPine.withValues(alpha: 0.35)),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add, size: 14, color: AppColors.editorialPine),
+                    SizedBox(width: 4),
+                    Text(
+                      '+ Thêm đồ',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.editorialPine),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 8),
 
-        ..._checklistItems.map((item) {
-          final isChecked = _checkedItems.contains(item);
-          return Container(
-            margin: const EdgeInsets.only(bottom: 8),
+        if (_checklistItems.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               color: AppColors.editorialSurface,
               borderRadius: AppRadius.roundedMd,
-              border: Border.all(
-                color: isChecked ? AppColors.editorialPine.withValues(alpha: 0.4) : AppColors.editorialBorder,
-                width: 1.2,
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x0617221B),
-                  blurRadius: 6,
-                  offset: Offset(0, 2),
-                ),
-              ],
+              border: Border.all(color: AppColors.editorialBorder),
             ),
-            child: ListTile(
-              leading: Icon(
-                isChecked ? Icons.check_circle : Icons.radio_button_unchecked,
-                color: isChecked ? AppColors.editorialPine : AppColors.editorialBorder,
-                size: 20,
+            child: const Center(
+              child: Text(
+                'Chưa có vật dụng nào trong danh sách.\nHãy nhấn "+ Thêm đồ" để chuẩn bị hành trang cho chuyến đi!',
+                style: TextStyle(fontSize: 12.5, color: AppColors.editorialMuted, height: 1.4),
+                textAlign: TextAlign.center,
               ),
-              title: Text(
-                item,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: isChecked ? AppColors.editorialMuted : AppColors.editorialInk,
-                  decoration: isChecked ? TextDecoration.lineThrough : null,
-                ),
-              ),
-              onTap: () => _toggleCheckItem(item),
             ),
-          );
-        }),
+          )
+        else
+          ..._checklistItems.map((item) {
+            final isChecked = _checkedItems.contains(item);
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(
+                color: AppColors.editorialSurface,
+                borderRadius: AppRadius.roundedMd,
+                border: Border.all(
+                  color: isChecked ? AppColors.editorialPine.withValues(alpha: 0.4) : AppColors.editorialBorder,
+                  width: 1.2,
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x0617221B),
+                    blurRadius: 6,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: ListTile(
+                leading: Icon(
+                  isChecked ? Icons.check_circle : Icons.radio_button_unchecked,
+                  color: isChecked ? AppColors.editorialPine : AppColors.editorialBorder,
+                  size: 20,
+                ),
+                title: Text(
+                  item,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isChecked ? AppColors.editorialMuted : AppColors.editorialInk,
+                    decoration: isChecked ? TextDecoration.lineThrough : null,
+                  ),
+                ),
+                trailing: IconButton(
+                  icon: const Icon(Icons.close, size: 16, color: AppColors.editorialMuted),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  tooltip: 'Xóa món này',
+                  onPressed: () => _removeChecklistItem(item),
+                ),
+                onTap: () => _toggleCheckItem(item),
+              ),
+            );
+          }),
 
         const SizedBox(height: 40),
       ],

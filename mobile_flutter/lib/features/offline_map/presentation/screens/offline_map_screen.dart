@@ -63,6 +63,7 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
   double? _customRouteDistanceKm;
   String _customRouteDurationText = '';
   bool _isLoadingCustomRoute = false;
+  bool _isCustomRouteCardCollapsed = false;
 
   // Waypoint được chọn để xem chi tiết
   Map<String, dynamic>? _selectedWaypoint;
@@ -149,7 +150,6 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
 
   void _checkActiveTab() {
     if (MainNavigationScreen.activeTabNotifier.value == 1 && mounted) {
-      _loadTripDestinations();
       if (MainNavigationScreen.openCustomRouteOnMap) {
         MainNavigationScreen.openCustomRouteOnMap = false;
         setState(() {
@@ -160,7 +160,16 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) _showLocationPickerSheet(forOrigin: false);
         });
+        return;
       }
+
+      // Nếu đang có Lộ trình A-B với line và điểm đến đầy đủ, bảo tồn nguyên vẹn và căn camera
+      if (_isCustomRouteMode && _customDestinationPoint != null && _customRoutePolyline.isNotEmpty) {
+        _fitRouteBounds([_customOriginPoint ?? _currentLocation, _customDestinationPoint!, ..._customRoutePolyline]);
+        return;
+      }
+
+      _loadTripDestinations();
     }
   }
 
@@ -291,6 +300,24 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
     );
 
     await StorageService.saveCustomRouteJson(customId, jsonEncode(model.toJson()));
+
+    // Lưu metadata chi tiết để phục hồi nguyên vẹn khi chuyển tab hoặc mở lại
+    final startPt = _customOriginPoint ?? _currentLocation;
+    final destPt = _customDestinationPoint!;
+    final detail = {
+      'id': customId,
+      'startName': _customOriginName,
+      'startLat': startPt.latitude,
+      'startLng': startPt.longitude,
+      'destName': _customDestinationName,
+      'destLat': destPt.latitude,
+      'destLng': destPt.longitude,
+      'distanceKm': _customRouteDistanceKm,
+      'durationText': _customRouteDurationText,
+      'polyline': _customRoutePolyline.map((p) => [p.latitude, p.longitude]).toList(),
+    };
+    await StorageService.saveCustomRouteDetail(customId, jsonEncode(detail));
+
     await StorageService.addTripDestination(customId);
     await StorageService.setSelectedTripDestination(customId);
     await _loadTripDestinations();
@@ -326,6 +353,49 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
 
   Future<void> _selectTripDestination(Destination dest, {bool animateCamera = true}) async {
     HapticFeedback.selectionClick();
+
+    // Nếu đây là Lộ trình tự chọn A-B: Khôi phục nguyên vẹn 100% 2 điểm A, B và đường line xanh
+    if (dest.id.startsWith('custom_route_')) {
+      final detailStr = await StorageService.getCustomRouteDetail(dest.id);
+      if (detailStr != null && detailStr.isNotEmpty) {
+        try {
+          final detail = jsonDecode(detailStr) as Map<String, dynamic>;
+          final startLat = (detail['startLat'] as num?)?.toDouble() ?? _currentLocation.latitude;
+          final startLng = (detail['startLng'] as num?)?.toDouble() ?? _currentLocation.longitude;
+          final destLat = (detail['destLat'] as num?)?.toDouble() ?? (dest.centerLatitude ?? 10.837);
+          final destLng = (detail['destLng'] as num?)?.toDouble() ?? (dest.centerLongitude ?? 106.832);
+          final start = LatLng(startLat, startLng);
+          final end = LatLng(destLat, destLng);
+          final rawPoly = detail['polyline'] as List<dynamic>?;
+          final List<LatLng> polyList = rawPoly != null && rawPoly.isNotEmpty
+              ? rawPoly.map((pt) => LatLng((pt[0] as num).toDouble(), (pt[1] as num).toDouble())).toList()
+              : [start, end];
+
+          if (mounted) {
+            setState(() {
+              _isCustomRouteMode = true;
+              _isCustomRouteCardCollapsed = false;
+              _customOriginPoint = start;
+              _customOriginName = detail['startName'] as String? ?? 'Điểm xuất phát A';
+              _customDestinationPoint = end;
+              _customDestinationName = detail['destName'] as String? ?? 'Điểm đến B';
+              _customRoutePolyline = polyList;
+              _customRouteDistanceKm = (detail['distanceKm'] as num?)?.toDouble() ??
+                  dest.route?.distanceKm ??
+                  const Distance().as(LengthUnit.Kilometer, start, end);
+              _customRouteDurationText = detail['durationText'] as String? ?? '';
+              _selectedTripDestination = dest;
+              _lastActiveDestination = dest;
+              _isLoadingRoute = false;
+            });
+            StorageService.setSelectedTripDestination(dest.id);
+            _fitRouteBounds([start, end, ...polyList]);
+          }
+          return;
+        } catch (_) {}
+      }
+    }
+
     final targetLoc = _getDestLatLng(dest);
     final directDistKm = const Distance().as(LengthUnit.Kilometer, _currentLocation, targetLoc);
 
@@ -428,6 +498,7 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
       _customRouteDurationText = '';
       _isPickingOriginOnMap = false;
       _isPickingDestinationOnMap = false;
+      _isCustomRouteCardCollapsed = false;
     });
   }
 
@@ -452,7 +523,17 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
     final end = _customDestinationPoint;
     if (end == null) return;
 
-    setState(() => _isLoadingCustomRoute = true);
+    final directKm = const Distance().as(LengthUnit.Kilometer, start, end);
+
+    setState(() {
+      _isLoadingCustomRoute = true;
+      _isCustomRouteCardCollapsed = false;
+      // Vẽ ngay đường định hướng tạm thời trong 0.01s để người dùng thấy line lập tức
+      _customRoutePolyline = [start, end];
+      _customRouteDistanceKm = directKm;
+      _customRouteDurationText = '${(directKm / 50.0 * 60).round().clamp(10, 9999)} phút';
+    });
+    _fitRouteBounds([start, end]);
 
     final routeResult = await RoutingService.getActualRoute(
       start: start,
@@ -2377,7 +2458,7 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
             ),
 
           // Card Kết Quả Lộ Trình Google Maps Tự Chọn (Custom A-to-B Floating Card)
-          if (_isCustomRouteMode && _customRouteDistanceKm != null)
+          if (_isCustomRouteMode && _customRouteDistanceKm != null && !_isCustomRouteCardCollapsed)
             Positioned(
               left: 14,
               right: 14,
@@ -2430,7 +2511,12 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                           icon: const Icon(Icons.close, size: 18, color: AppColors.textMuted),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
-                          onPressed: _clearCustomRoute,
+                          tooltip: 'Thu gọn (vẫn giữ lộ trình trên bản đồ)',
+                          onPressed: () {
+                            setState(() {
+                              _isCustomRouteCardCollapsed = true;
+                            });
+                          },
                         ),
                       ],
                     ),
@@ -2544,6 +2630,75 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                       ),
                     ),
                   ],
+                ),
+              ),
+            ),
+
+          // Mini Dock Khôi phục Pop-up Lộ trình A-B khi thu gọn (Line và điểm A, B vẫn còn nguyên trên bản đồ)
+          if (_isCustomRouteMode && _customRouteDistanceKm != null && _isCustomRouteCardCollapsed)
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 24,
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceElevated,
+                    borderRadius: AppRadius.roundedPill,
+                    border: Border.all(color: AppColors.alpineCyan, width: 1.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.6),
+                        blurRadius: 15,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.alt_route, size: 16, color: AppColors.alpineCyan),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: GestureDetector(
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            setState(() => _isCustomRouteCardCollapsed = false);
+                          },
+                          child: Text(
+                            '$_customOriginName ➔ $_customDestinationName (${_customRouteDistanceKm!.toStringAsFixed(1)} km)',
+                            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      BouncingButton(
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          setState(() => _isCustomRouteCardCollapsed = false);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.alpineCyan,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text('Mở lại', style: TextStyle(color: Colors.black, fontSize: 11, fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      IconButton(
+                        icon: const Icon(Icons.close, size: 16, color: AppColors.textMuted),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        tooltip: 'Xóa lộ trình này',
+                        onPressed: _clearCustomRoute,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
