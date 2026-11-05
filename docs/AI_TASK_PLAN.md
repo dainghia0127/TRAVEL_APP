@@ -248,8 +248,14 @@
     - **Trại & Bãi**: Số đêm cắm trại x đơn giá bãi/người/đêm = thành tiền (nêu rõ số ngày và số đêm).
     - **Khoản chi tự thêm**: Chi tiết từng khoản kèm công thức tính (mỗi người hay chia đoàn).
     - **Tổng dự toán**: Hiển thị rõ ràng phép cộng tổng và tổng chi phí toàn đoàn.
-- [x] Task 12.4: Kiểm thử tự động toàn diện:
-  - Bổ sung test cases trong `custom_route_and_geocoding_test.dart` kiểm tra cả 2 phương thức tính phí bãi trại (xóa về 0, đi 1 ngày, đi nhiều ngày) và khoản chi tự thêm (mỗi người vs chia đoàn).
+- [x] Task 12.4: Tái Thiết Kế Màu Sắc, Chữ & Icon Đồng Bộ Editorial Theme (`trip_planner_screen.dart`):
+  - Khắc phục triệt để lỗi màu sắc tối tăm, chữ chìm, icon lệch tông:
+    - Loại bỏ hoàn toàn nền đen ngòm tối tăm (`#1B231F`, `#131A16`) và các chữ xám mờ (`textMuted`, `textSecondary`) gây chìm chữ, khó nhìn.
+    - Chuyển toàn bộ Dialog Tùy Chỉnh và Modal Giải Trình sang **Editorial Light Theme** đồng bộ tuyệt đối với phong cách Tạp chí dã ngoại của Lịch Trình & Khám Phá.
+    - Màu nền: Nền giấy mộc ấm áp `editorialBg` (`#EFECE4`) và Thẻ trắng tinh khôi `editorialSurface` (`#FFFFFF`).
+    - Màu chữ: Chữ mực rừng sâu `editorialInk` (`#17221B`) và chữ xanh thông `editorialPine` (`#1E3A2B`) có độ tương phản cực cao, đậm nét, sắc sảo và dễ đọc trong mọi điều kiện ánh sáng.
+    - Màu icon & nút bấm: Thống nhất icon xanh thông `editorialPine` và đất nung `editorialTerracotta`, loại bỏ các icon vàng summit chói lóa hoặc cyan lạc quẻ.
+- [x] Task 12.5: Kiểm thử tự động toàn diện:
   - Đạt 31/31 automated tests pass 100% và `flutter analyze` 0 issues.
 
 ---

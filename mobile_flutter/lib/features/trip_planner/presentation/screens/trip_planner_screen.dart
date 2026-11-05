@@ -106,16 +106,16 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
             }
 
             return AlertDialog(
-              backgroundColor: const Color(0xFF1B231F),
+              backgroundColor: AppColors.editorialSurface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
-                side: const BorderSide(color: AppColors.editorialPine, width: 1.2),
+                side: const BorderSide(color: AppColors.editorialBorder, width: 1.2),
               ),
               title: const Row(
                 children: [
-                  Icon(Icons.tune, color: AppColors.summitGold, size: 20),
+                  Icon(Icons.tune, color: AppColors.editorialPine, size: 20),
                   SizedBox(width: 8),
-                  Text('Tùy Chỉnh Định Mức Chi Phí', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text('Tùy Chỉnh Định Mức Chi Phí', style: TextStyle(color: AppColors.editorialInk, fontSize: 16, fontWeight: FontWeight.bold)),
                 ],
               ),
               content: SizedBox(
@@ -134,45 +134,49 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                           margin: const EdgeInsets.only(bottom: 12),
                           decoration: BoxDecoration(
-                            color: AppColors.summitGold.withValues(alpha: 0.12),
+                            color: AppColors.editorialSurfaceSubtle,
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: AppColors.summitGold.withValues(alpha: 0.4)),
+                            border: Border.all(color: AppColors.editorialBorder),
                           ),
                           child: const Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.calculate_outlined, color: AppColors.summitGold, size: 16),
+                                  Icon(Icons.calculate_outlined, color: AppColors.editorialPine, size: 16),
                                   SizedBox(width: 6),
                                   Text(
                                     'Xem minh bạch công thức tính toán',
-                                    style: TextStyle(color: AppColors.summitGold, fontSize: 11.5, fontWeight: FontWeight.bold),
+                                    style: TextStyle(color: AppColors.editorialPine, fontSize: 11.5, fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),
-                              Icon(Icons.chevron_right, color: AppColors.summitGold, size: 16),
+                              Icon(Icons.chevron_right, color: AppColors.editorialPine, size: 16),
                             ],
                           ),
                         ),
                       ),
                       const Text(
                         'ĐỊNH MỨC CƠ BẢN (TỰ ĐỘNG TÍNH TOÁN)',
-                        style: TextStyle(color: AppColors.summitGold, fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                        style: TextStyle(color: AppColors.editorialPine, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.5),
                       ),
                       const SizedBox(height: 8),
                       TextField(
                         controller: gasCtrl,
                         keyboardType: TextInputType.number,
-                        style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                        style: const TextStyle(color: AppColors.editorialInk, fontSize: 14, fontWeight: FontWeight.w600),
                         decoration: InputDecoration(
                           labelText: 'Giá xăng RON95 (đ/lít)',
-                          labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                          labelStyle: const TextStyle(color: AppColors.editorialMuted, fontSize: 12),
+                          filled: true,
+                          fillColor: AppColors.editorialBg,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          border: const OutlineInputBorder(),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.editorialBorder)),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.editorialBorder)),
+                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.editorialPine, width: 1.5)),
                           suffixIcon: gasCtrl.text.isNotEmpty
                               ? IconButton(
-                                  icon: const Icon(Icons.clear, size: 16, color: AppColors.textMuted),
+                                  icon: const Icon(Icons.clear, size: 16, color: AppColors.editorialMuted),
                                   onPressed: () => setDialogState(() => gasCtrl.clear()),
                                 )
                               : null,
@@ -183,17 +187,21 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                       TextField(
                         controller: foodCtrl,
                         keyboardType: TextInputType.number,
-                        style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                        style: const TextStyle(color: AppColors.editorialInk, fontSize: 14, fontWeight: FontWeight.w600),
                         decoration: InputDecoration(
                           labelText: 'Ăn uống trung bình (đ/người/ngày)',
-                          labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                          labelStyle: const TextStyle(color: AppColors.editorialMuted, fontSize: 12),
                           hintText: '0 (để trống nếu tự túc)',
-                          hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                          hintStyle: const TextStyle(color: AppColors.editorialMuted, fontSize: 11),
+                          filled: true,
+                          fillColor: AppColors.editorialBg,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          border: const OutlineInputBorder(),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.editorialBorder)),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.editorialBorder)),
+                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.editorialPine, width: 1.5)),
                           suffixIcon: foodCtrl.text.isNotEmpty
                               ? IconButton(
-                                  icon: const Icon(Icons.clear, size: 16, color: AppColors.textMuted),
+                                  icon: const Icon(Icons.clear, size: 16, color: AppColors.editorialMuted),
                                   onPressed: () => setDialogState(() => foodCtrl.clear()),
                                 )
                               : null,
@@ -204,17 +212,21 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                       TextField(
                         controller: campCtrl,
                         keyboardType: TextInputType.number,
-                        style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                        style: const TextStyle(color: AppColors.editorialInk, fontSize: 14, fontWeight: FontWeight.w600),
                         decoration: InputDecoration(
                           labelText: 'Phí bãi trại / lưu trú (đ/người/đêm)',
-                          labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                          labelStyle: const TextStyle(color: AppColors.editorialMuted, fontSize: 12),
                           hintText: '0 (để trống nếu không cắm trại)',
-                          hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                          hintStyle: const TextStyle(color: AppColors.editorialMuted, fontSize: 11),
+                          filled: true,
+                          fillColor: AppColors.editorialBg,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          border: const OutlineInputBorder(),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.editorialBorder)),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.editorialBorder)),
+                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.editorialPine, width: 1.5)),
                           suffixIcon: campCtrl.text.isNotEmpty
                               ? IconButton(
-                                  icon: const Icon(Icons.clear, size: 16, color: AppColors.textMuted),
+                                  icon: const Icon(Icons.clear, size: 16, color: AppColors.editorialMuted),
                                   onPressed: () => setDialogState(() => campCtrl.clear()),
                                 )
                               : null,
@@ -222,13 +234,13 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                         onChanged: (_) => setDialogState(() {}),
                       ),
                       const SizedBox(height: 16),
-                      const Divider(color: AppColors.borderSubtle, height: 1),
+                      const Divider(color: AppColors.editorialBorder, height: 1),
                       const SizedBox(height: 12),
 
                       // PHẦN TỰ THÊM TIÊU ĐỀ CHI PHÍ VÀ GIÁ
                       const Text(
                         'KHOẢN CHI PHÍ TỰ THÊM TÙY CHỌN',
-                        style: TextStyle(color: AppColors.alpineCyan, fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                        style: TextStyle(color: AppColors.editorialTerracotta, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.5),
                       ),
                       const SizedBox(height: 8),
 
@@ -243,27 +255,27 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                             margin: const EdgeInsets.only(bottom: 6),
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF141916),
+                              color: AppColors.editorialSurfaceAlt,
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: AppColors.borderSubtle),
+                              border: Border.all(color: AppColors.editorialBorder),
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.receipt_outlined, size: 14, color: AppColors.alpineCyan),
-                                const SizedBox(width: 6),
+                                const Icon(Icons.receipt_long, size: 15, color: AppColors.editorialTerracotta),
+                                const SizedBox(width: 8),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         item['title'] as String,
-                                        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                                        style: const TextStyle(color: AppColors.editorialInk, fontSize: 12.5, fontWeight: FontWeight.w700),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                       Text(
                                         isPerPerson ? 'Mỗi người' : 'Chia cả đoàn ($_participants người)',
-                                        style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+                                        style: const TextStyle(color: AppColors.editorialMuted, fontSize: 10.5),
                                       ),
                                     ],
                                   ),
@@ -273,16 +285,16 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                                   children: [
                                     Text(
                                       '${amt.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} đ',
-                                      style: const TextStyle(color: AppColors.emerald, fontSize: 12, fontWeight: FontWeight.bold),
+                                      style: const TextStyle(color: AppColors.editorialPine, fontSize: 12.5, fontWeight: FontWeight.bold),
                                     ),
                                     if (!isPerPerson)
                                       Text(
                                         '= ${(costPerPerson / 1000).toInt()}k/người',
-                                        style: const TextStyle(color: AppColors.summitGold, fontSize: 10),
+                                        style: const TextStyle(color: AppColors.editorialTerracotta, fontSize: 10, fontWeight: FontWeight.w600),
                                       ),
                                   ],
                                 ),
-                                const SizedBox(width: 4),
+                                const SizedBox(width: 6),
                                 GestureDetector(
                                   onTap: () {
                                     setDialogState(() {
@@ -291,7 +303,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                                   },
                                   child: const Padding(
                                     padding: EdgeInsets.all(4),
-                                    child: Icon(Icons.close, size: 14, color: AppColors.emergencyRed),
+                                    child: Icon(Icons.close, size: 15, color: Color(0xFFC53030)),
                                   ),
                                 ),
                               ],
@@ -308,12 +320,16 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                             flex: 3,
                             child: TextField(
                               controller: newTitleCtrl,
-                              style: const TextStyle(color: Colors.white, fontSize: 12.5),
-                              decoration: const InputDecoration(
+                              style: const TextStyle(color: AppColors.editorialInk, fontSize: 13, fontWeight: FontWeight.w600),
+                              decoration: InputDecoration(
                                 hintText: 'Tên khoản chi (VD: Vé BOT...)',
-                                hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 11),
-                                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                border: OutlineInputBorder(),
+                                hintStyle: const TextStyle(color: AppColors.editorialMuted, fontSize: 11),
+                                filled: true,
+                                fillColor: AppColors.editorialBg,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.editorialBorder)),
+                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.editorialBorder)),
+                                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.editorialPine, width: 1.5)),
                               ),
                             ),
                           ),
@@ -323,12 +339,16 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                             child: TextField(
                               controller: newAmountCtrl,
                               keyboardType: TextInputType.number,
-                              style: const TextStyle(color: Colors.white, fontSize: 12.5),
-                              decoration: const InputDecoration(
+                              style: const TextStyle(color: AppColors.editorialInk, fontSize: 13, fontWeight: FontWeight.w600),
+                              decoration: InputDecoration(
                                 hintText: 'Số tiền (đ)',
-                                hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 11),
-                                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                border: OutlineInputBorder(),
+                                hintStyle: const TextStyle(color: AppColors.editorialMuted, fontSize: 11),
+                                filled: true,
+                                fillColor: AppColors.editorialBg,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.editorialBorder)),
+                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.editorialBorder)),
+                                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.editorialPine, width: 1.5)),
                               ),
                             ),
                           ),
@@ -339,15 +359,15 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                       // Bộ chọn loại tính chi phí (Mỗi người vs Chia cả đoàn)
                       Row(
                         children: [
-                          const Text('Áp dụng:', style: TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+                          const Text('Áp dụng:', style: TextStyle(color: AppColors.editorialMuted, fontSize: 11, fontWeight: FontWeight.w600)),
                           const SizedBox(width: 6),
                           ChoiceChip(
                             label: const Text('Mỗi người', style: TextStyle(fontSize: 10.5)),
                             selected: isPerPersonNew,
                             selectedColor: AppColors.editorialPine,
-                            backgroundColor: const Color(0xFF141916),
+                            backgroundColor: AppColors.editorialSurfaceSubtle,
                             labelStyle: TextStyle(
-                              color: isPerPersonNew ? Colors.white : AppColors.textMuted,
+                              color: isPerPersonNew ? Colors.white : AppColors.editorialInk,
                               fontWeight: isPerPersonNew ? FontWeight.bold : FontWeight.normal,
                             ),
                             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
@@ -358,9 +378,9 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                             label: Text('Chia cả đoàn ($_participants ng)', style: const TextStyle(fontSize: 10.5)),
                             selected: !isPerPersonNew,
                             selectedColor: AppColors.editorialPine,
-                            backgroundColor: const Color(0xFF141916),
+                            backgroundColor: AppColors.editorialSurfaceSubtle,
                             labelStyle: TextStyle(
-                              color: !isPerPersonNew ? Colors.white : AppColors.textMuted,
+                              color: !isPerPersonNew ? Colors.white : AppColors.editorialInk,
                               fontWeight: !isPerPersonNew ? FontWeight.bold : FontWeight.normal,
                             ),
                             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
@@ -374,11 +394,11 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                         height: 36,
                         child: OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: AppColors.alpineCyan),
+                            side: const BorderSide(color: AppColors.editorialPine),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                           ),
-                          icon: const Icon(Icons.add, size: 16, color: AppColors.alpineCyan),
-                          label: const Text('+ Thêm khoản chi này', style: TextStyle(color: AppColors.alpineCyan, fontSize: 12, fontWeight: FontWeight.bold)),
+                          icon: const Icon(Icons.add, size: 16, color: AppColors.editorialPine),
+                          label: const Text('+ Thêm khoản chi này', style: TextStyle(color: AppColors.editorialPine, fontSize: 12, fontWeight: FontWeight.bold)),
                           onPressed: () {
                             final amt = parseAmount(newAmountCtrl.text);
                             if (amt > 0) {
@@ -403,7 +423,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Hủy', style: TextStyle(color: AppColors.textSecondary)),
+                  child: const Text('Hủy', style: TextStyle(color: AppColors.editorialMuted, fontWeight: FontWeight.w600)),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -473,10 +493,10 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF131A16),
+      backgroundColor: AppColors.editorialBg,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        side: BorderSide(color: AppColors.editorialPine, width: 1.2),
+        side: BorderSide(color: AppColors.editorialBorder, width: 1.2),
       ),
       builder: (bctx) {
         return DraggableScrollableSheet(
@@ -498,7 +518,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                       height: 4,
                       margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
-                        color: Colors.white24,
+                        color: AppColors.editorialBorder,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -510,7 +530,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                     children: [
                       const Row(
                         children: [
-                          Icon(Icons.calculate_rounded, color: AppColors.summitGold, size: 22),
+                          Icon(Icons.calculate_rounded, color: AppColors.editorialPine, size: 22),
                           SizedBox(width: 8),
                           Text(
                             'Minh Bạch Dự Toán Chi Phí',
@@ -518,34 +538,36 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                               fontFamily: 'serif',
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
-                              color: Colors.white,
+                              color: AppColors.editorialInk,
                             ),
                           ),
                         ],
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, color: AppColors.textMuted, size: 20),
+                        icon: const Icon(Icons.close, color: AppColors.editorialMuted, size: 20),
                         onPressed: () => Navigator.pop(bctx),
                       ),
                     ],
                   ),
                   const Text(
                     'Chi tiết công thức tính toán tường minh để ra số tiền dự toán:',
-                    style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                    style: TextStyle(fontSize: 12, color: AppColors.editorialMuted),
                   ),
                   const SizedBox(height: 14),
 
                   // Hero Summary Card
                   Container(
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF1B3B2B), Color(0xFF14291F)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      color: AppColors.editorialPine,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AppColors.emerald.withValues(alpha: 0.4)),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x1E1E3A2B),
+                          blurRadius: 10,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
                     ),
                     child: Column(
                       children: [
@@ -554,25 +576,25 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                           children: [
                             const Text(
                               'TỔNG DỰ TOÁN / NGƯỜI:',
-                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.emerald, letterSpacing: 0.5),
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFFA5D6A7), letterSpacing: 0.5),
                             ),
                             Text(
                               formatVnd(total),
-                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Colors.white),
+                              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white),
                             ),
                           ],
                         ),
-                        const Divider(height: 16, color: Colors.white12),
+                        const Divider(height: 18, color: Colors.white24),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               'Đoàn $_participants người • $_maxDays ngày $_campFeeNights đêm',
-                              style: const TextStyle(fontSize: 11.5, color: Colors.white70),
+                              style: const TextStyle(fontSize: 12, color: Colors.white70),
                             ),
                             Text(
                               'Tổng đoàn: ${formatVnd(total * _participants)}',
-                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.summitGold),
+                              style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Color(0xFFFFD54F)),
                             ),
                           ],
                         ),
@@ -625,7 +647,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                   // Mục 3: Trại & Bãi
                   _buildCostItemExplanationCard(
                     icon: Icons.night_shelter_rounded,
-                    accentColor: const Color(0xFF638C6D),
+                    accentColor: const Color(0xFF2E7D32),
                     title: '3. Phí bãi cắm trại / lưu trú',
                     costPerPerson: camp,
                     formulaSummary: _campFeePerNight <= 0
@@ -646,7 +668,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                     // Mục 4: Khoản chi tự thêm
                     _buildCostItemExplanationCard(
                       icon: Icons.receipt_long_rounded,
-                      accentColor: const Color(0xFFD97706),
+                      accentColor: const Color(0xFFC26D38),
                       title: '4. Khoản chi tùy chọn tự thêm',
                       costPerPerson: custom,
                       formulaSummary: 'Tổng các khoản tự thêm = ${formatVnd(custom)}/người',
@@ -668,23 +690,30 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
 
                   // Phép cộng tổng
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1B231F),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppColors.borderSubtle),
+                      color: AppColors.editorialSurface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.editorialBorder, width: 1.2),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x0817221B),
+                          blurRadius: 6,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
                           'CÔNG THỨC CỘNG TỔNG DỰ TOÁN:',
-                          style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.summitGold, letterSpacing: 0.5),
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.editorialPine, letterSpacing: 0.5),
                         ),
                         const SizedBox(height: 6),
                         Text(
                           'Nhiên liệu (${(fuel / 1000).toInt()}k) + Ăn uống (${(food / 1000).toInt()}k) + Trại bãi (${(camp / 1000).toInt()}k)${custom > 0 ? ' + Khoản khác (${(custom / 1000).toInt()}k)' : ''} = ${formatVnd(total)}/người',
-                          style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Colors.white, height: 1.4),
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.editorialInk, height: 1.4),
                         ),
                       ],
                     ),
@@ -732,11 +761,18 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     }
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF18201B),
+        color: AppColors.editorialSurface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: accentColor.withValues(alpha: 0.35), width: 1.2),
+        border: Border.all(color: AppColors.editorialBorder, width: 1.2),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0817221B),
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -749,7 +785,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: accentColor.withValues(alpha: 0.15),
+                      color: accentColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Icon(icon, size: 16, color: accentColor),
@@ -757,7 +793,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                   const SizedBox(width: 8),
                   Text(
                     title,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.bold, color: AppColors.editorialInk),
                   ),
                 ],
               ),
@@ -767,16 +803,18 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: accentColor.withValues(alpha: 0.08),
+              color: AppColors.editorialSurfaceAlt,
               borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: AppColors.editorialBorderSubtle),
             ),
             child: Text(
               formulaSummary,
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: accentColor),
+              style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: AppColors.editorialInk),
             ),
           ),
           const SizedBox(height: 8),
@@ -785,11 +823,11 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('• ', style: TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                    Text('• ', style: TextStyle(color: accentColor, fontSize: 13, fontWeight: FontWeight.bold)),
                     Expanded(
                       child: Text(
                         b,
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 11.5, height: 1.3),
+                        style: const TextStyle(color: Color(0xFF2C3E35), fontSize: 12, height: 1.35, fontWeight: FontWeight.w500),
                       ),
                     ),
                   ],
@@ -2786,16 +2824,16 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AppColors.summitGold.withValues(alpha: 0.12),
+                            color: AppColors.editorialSurfaceSubtle,
                             borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: AppColors.summitGold.withValues(alpha: 0.35)),
+                            border: Border.all(color: AppColors.editorialBorder),
                           ),
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.calculate_outlined, size: 12, color: AppColors.summitGold),
+                              Icon(Icons.calculate_outlined, size: 12, color: AppColors.editorialPine),
                               SizedBox(width: 2),
-                              Text('Công thức', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.summitGold)),
+                              Text('Công thức', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.editorialPine)),
                             ],
                           ),
                         ),
@@ -2815,8 +2853,8 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                             color: AppColors.editorialPine,
                           ),
                         ),
-                        const SizedBox(width: 3),
-                        const Icon(Icons.help_outline, size: 14, color: AppColors.summitGold),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.info_outline, size: 14, color: AppColors.editorialPine),
                       ],
                     ),
                   ),
