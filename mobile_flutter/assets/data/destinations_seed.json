@@ -3317,6 +3317,113 @@
         "Di tích lịch sử quân sự Hải Vân Quan - nơi từng phân định bờ cõi và là vị trí chiến lược trọng yếu qua các thời kỳ lịch sử"
       ],
       "getting_there_advice": "Từ trung tâm Đà Nẵng hoặc Huế, thuê xe máy di chuyển theo đường Quốc lộ 1A đường đèo (không đi qua hầm ngầm) để thưởng ngoạn trọn vẹn cảnh sắc ngoạn mục."
+    },
+    {
+      "id": "dest_vn_ta_chi_nhu",
+      "slug": "ta-chi-nhu-yen-bai",
+      "name": "Đỉnh Tà Chì Nhu (Đại Dương Hoa Tím)",
+      "local_name": "Đỉnh Tà Chì Nhu, Xã Xà Hồ, Huyện Trạm Tấu, Yên Bái",
+      "province": "Yên Bái",
+      "country_name": "Việt Nam",
+      "country_ids": [
+        "VN"
+      ],
+      "region_id": "vn_north",
+      "category_ids": [
+        "trekking",
+        "peak",
+        "nature"
+      ],
+      "center_latitude": 21.6,
+      "center_longitude": 104.3,
+      "elevation_meters": 2979,
+      "editorial_summary": "Nóc nhà Yên Bái với đại dương hoa chi pâu tím biếc nở rộ ngập tràn các triền dốc vào tháng 10.",
+      "editorial_content": "Tà Chì Nhu cao 2.979m thuộc khối núi Pú Luông của dãy Hoàng Liên Sơn hùng vĩ. Nơi đây được xưng tụng là 'đại dương trên mây' bởi biển mây bồng bềnh bất tận và đặc biệt là thảm hoa chi pâu tím biếc trải dài vô tận khắp các triền đồi vào mùa thu. Cung leo Tà Chì Nhu nổi tiếng là 'dốc ngược không bóng cây', đòi hỏi người leo phải có sức bền và ý chí kiên định trước cái nắng và gió Tây Bắc.",
+      "best_travel_seasons": [
+        "09",
+        "10",
+        "11",
+        "02",
+        "03"
+      ],
+      "is_featured": true,
+      "is_popular": true,
+      "is_verified": true,
+      "verification_date": "2026-03-20",
+      "data_source": "UBND Huyện Trạm Tấu & CLB Trekking Hoàng Liên",
+      "media": [
+        {
+          "id": "media_tachinhu_1",
+          "image_url": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1280&q=80",
+          "photographer": "Unsplash Alpine Peaks",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Biển hoa mây Tà Chì Nhu Yên Bái",
+          "aspect_ratio": 1.77,
+          "is_hero": true,
+          "local_asset_path": "assets/images/default_nature.jpg"
+        }
+      ],
+      "route": {
+        "id": "route_tachinhu_climb",
+        "name": "Cung đường chinh phục chóp Tà Chì Nhu 2 ngày 1 đêm",
+        "distance_km": 18.0,
+        "elevation_gain_meters": 1800,
+        "difficulty_level": 4,
+        "estimated_duration_days": 2,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Mỏ Chì Xà Hồ lên lán nghỉ 2.400m",
+            "description": "Vượt dốc đứng liên tục dưới nắng gió, không có bóng cây cổ thụ che chắn.",
+            "distance_km": 10.0,
+            "elevation_gain_meters": 1200,
+            "terrain_type": "Dốc đất đá dựng đứng, đồi trọc cỏ tranh"
+          },
+          {
+            "stage_number": 2,
+            "title": "Lán nghỉ lên đỉnh chóp 2.979m đón bình minh",
+            "description": "Đoạn đường sỏi đá len lỏi giữa thung lũng hoa tím chi pâu lên đỉnh chóp inox.",
+            "distance_km": 8.0,
+            "elevation_gain_meters": 600,
+            "terrain_type": "Đường mòn sống núi sỏi đá"
+          }
+        ],
+        "safety": {
+          "water_advice": "Dọc đường dốc đứng tuyệt đối không có nước; mỗi người cần chuẩn bị tối thiểu 2.5 lít trước khi xuất phát.",
+          "mobile_coverage_summary": "Sóng điện thoại chập chờn; mất sóng tại các khe thung lũng.",
+          "primary_hazards": [
+            "Say nắng kiệt sức do đồi trống",
+            "Gió lốc mạnh về đêm",
+            "Chuột rút cơ bắp do leo dốc gắt liên tục"
+          ],
+          "required_gear": [
+            "Mũ rộng vành có quai",
+            "Muối khoáng điện giải Oresol",
+            "Gậy leo núi trợ lực",
+            "Kem chống nắng SPF 50+"
+          ],
+          "emergency_contact_info": "Công an Xã Xà Hồ / Cứu nạn Trạm Tấu: (+84) 216 3878 115",
+          "verification_date": "2026-03-20",
+          "verified_by": "Tổ Dẫn Đường Dã Ngoại Trạm Tấu"
+        }
+      },
+      "local_specialties": [
+        "Gà xương đen nướng mật ong rừng Trạm Tấu",
+        "Măng sặt xào lòng gà thơm ngọt",
+        "Xôi nếp ngũ sắc dẻo thơm ngào ngạt",
+        "Tắm khoáng nóng tự nhiên Trạm Tấu phục hồi thể lực"
+      ],
+      "must_try_activities": [
+        "Đắm chìm giữa cánh đồng hoa tím chi pâu nở rộ ngút ngàn vào tháng 10",
+        "Đón bình minh rực lửa trên biển mây cuồn cuộn độ cao gần 3.000m",
+        "Ngâm mình thư giãn trong dòng suối khoáng nóng lộ thiên Trạm Tấu sau khi xuống núi"
+      ],
+      "cultural_highlights": [
+        "Nếp sống hiền hòa và kỹ năng leo núi thoăn thoắt của bà con đồng bào người H'Mông thôn Mỏ Chì"
+      ],
+      "getting_there_advice": "Bắt xe khách từ Hà Nội lên thị xã Nghĩa Lộ (Yên Bái). Từ Nghĩa Lộ, thuê xe máy đi tiếp 30km lên huyện vùng cao Trạm Tấu để đến điểm xuất phát Mỏ Chì."
     }
   ]
 }
