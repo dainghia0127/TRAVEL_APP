@@ -11,7 +11,9 @@ echo.
 if %errorlevel% equ 0 (
     echo ===================================================================
     echo   [THANH CONG] Da day commit len GitHub thanh cong!
-    echo   GitHub Actions dang tu dong bien dich file .ipa moi cho iPhone.
+    echo   - GitHub Actions dang chay 2 workflow moi (PWA Pages va Native IPA).
+    echo   - He thong tu dong xoa sach cac ban workflow cu cua TRAVEL_APP.
+    echo   - Khong bao gio xoa nham hoac anh huong sang cac app/repo khac.
     echo ===================================================================
 ) else (
     echo ===================================================================

@@ -8,8 +8,9 @@ on:
       - '.github/workflows/deploy_pwa_pages.yml'
   workflow_dispatch:
 
-# Cấp quyền hạn chuẩn xác để GitHub Pages deploy an toàn
+# Cấp quyền hạn chuẩn xác để GitHub Pages deploy an toàn & dọn dẹp run cũ
 permissions:
+  actions: write
   contents: read
   pages: write
   id-token: write
@@ -29,6 +30,19 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Cleanup Previous Workflow Runs (Xóa bản cũ)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Dang kiem tra va xoa cac ban chay cu cua workflow deploy_pwa_pages.yml..."
+          RUN_IDS=$(gh run list --workflow "deploy_pwa_pages.yml" --limit 30 --json databaseId --jq ".[] | select(.databaseId != ${{ github.run_id }}) | .databaseId" || true)
+          for id in $RUN_IDS; do
+            echo "Xoa workflow run cu: $id"
+            gh run delete "$id" || true
+          done
+          echo "Hoan tat don dep ban cu cho deploy_pwa_pages.yml!"
+        continue-on-error: true
 
       - name: Setup Flutter Environment
         uses: subosito/flutter-action@v2

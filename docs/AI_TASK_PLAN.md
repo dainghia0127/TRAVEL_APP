@@ -192,6 +192,11 @@
 - [x] Task 10.7: Kiểm thử tự động toàn diện:
   - Bổ sung unit test `ExploreLocalDataSource dynamically includes Custom Routes from storage`.
   - Đạt 25/25 automated tests pass 100% và `flutter analyze` 0 issues.
+- [x] Task 10.8: Tự động dọn dẹp các workflow runs cũ của TRAVEL_APP trên GitHub Actions:
+  - Cấu hình quyền `actions: write` và tích hợp bước Cleanup tự động vào cả 2 workflow: `build_ios.yml` và `deploy_pwa_pages.yml`.
+  - Sử dụng GitHub CLI `gh run list --workflow ...` và `gh run delete` để xóa sạch toàn bộ các bản chạy cũ trước đó của chính workflow đó trong repo `TRAVEL_APP`.
+  - An toàn 100%: Chỉ hoạt động trong phạm vi `${{ github.repository }}` (`dainghia0127/TRAVEL_APP`), tuyệt đối không bao giờ xóa nhầm sang app hay repository nào khác của tài khoản.
+  - Cập nhật file `push_to_github.bat` thông báo trực quan quá trình dọn dẹp và kích hoạt workflow mới.
 
 ---
 

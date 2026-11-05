@@ -16,6 +16,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  actions: write
+  contents: read
+
 jobs:
   build-ios:
     name: Build Native iOS IPA
@@ -25,6 +29,19 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Cleanup Previous Workflow Runs (Xóa bản cũ)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Dang kiem tra va xoa cac ban chay cu cua workflow build_ios.yml..."
+          RUN_IDS=$(gh run list --workflow "build_ios.yml" --limit 30 --json databaseId --jq ".[] | select(.databaseId != ${{ github.run_id }}) | .databaseId" || true)
+          for id in $RUN_IDS; do
+            echo "Xoa workflow run cu: $id"
+            gh run delete "$id" || true
+          done
+          echo "Hoan tat don dep ban cu cho build_ios.yml!"
+        continue-on-error: true
 
       - name: Generate Dynamic Version & Date Tag
         id: meta
