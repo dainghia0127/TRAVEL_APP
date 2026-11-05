@@ -1,11 +1,12 @@
 {
-    "name": "mobile_flutter",
-    "short_name": "mobile_flutter",
-    "start_url": ".",
+    "name": "TRAVEL APP - Dã Ngoại & Sinh Tồn",
+    "short_name": "TRAVEL APP",
+    "start_url": "./",
+    "scope": "./",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0B1510",
+    "theme_color": "#0B1510",
+    "description": "Ứng dụng Khám phá, Phượt, Lập lịch trình và Sinh tồn ngoài trời chuyên nghiệp.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

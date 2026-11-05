@@ -149,6 +149,10 @@
   - Tối ưu `_buildContinuousTimelineView()` dùng `LayoutBuilder` để co giãn chiều cao thông minh trên mọi kích cỡ màn hình iOS, khắc phục triệt để RenderFlex overflow.
   - Viết bộ test `custom_route_and_geocoding_test.dart` kiểm thử đầy đủ `GeocodingResult` và `StorageService`.
   - Đạt 22/22 unit & widget tests pass 100% và `flutter analyze` 0 issues.
+- [x] Task 9.6: Triển khai PWA (Progressive Web App) & Tự Động Deploy Lên GitHub Pages:
+  - Cấu hình PWA tối ưu chuẩn mực cho iPhone Safari (`manifest.json`, `index.html` với `viewport-fit=cover`, `black-translucent`, splash screen nền tối Dark Forest tránh chớp trắng).
+  - Tạo GitHub Actions Workflow `.github/workflows/deploy_pwa_pages.yml`: Tự động biên dịch Flutter Web và deploy trực tiếp lên GitHub Pages (`https://dainghia0127.github.io/TRAVEL_APP/`) mỗi khi push code lên `main`.
+  - Đảm bảo app chạy vĩnh viễn trên iPhone không bao giờ hết hạn (loại bỏ giới hạn 7 ngày của chứng chỉ Apple Free Developer qua Sideloadly).
 
 ---
 
