@@ -124,11 +124,16 @@
     - Điểm kết thúc (B): Chạm hoặc nhấn giữ bất kỳ đâu trên bản đồ để thả ghim đích, hoặc chọn từ danh sách.
   - Hỗ trợ nút đảo chiều (Swap A ⇄ B), tính toán và vẽ tuyến đường bộ OSRM thực tế kèm cự ly km và thời gian di chuyển.
   - Hiển thị Floating Card tóm tắt lộ trình A-B và nút bao quát toàn tuyến đường.
+- [x] Task 8.4: Tự Động Hóa Thu Thập & Đồng Bộ Dữ Liệu Địa Danh Mới (Automated Content Ingestion Pipeline):
+  - Phát triển công cụ tự động hóa `tools/auto_destinations_updater.py`: Quản lý kho dữ liệu dã ngoại tuyển chọn chất lượng cao (Curated Outdoor Reservoir), kiểm tra chống trùng lặp thông minh và tự động chèn địa danh chuẩn cấu trúc vào `destinations_seed.json`.
+  - Thiết lập GitHub Actions Workflow `.github/workflows/auto_sync_destinations.yml`: Tự động kích hoạt hàng tuần (Chủ Nhật) hoặc chạy thủ công bằng 1 click (`workflow_dispatch`), tự động commit và đẩy lên nhánh `main` kèm cờ `[skip ci]` không làm tốn tài nguyên build iOS.
+  - Khi có địa danh mới trên GitHub, app người dùng tự động kéo về qua Cloud Sync khi bấm Làm mới/Refresh, không cần nhập liệu thủ công và không cần cài lại file IPA.
 
 ---
 
 ## 4. Công Việc Đang Thực Hiện
-- Hoàn thành toàn bộ 3/3 yêu cầu của Giai Đoạn 8. Kiểm thử 18/18 test passed, 0 lỗi, 0 cảnh báo.
+- Hoàn thành toàn bộ các yêu cầu của Giai Đoạn 8 bao gồm Cloud Sync, Live Trekking, Bản đồ A-B Custom Routing và Quy trình Tự động nạp địa danh mới (Data Pipeline).
+- Sẵn sàng bàn giao và hướng dẫn người dùng vận hành.
 
 ---
 

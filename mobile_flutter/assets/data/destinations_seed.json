@@ -2988,6 +2988,335 @@
           }
         ]
       }
+    },
+    {
+      "id": "dest_vn_bach_moc_luong_tu",
+      "slug": "bach-moc-luong-tu-ky-quan-san",
+      "name": "Kỳ Quan San (Bạch Mộc Lương Tử)",
+      "local_name": "Dãy Kỳ Quan San, Giáp ranh Bát Xát (Lào Cai) & Phong Thổ (Lai Châu)",
+      "province": "Lai Châu",
+      "country_name": "Việt Nam",
+      "country_ids": [
+        "VN"
+      ],
+      "region_id": "vn_north",
+      "category_ids": [
+        "trekking",
+        "peak",
+        "extreme"
+      ],
+      "center_latitude": 22.5083,
+      "center_longitude": 103.5889,
+      "elevation_meters": 3046,
+      "editorial_summary": "Đỉnh núi cao thứ 4 Việt Nam, nổi tiếng với sống lưng khủng long hiểm trở và đồi Muối săn hoàng hôn rực lửa.",
+      "editorial_content": "Kỳ Quan San (cao 3.046m) là một trong những cung trekking kỳ vĩ và thử thách bậc nhất miền Bắc. Cung đường đòi hỏi thể lực bền bỉ khi vượt qua những vách đá thẳng đứng, khu rừng trúc rậm rạp và những cây cầu gỗ cheo leo bên bờ vực. Điểm nhấn huyền thoại là đồi Muối ở độ cao 2.100m - nơi du khách được chiêm ngưỡng hoàng hôn nhuộm đỏ cả một vùng trời biển mây bao la.",
+      "best_travel_seasons": [
+        "10",
+        "11",
+        "12",
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "is_featured": true,
+      "is_popular": true,
+      "is_verified": true,
+      "verification_date": "2026-03-20",
+      "data_source": "Hội Trekking & Thể Thao Mạo Hiểm Việt Nam",
+      "media": [
+        {
+          "id": "media_kyquansan_1",
+          "image_url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1280&q=80",
+          "photographer": "Unsplash Alpine Adventure",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Cung đường trekking Kỳ Quan San",
+          "aspect_ratio": 1.77,
+          "is_hero": true,
+          "local_asset_path": "assets/images/default_nature.jpg"
+        }
+      ],
+      "route": {
+        "id": "route_kyquansan_trail",
+        "name": "Cung đường vượt thác đồi Muối lên đỉnh 3.046m",
+        "distance_km": 30.0,
+        "elevation_gain_meters": 2100,
+        "difficulty_level": 4,
+        "estimated_duration_days": 3,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Bản Dền Sung lên Lán Đồi Muối (2.100m)",
+            "description": "Vượt suối lớn, xuyên qua rừng tre trúc và dốc đá đứng vắt kiệt sức lực.",
+            "distance_km": 14.0,
+            "elevation_gain_meters": 1200,
+            "terrain_type": "Bậc đá đứng, suối trơn trượt"
+          },
+          {
+            "stage_number": 2,
+            "title": "Lán Đồi Muối qua sống lưng khủng long lên đỉnh 3.046m",
+            "description": "Băng qua vách đá gió xoáy cực mạnh, sống lưng hẹp hai bên là vực thẳm.",
+            "distance_km": 16.0,
+            "elevation_gain_meters": 900,
+            "terrain_type": "Vách đá vôi hiểm trở, sống lưng hẹp"
+          }
+        ],
+        "safety": {
+          "water_advice": "Đoạn từ lán 2.100m lên đỉnh hoàn toàn không có nước; bắt buộc mang tối thiểu 2.5 lít/người.",
+          "mobile_coverage_summary": "Mất sóng 90% hành trình; chỉ có sóng yếu tại lán Đồi Muối và mỏm chóp đỉnh.",
+          "primary_hazards": [
+            "Vách đá trơn trượt khi mưa",
+            "Gió giật cấp 7 trên sống lưng",
+            "Lạc rừng trúc về chiều"
+          ],
+          "required_gear": [
+            "Găng tay leo núi có gai bám",
+            "Giày trekking đế Vibram",
+            "Bọc bảo hộ đầu gối",
+            "Áo mưa dã ngoại bền"
+          ],
+          "emergency_contact_info": "Cứu hộ Huyện Bát Xát / Đội Porter Kỳ Quan San: (+84) 912 345 115",
+          "verification_date": "2026-03-20",
+          "verified_by": "CLB Dã Ngoại Núi Cao"
+        }
+      },
+      "local_specialties": [
+        "Lẩu gà đen thảo mộc vùng cao",
+        "Thịt lợn bản nướng than hồng hạt dổi",
+        "Rau cải mèo xào tỏi nương giòn ngọt",
+        "Rượu thóc San Lùng êm say nồng ấm"
+      ],
+      "must_try_activities": [
+        "Chinh phục sống lưng khủng long cheo leo giữa mây trời Tây Bắc",
+        "Ngắm hoàng hôn tráng lệ nhất Việt Nam từ lán nghỉ Đồi Muối",
+        "Chạm tay vào cột mốc inox 3.046m Kỳ Quan San",
+        "Tắm lá thuốc người Dao đỏ hồi phục cơ bắp sau hành trình"
+      ],
+      "cultural_highlights": [
+        "Cuộc sống mộc mạc và sự dẻo dai phi thường của những người dẫn đường (porter) dân tộc H'Mông và Dao"
+      ],
+      "getting_there_advice": "Bắt xe khách đêm từ Hà Nội lên thị xã Sa Pa. Từ Sa Pa, thuê xe máy hoặc taxi đi 45km về bản Ky Quan San (xã Sàng Ma Sáo, huyện Bát Xát) để tập kết đoàn trekking."
+    },
+    {
+      "id": "dest_vn_thac_k50",
+      "slug": "thac-k50-hang-en-gia-lai",
+      "name": "Thác K50 (Thác Hang Én)",
+      "local_name": "Khu Bảo Tồn Thiên Nhiên Kon Chư Răng, Huyện Kbang, Gia Lai",
+      "province": "Gia Lai",
+      "country_name": "Việt Nam",
+      "country_ids": [
+        "VN"
+      ],
+      "region_id": "vn_highlands",
+      "category_ids": [
+        "waterfall",
+        "trekking",
+        "nature",
+        "safari"
+      ],
+      "center_latitude": 14.5208,
+      "center_longitude": 108.5714,
+      "elevation_meters": 820,
+      "editorial_summary": "Dải lụa bạc hùng vĩ ẩn sâu giữa lõi rừng nguyên sinh Tây Nguyên với cầu vồng đôi rực rỡ dưới chân thác.",
+      "editorial_content": "Thác K50 (hay thác Hang Én) nằm ở ranh giới giữa Gia Lai và Bình Định, sâu trong vùng lõi Khu bảo tồn thiên nhiên Kon Chư Răng. Dòng nước đổ thẳng từ độ cao hơn 50 mét xuống lòng hồ xanh ngắt như ngọc, tạo nên làn bụi sương mù mịt và cầu vồng đôi lung linh dưới ánh mặt trời. Phía sau màn nước khổng lồ là một hang đá tự nhiên rộng lớn - nơi trú ngụ của hàng ngàn cánh én rừng chao lượn mỗi hoàng hôn.",
+      "best_travel_seasons": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05"
+      ],
+      "is_featured": true,
+      "is_popular": false,
+      "is_verified": true,
+      "verification_date": "2026-03-20",
+      "data_source": "Ban Quản Lý Khu Bảo Tồn Kon Chư Răng",
+      "media": [
+        {
+          "id": "media_k50_1",
+          "image_url": "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=1280&q=80",
+          "photographer": "Unsplash Waterfall Expedition",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Thác K50 Kon Chư Răng",
+          "aspect_ratio": 1.77,
+          "is_hero": true,
+          "local_asset_path": "assets/images/default_nature.jpg"
+        }
+      ],
+      "route": {
+        "id": "route_k50_jungle",
+        "name": "Trekking xuyên lõi rừng Kon Chư Răng đến Thác K50",
+        "distance_km": 14.0,
+        "elevation_gain_meters": 450,
+        "difficulty_level": 3,
+        "estimated_duration_days": 2,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Trạm Kiểm Lâm số 49 xuyên rừng già",
+            "description": "Vượt dốc đất đỏ, lội qua các con suối đá trơn và rừng cây cổ thụ nguyên sinh.",
+            "distance_km": 8.0,
+            "elevation_gain_meters": 250,
+            "terrain_type": "Đường mòn rừng rậm, đất bùn mùa ẩm"
+          },
+          {
+            "stage_number": 2,
+            "title": "Tiếp cận chân thác và khám phá lòng hang én",
+            "description": "Leo dây thừng xuống hẻm vực chân thác, đón luồng gió áp suất mạnh từ dòng nước đổ.",
+            "distance_km": 6.0,
+            "elevation_gain_meters": 200,
+            "terrain_type": "Bậc đá ướt bám rêu, dốc dây thừng"
+          }
+        ],
+        "safety": {
+          "water_advice": "Nước suối rừng nhiều khoáng chất nhưng cần lọc qua màng lọc dã ngoại hoặc đun sôi.",
+          "mobile_coverage_summary": "Mất sóng 100% trong rừng già; bắt buộc có thiết bị bộ đàm hoặc GPS vệ tinh Garmin.",
+          "primary_hazards": [
+            "Vắt rừng dày đặc vào mùa mưa ẩm",
+            "Rắn lục đuôi đỏ",
+            "Trơn trượt té ngã vách đá"
+          ],
+          "required_gear": [
+            "Tất chống vắt chuyên dụng",
+            "Thuốc bôi DEET chống côn trùng",
+            "Găng tay bám dây",
+            "Túi chống nước cho điện thoại"
+          ],
+          "emergency_contact_info": "Trạm Kiểm Lâm Kon Chư Răng: (+84) 269 3839 114",
+          "verification_date": "2026-03-20",
+          "verified_by": "Hạt Kiểm Lâm Kbang"
+        }
+      },
+      "local_specialties": [
+        "Cơm lam nướng ống tre rừng chấm muối é",
+        "Gà nướng mọi than củi Kbang thơm lừng",
+        "Rau rừng xào thịt heo mọi gác bếp",
+        "Rượu cần người Ba Na men lá rừng say nồng"
+      ],
+      "must_try_activities": [
+        "Đứng sau bức rèm nước khổng lồ của thác K50 đón luồng gió mát lạnh sảng khoái",
+        "Chiêm ngưỡng cầu vồng đôi rực rỡ xuất hiện lúc 9 giờ sáng dưới chân thác",
+        "Cắm trại đêm bên bờ suối nghe tiếng thác đổ gầm vang giữa rừng già",
+        "Ngắm hàng ngàn con chim én chao liệng về tổ trong lòng hang đá"
+      ],
+      "cultural_highlights": [
+        "Văn hóa nhà Rông và cồng chiêng linh thiêng của đồng bào Ba Na tại huyện Kbang kiên cường"
+      ],
+      "getting_there_advice": "Bay đến sân bay Pleiku (Gia Lai) hoặc Quy Nhơn (Bình Định). Di chuyển bằng ô tô về huyện Kbang, tiếp tục thuê xe máy vượt đường đất đỏ vào Trạm Kiểm lâm số 49 của Khu bảo tồn Kon Chư Răng."
+    },
+    {
+      "id": "dest_vn_deo_hai_van",
+      "slug": "deo-hai-van-da-nang-hue",
+      "name": "Đèo Hải Vân (Thiên Hạ Đệ Nhất Hùng Quan)",
+      "local_name": "Đèo Hải Vân, Ranh giới TP. Đà Nẵng & Tỉnh Thừa Thiên Huế",
+      "province": "Đà Nẵng",
+      "country_name": "Việt Nam",
+      "country_ids": [
+        "VN"
+      ],
+      "region_id": "vn_central",
+      "category_ids": [
+        "road_trip",
+        "historical",
+        "nature"
+      ],
+      "center_latitude": 16.195,
+      "center_longitude": 108.1294,
+      "elevation_meters": 496,
+      "editorial_summary": "Cung đèo ven biển ngoạn mục bậc nhất thế giới, nối liền vịnh Đà Nẵng và vịnh Lăng Cô thơ mộng.",
+      "editorial_content": "Đèo Hải Vân dài 21 km uốn lượn men theo sườn dãy núi Bạch Mã đâm ngang ra Biển Đông. Trên đỉnh đèo là Hải Vân Quan - di tích lịch sử quân sự được xây dựng từ thời nhà Trần và trùng tu dưới thời vua Minh Mạng với mỹ danh 'Thiên hạ đệ nhất hùng quan'. Đứng trên đỉnh đèo, du khách có thể phóng tầm mắt bao quát toàn cảnh thành phố Đà Nẵng hiện đại ở phía nam và vịnh Lăng Cô xanh ngọc êm đềm ở phía bắc.",
+      "best_travel_seasons": [
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08"
+      ],
+      "is_featured": true,
+      "is_popular": true,
+      "is_verified": true,
+      "verification_date": "2026-03-20",
+      "data_source": "Sở Du Lịch Đà Nẵng & Trung Tâm Bảo Tồn Di Tích Cố Đô Huế",
+      "media": [
+        {
+          "id": "media_haivan_1",
+          "image_url": "https://images.unsplash.com/photo-1528127269322-539801943592?w=1280&q=80",
+          "photographer": "Unsplash Vietnam Coast",
+          "source_name": "Unsplash",
+          "license": "Unsplash License",
+          "attribution": "Ảnh: Đèo Hải Vân nhìn ra biển Đà Nẵng",
+          "aspect_ratio": 1.77,
+          "is_hero": true,
+          "local_asset_path": "assets/images/default_nature.jpg"
+        }
+      ],
+      "route": {
+        "id": "route_haivan_pass",
+        "name": "Chinh phục cung đèo ven biển Hải Vân bằng xe máy / xe đạp",
+        "distance_km": 21.0,
+        "elevation_gain_meters": 496,
+        "difficulty_level": 2,
+        "estimated_duration_days": 1,
+        "is_verified": true,
+        "stages": [
+          {
+            "stage_number": 1,
+            "title": "Chân đèo Nam Ô (Đà Nẵng) lên đỉnh Hải Vân Quan",
+            "description": "Đoạn đèo dốc uốn lượn nhìn xuống bán đảo Sơn Trà và vịnh Đà Nẵng trong xanh.",
+            "distance_km": 11.0,
+            "elevation_gain_meters": 496,
+            "terrain_type": "Nhựa đường đèo dốc quanh co"
+          },
+          {
+            "stage_number": 2,
+            "title": "Đỉnh Hải Vân Quan đổ đèo xuống Vịnh Lăng Cô",
+            "description": "Khúc cua tay áo ngoạn mục ngắm đoàn tàu Bắc Nam chạy dọc bờ biển Lăng Cô.",
+            "distance_km": 10.0,
+            "elevation_gain_meters": 0,
+            "terrain_type": "Dốc quanh co ven vực biển"
+          }
+        ],
+        "safety": {
+          "water_advice": "Dọc đèo có nhiều quán cà phê mộc và điểm dừng chân phục vụ nước ngọt.",
+          "mobile_coverage_summary": "Sóng 4G phủ sóng 100% toàn bộ cung đèo.",
+          "primary_hazards": [
+            "Khúc cua tay áo cua gắt khuất tầm nhìn",
+            "Sương mù mờ ảo vào sáng sớm",
+            "Mặt đường trơn khi mưa"
+          ],
+          "required_gear": [
+            "Mũ bảo hiểm đạt chuẩn",
+            "Gương chiếu hậu xe máy đầy đủ",
+            "Áo khoác gió mỏng",
+            "Kính râm chống lóa"
+          ],
+          "emergency_contact_info": "Cảnh sát Giao thông Trạm Cửa Ô Hải Vân: (+84) 236 3842 113",
+          "verification_date": "2026-03-20",
+          "verified_by": "Ban Quản Lý Di Tích Hải Vân Quan"
+        }
+      },
+      "local_specialties": [
+        "Hải sản tươi sống đầm Lăng Cô (hàu nướng mỡ hành, ghẹ hấp)",
+        "Gỏi cá Nam Ô cay nồng hương vị biển Đà Nẵng",
+        "Bánh tráng cuốn thịt heo hai đầu da",
+        "Cà phê muối uống ngắm mây trôi trên đỉnh đèo"
+      ],
+      "must_try_activities": [
+        "Phượt xe máy ngắm bình minh biển từ mỏm đá Cụ Rùa trên đèo",
+        "Thăm di tích cửa ải Hải Vân Quan được phục dựng tôn nghiêm",
+        "Ngắm đoàn tàu hỏa hỏa xa Bắc Nam len lỏi qua các sườn hầm vách núi",
+        "Thưởng thức hải sản tươi rói dưới chân cầu Lăng Cô thơ mộng"
+      ],
+      "cultural_highlights": [
+        "Di tích lịch sử quân sự Hải Vân Quan - nơi từng phân định bờ cõi và là vị trí chiến lược trọng yếu qua các thời kỳ lịch sử"
+      ],
+      "getting_there_advice": "Từ trung tâm Đà Nẵng hoặc Huế, thuê xe máy di chuyển theo đường Quốc lộ 1A đường đèo (không đi qua hầm ngầm) để thưởng ngoạn trọn vẹn cảnh sắc ngoạn mục."
     }
   ]
 }

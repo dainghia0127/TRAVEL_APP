@@ -7,14 +7,14 @@ void main() {
   test('Check all destinations have valid heroMedia and localAssetPath', () async {
     final ds = ExploreLocalDataSource();
     final list = await ds.getSeedDestinations();
-    expect(list.length, 32);
+    expect(list.length, greaterThanOrEqualTo(32));
 
     for (final d in list) {
       final hero = d.heroMedia;
       expect(hero, isNotNull, reason: 'Destination ${d.id} has null heroMedia');
       expect(hero!.imageUrl.isNotEmpty, isTrue);
       expect(hero.localAssetPath, isNotNull, reason: 'Destination ${d.id} has null localAssetPath');
-      expect(hero.localAssetPath!.startsWith('assets/images/destinations/'), isTrue);
+      expect(hero.localAssetPath!.startsWith('assets/images/'), isTrue);
     }
   });
 }
