@@ -78,84 +78,253 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     }
   }
 
+  List<Map<String, dynamic>> _customCostItems = [];
+
   void _showCostConfigDialog() {
     HapticFeedback.mediumImpact();
     final gasCtrl = TextEditingController(text: _gasPrice.round().toString());
     final foodCtrl = TextEditingController(text: _foodPerDay.toString());
     final campCtrl = TextEditingController(text: _campFeePerNight.toString());
 
+    final newTitleCtrl = TextEditingController();
+    final newAmountCtrl = TextEditingController();
+
+    // Tạo bản sao danh sách khoản chi tự thêm để chỉnh sửa trong dialog
+    final List<Map<String, dynamic>> tempCustomItems = List<Map<String, dynamic>>.from(
+      _customCostItems.map((e) => Map<String, dynamic>.from(e)),
+    );
+
     showDialog(
       context: context,
       builder: (ctx) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF1B231F),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Row(
-            children: [
-              Icon(Icons.tune, color: AppColors.summitGold, size: 20),
-              SizedBox(width: 8),
-              Text('Tùy Chỉnh Định Mức Chi Phí', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-            ],
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: gasCtrl,
-                  keyboardType: TextInputType.number,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Giá xăng RON95 (đ/lít)',
-                    labelStyle: TextStyle(color: AppColors.textSecondary),
+        return StatefulBuilder(
+          builder: (dialogCtx, setDialogState) {
+            int parseAmount(String text) {
+              final cleaned = text.replaceAll(RegExp(r'[^\d]'), '');
+              return int.tryParse(cleaned) ?? 0;
+            }
+
+            return AlertDialog(
+              backgroundColor: const Color(0xFF1B231F),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: const BorderSide(color: AppColors.editorialPine, width: 1.2),
+              ),
+              title: const Row(
+                children: [
+                  Icon(Icons.tune, color: AppColors.summitGold, size: 20),
+                  SizedBox(width: 8),
+                  Text('Tùy Chỉnh Định Mức Chi Phí', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              content: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.9,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'ĐỊNH MỨC CƠ BẢN (TỰ ĐỘNG TÍNH TOÁN)',
+                        style: TextStyle(color: AppColors.summitGold, fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: gasCtrl,
+                        keyboardType: TextInputType.number,
+                        style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                        decoration: const InputDecoration(
+                          labelText: 'Giá xăng RON95 (đ/lít)',
+                          labelStyle: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: foodCtrl,
+                        keyboardType: TextInputType.number,
+                        style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                        decoration: const InputDecoration(
+                          labelText: 'Ăn uống trung bình (đ/người/ngày)',
+                          labelStyle: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: campCtrl,
+                        keyboardType: TextInputType.number,
+                        style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                        decoration: const InputDecoration(
+                          labelText: 'Phí bãi trại / lưu trú (đ/người/đêm)',
+                          labelStyle: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Divider(color: AppColors.borderSubtle, height: 1),
+                      const SizedBox(height: 12),
+
+                      // PHẦN TỰ THÊM TIÊU ĐỀ CHI PHÍ VÀ GIÁ
+                      const Text(
+                        'KHOẢN CHI PHÍ TỰ THÊM TÙY CHỌN',
+                        style: TextStyle(color: AppColors.alpineCyan, fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                      ),
+                      const SizedBox(height: 8),
+
+                      if (tempCustomItems.isNotEmpty) ...[
+                        ...tempCustomItems.asMap().entries.map((entry) {
+                          final idx = entry.key;
+                          final item = entry.value;
+                          final amt = item['amount'] as int;
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 6),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF141916),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: AppColors.borderSubtle),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.receipt_outlined, size: 14, color: AppColors.alpineCyan),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    item['title'] as String,
+                                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Text(
+                                  '${amt.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} đ',
+                                  style: const TextStyle(color: AppColors.emerald, fontSize: 12, fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(width: 4),
+                                GestureDetector(
+                                  onTap: () {
+                                    setDialogState(() {
+                                      tempCustomItems.removeAt(idx);
+                                    });
+                                  },
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(4),
+                                    child: Icon(Icons.close, size: 14, color: AppColors.emergencyRed),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                        const SizedBox(height: 8),
+                      ],
+
+                      // Ô nhập thêm khoản chi mới (Tiêu đề + Giá tiền)
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: TextField(
+                              controller: newTitleCtrl,
+                              style: const TextStyle(color: Colors.white, fontSize: 12.5),
+                              decoration: const InputDecoration(
+                                hintText: 'Tên khoản chi (VD: Vé BOT...)',
+                                hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 11),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            flex: 2,
+                            child: TextField(
+                              controller: newAmountCtrl,
+                              keyboardType: TextInputType.number,
+                              style: const TextStyle(color: Colors.white, fontSize: 12.5),
+                              decoration: const InputDecoration(
+                                hintText: 'Số tiền (đ)',
+                                hintStyle: TextStyle(color: AppColors.textMuted, fontSize: 11),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 36,
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: AppColors.alpineCyan),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                          icon: const Icon(Icons.add, size: 16, color: AppColors.alpineCyan),
+                          label: const Text('+ Thêm khoản chi này', style: TextStyle(color: AppColors.alpineCyan, fontSize: 12, fontWeight: FontWeight.bold)),
+                          onPressed: () {
+                            final title = newTitleCtrl.text.trim();
+                            final amt = parseAmount(newAmountCtrl.text);
+                            if (title.isNotEmpty && amt > 0) {
+                              setDialogState(() {
+                                tempCustomItems.add({
+                                  'title': title,
+                                  'amount': amt,
+                                });
+                                newTitleCtrl.clear();
+                                newAmountCtrl.clear();
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: foodCtrl,
-                  keyboardType: TextInputType.number,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Ăn uống trung bình (đ/người/ngày)',
-                    labelStyle: TextStyle(color: AppColors.textSecondary),
-                  ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Hủy', style: TextStyle(color: AppColors.textSecondary)),
                 ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: campCtrl,
-                  keyboardType: TextInputType.number,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Phí bãi trại / lều (đ/người/đêm)',
-                    labelStyle: TextStyle(color: AppColors.textSecondary),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.editorialPine,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
+                  onPressed: () {
+                    final g = parseAmount(gasCtrl.text);
+                    final f = parseAmount(foodCtrl.text);
+                    final c = parseAmount(campCtrl.text);
+
+                    // Xử lý nếu người dùng gõ dở ở ô thêm khoản chi mà quên bấm nút thêm
+                    final pendingTitle = newTitleCtrl.text.trim();
+                    final pendingAmt = parseAmount(newAmountCtrl.text);
+                    if (pendingTitle.isNotEmpty && pendingAmt > 0) {
+                      tempCustomItems.add({'title': pendingTitle, 'amount': pendingAmt});
+                    }
+
+                    if (mounted) {
+                      setState(() {
+                        if (g > 0) _gasPrice = g.toDouble();
+                        if (f >= 0) _foodPerDay = f;
+                        if (c >= 0) _campFeePerNight = c;
+                        _customCostItems = tempCustomItems;
+                      });
+                    }
+                    Navigator.pop(ctx);
+                  },
+                  child: const Text('Lưu thay đổi & Tính lại', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Hủy', style: TextStyle(color: AppColors.textSecondary)),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.editorialPine),
-              onPressed: () {
-                final g = double.tryParse(gasCtrl.text);
-                final f = int.tryParse(foodCtrl.text);
-                final c = int.tryParse(campCtrl.text);
-                if (mounted) {
-                  setState(() {
-                    if (g != null && g > 0) _gasPrice = g;
-                    if (f != null && f >= 0) _foodPerDay = f;
-                    if (c != null && c >= 0) _campFeePerNight = c;
-                  });
-                }
-                Navigator.pop(ctx);
-              },
-              child: const Text('Lưu thay đổi', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            ),
-          ],
+            );
+          },
         );
       },
     );
@@ -621,7 +790,17 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
 
   int get _foodCostPerPerson => _maxDays * _foodPerDay;
   int get _campFeePerPerson => (_maxDays - 1) * _campFeePerNight;
-  int get _totalCostPerPerson => _fuelCostPerPerson + _foodCostPerPerson + _campFeePerPerson;
+  int get _customCostsPerPerson {
+    if (_customCostItems.isEmpty) return 0;
+    int sum = 0;
+    for (final item in _customCostItems) {
+      sum += (item['amount'] as num?)?.toInt() ?? 0;
+    }
+    return _participants > 0 ? (sum / _participants).round() : sum;
+  }
+
+  int get _totalCostPerPerson =>
+      _fuelCostPerPerson + _foodCostPerPerson + _campFeePerPerson + _customCostsPerPerson;
 
   void _toggleCheckItem(String item) {
     HapticFeedback.lightImpact();
@@ -2057,11 +2236,13 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     final fuel = _fuelCostPerPerson;
     final food = _foodCostPerPerson;
     final camp = _campFeePerPerson;
+    final custom = _customCostsPerPerson;
     final total = _totalCostPerPerson;
 
     final fuelPct = total == 0 ? 0.0 : (fuel / total);
     final foodPct = total == 0 ? 0.0 : (food / total);
     final campPct = total == 0 ? 0.0 : (camp / total);
+    final customPct = total == 0 ? 0.0 : (custom / total);
 
     return ListView(
       physics: const BouncingScrollPhysics(),
@@ -2138,24 +2319,35 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 borderRadius: AppRadius.roundedPill,
                 child: SizedBox(
                   height: 8,
-                  child: Row(
-                    children: [
-                      Expanded(flex: (fuelPct * 100).toInt().clamp(1, 100), child: Container(color: AppColors.editorialTerracotta)),
-                      Expanded(flex: (foodPct * 100).toInt().clamp(1, 100), child: Container(color: AppColors.editorialPine)),
-                      Expanded(flex: (campPct * 100).toInt().clamp(1, 100), child: Container(color: const Color(0xFF638C6D))),
-                    ],
-                  ),
+                  child: total == 0
+                      ? Container(color: AppColors.editorialBorder)
+                      : Row(
+                          children: [
+                            if (fuelPct > 0)
+                              Expanded(flex: (fuelPct * 100).toInt().clamp(1, 100), child: Container(color: AppColors.editorialTerracotta)),
+                            if (foodPct > 0)
+                              Expanded(flex: (foodPct * 100).toInt().clamp(1, 100), child: Container(color: AppColors.editorialPine)),
+                            if (campPct > 0)
+                              Expanded(flex: (campPct * 100).toInt().clamp(1, 100), child: Container(color: const Color(0xFF638C6D))),
+                            if (customPct > 0)
+                              Expanded(flex: (customPct * 100).toInt().clamp(1, 100), child: Container(color: const Color(0xFFD97706))),
+                          ],
+                        ),
                 ),
               ),
               const SizedBox(height: 10),
 
               // Legend
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                spacing: 12,
+                runSpacing: 6,
                 children: [
                   _buildLegendItem('Nhiên liệu', AppColors.editorialTerracotta, fuel),
                   _buildLegendItem('Ăn uống', AppColors.editorialPine, food),
                   _buildLegendItem('Trại & Bãi', const Color(0xFF638C6D), camp),
+                  if (custom > 0)
+                    _buildLegendItem('Khoản khác', const Color(0xFFD97706), custom),
                 ],
               ),
               const Divider(height: 24, color: AppColors.editorialBorder),
@@ -2229,6 +2421,83 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                   ),
                 ],
               ),
+
+              if (_customCostItems.isNotEmpty) ...[
+                const Divider(height: 20, color: AppColors.editorialBorder),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Khoản chi tự thêm:',
+                      style: TextStyle(
+                        color: AppColors.editorialInk,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      '${_customCostItems.length} khoản',
+                      style: const TextStyle(
+                        color: AppColors.editorialMuted,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                ..._customCostItems.asMap().entries.map((entry) {
+                  final idx = entry.key;
+                  final item = entry.value;
+                  final title = item['title'] as String? ?? 'Khoản chi';
+                  final amount = item['amount'] as int? ?? 0;
+                  final formattedAmt = '${amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} đ';
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                    decoration: BoxDecoration(
+                      color: AppColors.editorialBg,
+                      borderRadius: AppRadius.roundedSm,
+                      border: Border.all(color: AppColors.editorialBorder),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.receipt_long, size: 15, color: Color(0xFFD97706)),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.editorialInk,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          formattedAmt,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.editorialPine,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              _customCostItems.removeAt(idx);
+                            });
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.all(4),
+                            child: Icon(Icons.close, size: 14, color: AppColors.editorialMuted),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+              ],
             ],
           ),
         ),

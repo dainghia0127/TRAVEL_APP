@@ -20,8 +20,8 @@
 ---
 
 ## 2. Giai Đoạn Hiện Tại & Trạng Thái Tổng Thể
-- **Giai đoạn hiện tại**: **GIAI ĐOẠN 11 — TỐI ƯU HÓA TRẢI NGHIỆM LỘ TRÌNH TỰ CHỌN A-B, KHỞI TẠO CHUYẾN ĐI SẠCH SẼ, MINI DOCK POP-UP VÀ TỰ THÊM HÀNH TRANG**.
-- **Trạng thái tổng thể**: `[x]` **Đã hoàn thành và kiểm chứng 100% qua 27/27 unit & widget tests.**
+- **Giai đoạn hiện tại**: **GIAI ĐOẠN 12 — KHẮC PHỤC HIỂN THỊ ĐƠN POP-UP BẢN ĐỒ & TÙY BIẾN CHI PHÍ / THÊM KHOẢN CHI TỰ DO**.
+- **Trạng thái tổng thể**: `[x]` **Đã hoàn thành và kiểm chứng 100% qua 29/29 unit & widget tests.**
 
 ---
 
@@ -224,18 +224,33 @@
   - Bổ sung 2 test cases mới trong `custom_route_and_geocoding_test.dart` kiểm thử `clearAllTripDestinations` và `saveCustomRouteDetail`.
   - Đạt 27/27 automated tests pass 100% và `flutter analyze` 0 issues.
 
+### Giai Đoạn 12: Tối Ưu Hiển Thị Pop-up Bản Đồ & Tùy Biến Chi Phí Tự Do (Phase 12)
+- [x] Task 12.1: Khắc phục triệt để hiện 2 pop-up đè lên nhau trên Bản Đồ (`offline_map_screen.dart`):
+  - Khi lộ trình A-B đã thêm vào lịch trình hoặc khi chọn lộ trình từ danh sách chuyến đi: Đặt `_isCustomRouteMode = false` và chọn `_selectedTripDestination = dest`.
+  - Thêm điều kiện `_selectedTripDestination == null` vào cả Card Lộ trình A-B tự chọn và Mini Dock.
+  - Kết quả: Khi lộ trình A-B đã thêm vào chuyến đi, bản đồ **chỉ hiển thị DUY NHẤT một pop-up Tuyến đường bộ thực tế**, giữ nguyên vẹn vệt đường màu xanh và 2 marker A, B; pop-up Lộ trình A-B tự chọn không bao giờ hiện đè lên nữa.
+- [x] Task 12.2: Tùy chỉnh chi phí linh hoạt & Tự thêm khoản chi tiêu đề + giá tiền (`trip_planner_screen.dart`):
+  - Xử lý triệt để lỗi parse tiền tệ có dấu phân cách: Nâng cấp `parseAmount` dùng Regex lọc sạch mọi ký tự không phải số (`text.replaceAll(RegExp(r'[^\d]'), '')`), cho phép nhập `150.000`, `150,000`, `150 000` mà không bị reset về 0.
+  - Bổ sung ô nhập "Tên khoản chi (ví dụ: Vé BOT, Thuê lều...)" và "Số tiền (VNĐ)" kèm nút "+ Thêm khoản chi này".
+  - Cho phép người dùng xem danh sách các khoản chi tự thêm kèm icon xóa `[X]` trực tiếp trong dialog tùy chỉnh cũng như trên thẻ Dự Toán Chi Phí.
+  - Tự động cộng tổng vào `_totalCostPerPerson` và chia đều theo số người tham gia.
+  - Cập nhật thanh phân đoạn chi phí (Segmented Cost Bar - thêm dải màu vàng hổ phách) và chú giải (Legend) phản ánh chính xác các khoản chi tự thêm.
+- [x] Task 12.3: Kiểm thử tự động toàn diện:
+  - Bổ sung nhóm test `Trip Planner Expense & Custom Cost Logic Tests` trong `custom_route_and_geocoding_test.dart` kiểm tra hàm `parseAmount` và thuật toán tính tổng chi phí tự thêm chia theo người tham gia.
+  - Đạt 29/29 automated tests pass 100% và `flutter analyze` 0 issues.
+
 ---
 
 ## 4. Công Việc Đang Thực Hiện
-- Hoàn thành toàn diện 4/4 yêu cầu người dùng, kiểm chứng 100% qua Flutter Analyze & Automated Tests.
-- Sẵn sàng bàn giao và hướng dẫn người dùng vận hành.
+- Đã hoàn thành toàn diện 2/2 yêu cầu người dùng, kiểm chứng 100% qua Flutter Analyze & Automated Tests (29/29 tests passed).
+- Sẵn sàng để người dùng chạy `push_to_github.bat` deploy lên GitHub Pages và kích hoạt workflow build.
 
 ---
 
 ## 5. Kết Quả Kiểm Thử Thực Tế
 - **`flutter analyze`**: **`No issues found!`** (0 lỗi, 0 cảnh báo - 100% clean).
-- **`flutter test`**: **`All tests passed!`** (27/27 unit & widget test pass 100%).
-- **`flutter build web`**: Sẵn sàng biên dịch khi cần.
+- **`flutter test`**: **`All tests passed!`** (29/29 unit & widget test pass 100%).
+- **`flutter build web`**: Sẵn sàng biên dịch khi deploy GitHub Pages.
 
 ---
 

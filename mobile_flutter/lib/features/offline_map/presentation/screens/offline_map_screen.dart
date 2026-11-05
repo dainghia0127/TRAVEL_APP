@@ -320,6 +320,13 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
 
     await StorageService.addTripDestination(customId);
     await StorageService.setSelectedTripDestination(customId);
+
+    // Sau khi đã thêm vào chuyến đi: Tắt chế độ tự chọn để chuyển hẳn sang chế độ Tuyến đường thực tế của chuyến đi
+    setState(() {
+      _isCustomRouteMode = false;
+      _isCustomRouteCardCollapsed = false;
+    });
+
     await _loadTripDestinations();
 
     if (mounted) {
@@ -373,19 +380,23 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
 
           if (mounted) {
             setState(() {
-              _isCustomRouteMode = true;
+              // Đã thêm vào lịch trình: Tắt pop up tự chọn A-B, chỉ hiển thị duy nhất Pop-up Tuyến đường bộ thực tế
+              _isCustomRouteMode = false;
               _isCustomRouteCardCollapsed = false;
               _customOriginPoint = start;
               _customOriginName = detail['startName'] as String? ?? 'Điểm xuất phát A';
               _customDestinationPoint = end;
               _customDestinationName = detail['destName'] as String? ?? 'Điểm đến B';
-              _customRoutePolyline = polyList;
-              _customRouteDistanceKm = (detail['distanceKm'] as num?)?.toDouble() ??
+              _routingPolyline = polyList;
+              _distanceToSelectedKm = (detail['distanceKm'] as num?)?.toDouble() ??
                   dest.route?.distanceKm ??
                   const Distance().as(LengthUnit.Kilometer, start, end);
-              _customRouteDurationText = detail['durationText'] as String? ?? '';
+              _estimatedTravelDuration = detail['durationText'] as String? ?? '';
+              _isActualRoad = true;
               _selectedTripDestination = dest;
               _lastActiveDestination = dest;
+              _isCardCollapsed = false;
+              _selectedWaypoint = null;
               _isLoadingRoute = false;
             });
             StorageService.setSelectedTripDestination(dest.id);
@@ -1204,7 +1215,7 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                   ),
 
                   // Marker Điểm Xuất Phát Tùy Chọn A (Custom Route Origin)
-                  if (_isCustomRouteMode && _customOriginPoint != null)
+                  if ((_isCustomRouteMode || _selectedTripDestination?.id.startsWith('custom_route_') == true) && _customOriginPoint != null)
                     Marker(
                       point: _customOriginPoint!,
                       width: 50,
@@ -1227,7 +1238,7 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                     ),
 
                   // Marker Điểm Đích Tùy Chọn B (Custom Route Destination - Google Maps Red Pin)
-                  if (_isCustomRouteMode && _customDestinationPoint != null)
+                  if ((_isCustomRouteMode || _selectedTripDestination?.id.startsWith('custom_route_') == true) && _customDestinationPoint != null)
                     Marker(
                       point: _customDestinationPoint!,
                       width: 50,
@@ -1240,8 +1251,8 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                       ),
                     ),
 
-                  // Markers cho TẤT CẢ các điểm đến trong chuyến đi
-                  ..._tripDestinations.map((dest) {
+                  // Markers cho TẤT CẢ các điểm dã ngoại trong chuyến đi (Không vẽ đè lên lộ trình A-B)
+                  ..._tripDestinations.where((d) => !d.id.startsWith('custom_route_')).map((dest) {
                     final isSelected = _selectedTripDestination?.id == dest.id;
                     final point = _getDestLatLng(dest);
 
@@ -2457,8 +2468,8 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
               ),
             ),
 
-          // Card Kết Quả Lộ Trình Google Maps Tự Chọn (Custom A-to-B Floating Card)
-          if (_isCustomRouteMode && _customRouteDistanceKm != null && !_isCustomRouteCardCollapsed)
+          // Card Kết Quả Lộ Trình Google Maps Tự Chọn (Chỉ hiện khi CHƯA thêm vào chuyến đi)
+          if (_isCustomRouteMode && _customRouteDistanceKm != null && !_isCustomRouteCardCollapsed && _selectedTripDestination == null)
             Positioned(
               left: 14,
               right: 14,
@@ -2634,8 +2645,8 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
               ),
             ),
 
-          // Mini Dock Khôi phục Pop-up Lộ trình A-B khi thu gọn (Line và điểm A, B vẫn còn nguyên trên bản đồ)
-          if (_isCustomRouteMode && _customRouteDistanceKm != null && _isCustomRouteCardCollapsed)
+          // Mini Dock Khôi phục Pop-up Lộ trình A-B khi thu gọn (Chỉ hiện khi CHƯA thêm vào chuyến đi)
+          if (_isCustomRouteMode && _customRouteDistanceKm != null && _isCustomRouteCardCollapsed && _selectedTripDestination == null)
             Positioned(
               left: 16,
               right: 16,

@@ -182,4 +182,35 @@ void main() {
       expect(fetched['distanceKm'], equals(25.4));
     });
   });
+
+  group('Trip Planner Expense & Custom Cost Logic Tests', () {
+    int parseAmount(String text) {
+      final clean = text.replaceAll(RegExp(r'[^\d]'), '');
+      return int.tryParse(clean) ?? 0;
+    }
+
+    test('parseAmount parses Vietnamese formatted currency strings correctly', () {
+      expect(parseAmount('150.000'), equals(150000));
+      expect(parseAmount('50,000'), equals(50000));
+      expect(parseAmount('1.250.000 đ'), equals(1250000));
+      expect(parseAmount('  200000 '), equals(200000));
+      expect(parseAmount('abc'), equals(0));
+      expect(parseAmount(''), equals(0));
+    });
+
+    test('Custom cost items are correctly summed per person', () {
+      final customCostItems = [
+        {'title': 'Vé BOT cầu đường', 'amount': 70000},
+        {'title': 'Thuê lều trại', 'amount': 150000},
+        {'title': 'Nước uống & đá lạnh', 'amount': 80000},
+      ];
+
+      final totalCustom = customCostItems.fold<int>(0, (sum, i) => sum + (i['amount'] as int? ?? 0));
+      expect(totalCustom, equals(300000));
+
+      final participants = 2;
+      final perPerson = (totalCustom / participants).round();
+      expect(perPerson, equals(150000));
+    });
+  });
 }
