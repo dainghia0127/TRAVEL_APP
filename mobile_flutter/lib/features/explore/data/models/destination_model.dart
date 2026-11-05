@@ -223,5 +223,62 @@ class DestinationModel extends Destination {
       photoSpotTip: json['photo_spot_tip'] as String?,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'slug': slug,
+      'name': name,
+      'local_name': localName,
+      'province': province,
+      'country_name': countryName,
+      'country_ids': countryIds,
+      'region_id': regionId,
+      'category_ids': categoryIds,
+      'center_latitude': centerLatitude,
+      'center_longitude': centerLongitude,
+      'elevation_meters': elevationMeters,
+      'editorial_summary': editorialSummary,
+      'editorial_content': editorialContent,
+      'best_travel_seasons': bestTravelSeasons,
+      'is_featured': isFeatured,
+      'is_popular': isPopular,
+      'is_verified': isVerified,
+      'verification_date': verificationDate,
+      'data_source': dataSource,
+      'media': media
+          .map((m) => {
+                'id': m.id,
+                'image_url': m.imageUrl,
+                'local_asset_path': m.localAssetPath,
+                'photographer': m.photographer,
+                'source_name': m.sourceName,
+                'license': m.license,
+                'attribution': m.attribution,
+                'aspect_ratio': m.aspectRatio,
+                'is_hero': m.isHero,
+              })
+          .toList(),
+      'route': route != null
+          ? {
+              'id': route!.id,
+              'name': route!.name,
+              'distance_km': route!.distanceKm,
+              'elevation_gain_meters': route!.elevationGainMeters,
+              'difficulty_level': route!.difficultyLevel,
+              'estimated_duration_days': route!.estimatedDurationDays,
+              'is_verified': route!.isVerified,
+            }
+          : null,
+      'local_specialties': localSpecialties,
+      'must_try_activities': mustTryActivities,
+      'cultural_highlights': culturalHighlights,
+      'getting_there_advice': gettingThereAdvice,
+      'is_social_trend': isSocialTrend,
+      'social_platform': socialPlatform,
+      'social_views': socialViews,
+      'photo_spot_tip': photoSpotTip,
+    };
+  }
 }
 

@@ -175,6 +175,19 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   void initState() {
     super.initState();
     _initTripData();
+    MainNavigationScreen.activeTabNotifier.addListener(_onTabChanged);
+  }
+
+  @override
+  void dispose() {
+    MainNavigationScreen.activeTabNotifier.removeListener(_onTabChanged);
+    super.dispose();
+  }
+
+  void _onTabChanged() {
+    if (MainNavigationScreen.activeTabNotifier.value == 2 && mounted) {
+      _initTripData();
+    }
   }
 
   Future<void> _initTripData() async {
@@ -196,9 +209,15 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
       }
     }
 
-    if (loaded.isEmpty && allDestinations.isNotEmpty) {
-      loaded.addAll(allDestinations.take(2));
-      await StorageService.saveTripDestinations(loaded.map((d) => d.id).toList());
+    // Khi người dùng đã xóa hết địa điểm: giữ nguyên rỗng, không tự ý nạp lại
+    if (loaded.isEmpty) {
+      if (mounted) {
+        setState(() {
+          _tripDestinations = [];
+          _selectedDestination = null;
+        });
+      }
+      return;
     }
 
     final selectedId = await StorageService.getSelectedTripDestination();
@@ -770,17 +789,23 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                                         color: isSelected ? Colors.white : AppColors.editorialInk,
                                       ),
                                     ),
-                                    if (_tripDestinations.length > 1) ...[
-                                      const SizedBox(width: 6),
-                                      GestureDetector(
-                                        onTap: () => _removeDestination(dest),
+                                    // Cho phép xóa bất kỳ địa điểm nào kể cả điểm cuối cùng
+                                    const SizedBox(width: 6),
+                                    GestureDetector(
+                                      onTap: () => _removeDestination(dest),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(2),
+                                        decoration: BoxDecoration(
+                                          color: isSelected ? Colors.white24 : AppColors.editorialBorder,
+                                          shape: BoxShape.circle,
+                                        ),
                                         child: Icon(
                                           Icons.close,
-                                          size: 13,
-                                          color: isSelected ? Colors.white70 : AppColors.editorialMuted,
+                                          size: 12,
+                                          color: isSelected ? Colors.white : AppColors.editorialMuted,
                                         ),
                                       ),
-                                    ],
+                                    ),
                                   ],
                                 ),
                               ),
@@ -790,6 +815,89 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                       ),
                     ),
                     const SizedBox(height: 10),
+                  ] else ...[
+                    // Khối Empty State khi người dùng đã xóa hết địa điểm
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.editorialSurface,
+                        borderRadius: AppRadius.roundedLg,
+                        border: Border.all(color: AppColors.editorialBorder),
+                      ),
+                      child: Column(
+                        children: [
+                          const Icon(Icons.alt_route_rounded, size: 36, color: AppColors.editorialPine),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Chưa có địa điểm nào trong chuyến đi',
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.editorialInk),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Bạn có thể tự chọn tuyến đường A ➔ B trên bản đồ hoặc chọn địa danh từ mục Khám phá.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 11.5, color: AppColors.editorialMuted),
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: BouncingButton(
+                                  onTap: () {
+                                    HapticFeedback.lightImpact();
+                                    MainNavigationScreen.openCustomRouteOnMap = true;
+                                    MainNavigationScreen.switchToTab(1);
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.editorialPine,
+                                      borderRadius: AppRadius.roundedPill,
+                                    ),
+                                    child: const Center(
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.alt_route_rounded, size: 16, color: Colors.white),
+                                          SizedBox(width: 6),
+                                          Text(
+                                            'Tạo Điểm A-B Trên Bản Đồ',
+                                            style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              BouncingButton(
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  MainNavigationScreen.switchToTab(0);
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.editorialSurface,
+                                    borderRadius: AppRadius.roundedPill,
+                                    border: Border.all(color: AppColors.editorialBorder),
+                                  ),
+                                  child: const Row(
+                                    children: [
+                                      Icon(Icons.explore_outlined, size: 16, color: AppColors.editorialInk),
+                                      SizedBox(width: 4),
+                                      Text('Khám phá', style: TextStyle(color: AppColors.editorialInk, fontSize: 12, fontWeight: FontWeight.w600)),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
 
                   // Destination Info Summary Card
@@ -943,12 +1051,50 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     final currentDayStops = _daysItinerary[_selectedDay] ?? [];
     final availableDays = List.generate(_maxDays, (i) => i + 1);
 
-    return Column(
-      children: [
-        // =========================================================================
-        // PHẦN HEADER GHIM CỐ ĐỊNH (STICKY HEADER - KHÔNG BỊ TRÔI KHI VUỐT LÊN)
-        // =========================================================================
-        Container(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final headerWidget = _buildStickyTimelineHeader(availableDays, currentDayStops);
+        final timelineContent = _buildTimelineListContent(currentDayStops);
+
+        // Khi chiều cao khả dụng thấp (< 280px như test runner 800x600 hoặc màn hình xoay ngang):
+        // Cho phép cuộn toàn bộ trong 1 ListView duy nhất tránh RenderFlex Overflow
+        if (constraints.maxHeight < 280) {
+          return ListView(
+            physics: const BouncingScrollPhysics(),
+            padding: EdgeInsets.zero,
+            children: [
+              headerWidget,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space16, vertical: 4),
+                child: timelineContent,
+              ),
+              const SizedBox(height: 40),
+            ],
+          );
+        }
+
+        // Màn hình dọc chuẩn: Header ghim cố định bên trên, cuộn các mốc bên dưới
+        return Column(
+          children: [
+            headerWidget,
+            Expanded(
+              child: ListView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space16, vertical: 4),
+                children: [
+                  timelineContent,
+                  const SizedBox(height: 40),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildStickyTimelineHeader(List<int> availableDays, List<Map<String, dynamic>> currentDayStops) {
+    return Container(
           color: AppColors.editorialBg,
           padding: const EdgeInsets.fromLTRB(AppSpacing.space16, 8, AppSpacing.space16, 10),
           child: Column(
@@ -1281,36 +1427,30 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
               ),
             ],
           ),
-        ),
+        );
+  }
 
-        // =========================================================================
-        // PHẦN TIMELINE CUỘN ĐƯỢC (CHỈ DANH SÁCH MỐC DI CHUYỂN BÊN DƯỚI)
-        // =========================================================================
-        Expanded(
-          child: ListView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space16, vertical: 4),
-            children: [
-              // Timeline Spine
-              if (currentDayStops.isEmpty)
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  margin: const EdgeInsets.only(top: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.editorialSurface,
-                    borderRadius: AppRadius.roundedMd,
-                    border: Border.all(color: AppColors.editorialBorder),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Chưa có mốc lịch trình cho ngày này. Hãy bấm "Thêm mốc" để lập kế hoạch!',
-                      style: TextStyle(fontSize: 12, color: AppColors.editorialMuted),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                )
-        else
-          ReorderableListView.builder(
+  Widget _buildTimelineListContent(List<Map<String, dynamic>> currentDayStops) {
+    if (currentDayStops.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        margin: const EdgeInsets.only(top: 8),
+        decoration: BoxDecoration(
+          color: AppColors.editorialSurface,
+          borderRadius: AppRadius.roundedMd,
+          border: Border.all(color: AppColors.editorialBorder),
+        ),
+        child: const Center(
+          child: Text(
+            'Chưa có mốc lịch trình cho ngày này. Hãy bấm "Thêm mốc" để lập kế hoạch!',
+            style: TextStyle(fontSize: 12, color: AppColors.editorialMuted),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    return ReorderableListView.builder(
             shrinkWrap: true,
             buildDefaultDragHandles: false,
             physics: const NeverScrollableScrollPhysics(),
@@ -1566,14 +1706,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 ),
               );
             },
-          ),
-
-        const SizedBox(height: 40),
-            ],
-          ),
-        ),
-      ],
-    );
+          );
   }
 
   // TAB 2: BUDGET & PACK VIEW

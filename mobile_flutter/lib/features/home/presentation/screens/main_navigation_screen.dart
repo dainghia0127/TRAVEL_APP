@@ -16,6 +16,9 @@ class MainNavigationScreen extends StatefulWidget {
   /// chuyển đổi tab một cách đồng bộ và tức thì.
   static final ValueNotifier<int> activeTabNotifier = ValueNotifier<int>(0);
 
+  /// Cờ báo cho tab Bản đồ biết cần mở ngay chế độ Lộ trình A-B
+  static bool openCustomRouteOnMap = false;
+
   static void switchToTab(int index) {
     activeTabNotifier.value = index;
   }

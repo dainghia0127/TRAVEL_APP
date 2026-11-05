@@ -20,8 +20,8 @@
 ---
 
 ## 2. Giai Đoạn Hiện Tại & Trạng Thái Tổng Thể
-- **Giai đoạn hiện tại**: **GIAI ĐOẠN 8 — ĐỒNG BỘ ĐÁM MÂY (CLOUD SYNC), LỊCH TRÌNH LIVE TREKKING & BẢN ĐỒ TỰ CHỌN LỘ TRÌNH A-B**.
-- **Trạng thái tổng thể**: `[~]` **Đang thực hiện triển khai 3 tính năng nâng cấp quan trọng theo yêu cầu.**
+- **Giai đoạn hiện tại**: **GIAI ĐOẠN 9 — HOÀN THIỆN ĐỒNG BỘ HAI CHIỀU BẢN ĐỒ - LỊCH TRÌNH, TÌM KIẾM ĐỊA CHỈ GOOGLE MAPS GEOCODING & KHẮC PHỤC THÔNG BÁO CLOUD SYNC REPO PRIVATE**.
+- **Trạng thái tổng thể**: `[x]` **Đã hoàn thành và kiểm chứng 100% qua 22/22 unit & widget tests.**
 
 ---
 
@@ -119,22 +119,36 @@
     - Hiển thị thanh tiến độ phần trăm hoàn thành hành trình ngày.
 - [x] Task 8.3: Bản Đồ Google Maps Style - Tự Chọn Điểm Bắt Đầu & Điểm Đích (Custom A-to-B Routing):
   - Thêm nút chuyển chế độ "Lộ trình A-B" ngay trên Top Header.
-  - Hộp nhập Google Maps Style:
-    - Điểm bắt đầu (A): Mặc định Vị trí GPS hiện tại, hoặc chọn trên bản đồ / danh sách địa danh.
-    - Điểm kết thúc (B): Chạm hoặc nhấn giữ bất kỳ đâu trên bản đồ để thả ghim đích, hoặc chọn từ danh sách.
   - Hỗ trợ nút đảo chiều (Swap A ⇄ B), tính toán và vẽ tuyến đường bộ OSRM thực tế kèm cự ly km và thời gian di chuyển.
   - Hiển thị Floating Card tóm tắt lộ trình A-B và nút bao quát toàn tuyến đường.
 - [x] Task 8.4: Tự Động Hóa Thu Thập & Đồng Bộ Dữ Liệu Địa Danh Mới (Automated Content Ingestion Pipeline):
   - Phát triển công cụ tự động hóa `tools/auto_destinations_updater.py`: Quản lý kho dữ liệu dã ngoại tuyển chọn chất lượng cao (Curated Outdoor Reservoir), kiểm tra chống trùng lặp thông minh và tự động chèn địa danh chuẩn cấu trúc vào `destinations_seed.json`.
   - Thiết lập GitHub Actions Workflow `.github/workflows/auto_sync_destinations.yml`: Tự động kích hoạt hàng ngày vào lúc 00:00 (17:00 UTC = 00:00 GMT+7 giờ VN) và dự phòng 00:00 UTC hoặc chạy thủ công bằng 1 click (`workflow_dispatch`), tự động commit và đẩy lên nhánh `main` kèm cờ `[skip ci]` không làm tốn tài nguyên build iOS.
-  - Khi có địa danh mới trên GitHub, app người dùng tự động kéo về qua Cloud Sync khi bấm Làm mới/Refresh, không cần nhập liệu thủ công và không cần cài lại file IPA.
 - [x] Task 8.5: Tối Ưu Bản Đồ - Chống Che Khuất Nút Zoom Out Khi Pop-up Thu Gọn:
-  - Bổ sung getter `_mapControlsBottomOffset` tính toán vị trí đáy linh hoạt cho cụm nút điều khiển bên phải theo từng trạng thái:
-    - Khi pop-up thu gọn (mini bar): cụm nút hạ xuống `bottom: 105.0` (ngay trên mép trên thanh mini bar 95px), nút Zoom Out hoàn toàn lộ diện, không bị che khuất.
-    - Khi pop-up mở rộng: cụm nút nâng lên `bottom: 320.0` (trên mép trên card chi tiết).
-    - Khi đóng pop-up có thanh khôi phục "Mở lại lộ trình...": cụm nút hạ xuống `bottom: 88.0` (trên thanh 72px).
-    - Khi bình thường: cụm nút ở `bottom: 28.0`.
+  - Bổ sung getter `_mapControlsBottomOffset` tính toán vị trí đáy linh hoạt cho cụm nút điều khiển bên phải theo từng trạng thái.
   - Chuyển cụm nút điều khiển thành `AnimatedPositioned` (thời gian chuyển động 250ms, easeOutCubic) giúp các nút trượt lên/xuống mượt mà tự nhiên.
+
+---
+
+### Giai Đoạn 9: Hoàn Thiện Đồng Bộ Hai Chiều Bản Đồ - Lịch Trình & Tìm Kiếm Địa Chỉ Geocoding (Phase 9)
+- [x] Task 9.1: Khắc phục thông báo Cloud Sync 404 & giải thích nguyên nhân:
+  - Repo GitHub đang ở chế độ Private nên Raw link trả về 404 khi truy cập không kèm OAuth token bí mật.
+  - Cập nhật thông báo trực quan: *"Kho lưu trữ GitHub đang ở chế độ Riêng Tư (Private). Hãy chuyển Repo sang Public để tải tự động"*, giúp người dùng phân biệt rõ với tình trạng mất mạng offline.
+- [x] Task 9.2: Tích hợp Ô Tìm Kiếm Địa Chỉ Thời Gian Thực Chuẩn Google Maps (`GeocodingService`):
+  - Kết nối OpenStreetMap Nominatim Geocoding API (`search?q=...&countrycodes=vn`).
+  - Hỗ trợ gõ tìm kiếm mọi địa chỉ, số nhà, ngõ hẻm, tên đèo, đỉnh núi, địa danh tiếng Việt có dấu hoặc không dấu.
+  - Tự động hiển thị danh sách gợi ý địa chỉ tức thì khi gõ, chọn là định vị ngay điểm A hoặc B với độ chính xác cao.
+- [x] Task 9.3: Cho phép xóa sạch toàn bộ địa điểm và đồng bộ trạng thái rỗng sang Lịch Trình:
+  - Bỏ ràng buộc `if (_tripDestinations.length > 1)` ở cả Bản đồ và Lịch trình: Người dùng có thể xóa sạch mọi điểm kể cả điểm cuối cùng.
+  - Cập nhật `StorageService`: Tôn trọng danh sách chuyến đi rỗng (`[]`), không tự ý nạp lại 2 địa điểm mẫu sau khi người dùng đã chủ động xóa.
+- [x] Task 9.4: Đồng bộ hai chiều giữa Bản Đồ và Lịch Trình:
+  - Khi Lịch trình rỗng: Hiển thị Empty State với nút lớn **"TẠO ĐIỂM A-B TRÊN BẢN ĐỒ"**.
+  - Nhấn nút sẽ tự động chuyển sang tab Bản Đồ và kích hoạt ngay modal Lộ Trình A-B.
+  - Trên Floating Card Lộ Trình A-B của Bản Đồ: Bổ sung nút **"Thêm Lộ Trình Này Vào Lịch Trình"** (`_addCustomRouteToTrip`), tự động lưu tuyến đường A-B và chuyển sang tab Lịch trình để người dùng theo dõi và check-in.
+- [x] Task 9.5: Đảm bảo độ ổn định giao diện và kiểm thử toàn diện:
+  - Tối ưu `_buildContinuousTimelineView()` dùng `LayoutBuilder` để co giãn chiều cao thông minh trên mọi kích cỡ màn hình iOS, khắc phục triệt để RenderFlex overflow.
+  - Viết bộ test `custom_route_and_geocoding_test.dart` kiểm thử đầy đủ `GeocodingResult` và `StorageService`.
+  - Đạt 22/22 unit & widget tests pass 100% và `flutter analyze` 0 issues.
 
 ---
 
@@ -146,7 +160,7 @@
 
 ## 5. Kết Quả Kiểm Thử Thực Tế
 - **`flutter analyze`**: **`No issues found!`** (0 lỗi, 0 cảnh báo - 100% clean).
-- **`flutter test`**: **`All tests passed!`** (18/18 unit & widget test pass 100%).
+- **`flutter test`**: **`All tests passed!`** (22/22 unit & widget test pass 100%).
 - **`flutter build web`**: Sẵn sàng biên dịch khi cần.
 
 ---

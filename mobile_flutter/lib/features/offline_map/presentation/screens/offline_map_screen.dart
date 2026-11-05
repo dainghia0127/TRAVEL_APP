@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -9,8 +10,11 @@ import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
 import 'package:mobile_flutter/core/widgets/tactical_badge.dart';
 import 'package:mobile_flutter/core/services/storage_service.dart';
+import 'package:mobile_flutter/core/services/geocoding_service.dart';
 import 'package:mobile_flutter/features/explore/data/datasources/explore_local_datasource.dart';
+import 'package:mobile_flutter/features/explore/data/models/destination_model.dart';
 import 'package:mobile_flutter/features/explore/domain/entities/destination.dart';
+import 'package:mobile_flutter/features/explore/domain/entities/trekking_route.dart';
 import 'package:mobile_flutter/features/home/presentation/screens/main_navigation_screen.dart';
 import 'package:mobile_flutter/features/offline_map/services/location_service.dart';
 import 'package:mobile_flutter/features/offline_map/services/routing_service.dart';
@@ -132,13 +136,32 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
     _loadTripDestinations();
     _startLiveGpsTracking();
     _startPeriodicSync();
+    MainNavigationScreen.activeTabNotifier.addListener(_checkActiveTab);
   }
 
   @override
   void dispose() {
+    MainNavigationScreen.activeTabNotifier.removeListener(_checkActiveTab);
     _positionStreamSub?.cancel();
     _offlineSyncTimer?.cancel();
     super.dispose();
+  }
+
+  void _checkActiveTab() {
+    if (MainNavigationScreen.activeTabNotifier.value == 1 && mounted) {
+      _loadTripDestinations();
+      if (MainNavigationScreen.openCustomRouteOnMap) {
+        MainNavigationScreen.openCustomRouteOnMap = false;
+        setState(() {
+          _isCustomRouteMode = true;
+          _customOriginPoint ??= _currentLocation;
+          _customOriginName = 'Vị trí hiện tại của bạn';
+        });
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _showLocationPickerSheet(forOrigin: false);
+        });
+      }
+    }
   }
 
   /// Lắng nghe tọa độ GPS phần cứng liên tục và cập nhật tức thì khi di chuyển
@@ -201,10 +224,16 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
         }
       }
 
-      // Nếu danh sách trống, khởi tạo ít nhất 2 điểm mẫu chất lượng
-      if (loaded.isEmpty && allDestinations.isNotEmpty) {
-        loaded.addAll(allDestinations.take(2));
-        await StorageService.saveTripDestinations(loaded.map((d) => d.id).toList());
+      // Khi người dùng đã xóa hết địa điểm: tôn trọng danh sách rỗng, không tự ý nạp lại
+      if (loaded.isEmpty) {
+        if (mounted) {
+          setState(() {
+            _tripDestinations = [];
+            _selectedTripDestination = null;
+            _routingPolyline = [];
+          });
+        }
+        return;
       }
 
       final selectedId = await StorageService.getSelectedTripDestination();
@@ -226,6 +255,73 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
         }
       }
     } catch (_) {}
+  }
+
+  /// Thêm Tuyến Đường Tự Chọn A-B Vào Lịch Trình Chuyến Đi
+  Future<void> _addCustomRouteToTrip() async {
+    if (_customRouteDistanceKm == null || _customDestinationPoint == null) return;
+    HapticFeedback.heavyImpact();
+
+    final customId = 'custom_route_${DateTime.now().millisecondsSinceEpoch}';
+    final customName = '$_customOriginName ➔ $_customDestinationName';
+
+    final model = DestinationModel(
+      id: customId,
+      slug: 'custom-route-ab',
+      name: customName,
+      province: 'Lộ trình A-B Google Maps',
+      countryName: 'Việt Nam',
+      countryIds: const ['VN'],
+      regionId: 'vn_custom',
+      categoryIds: const ['scenic_road', 'custom_route'],
+      centerLatitude: _customDestinationPoint?.latitude,
+      centerLongitude: _customDestinationPoint?.longitude,
+      editorialSummary: 'Lộ trình đường bộ tự chọn A-B dài ${_customRouteDistanceKm!.toStringAsFixed(1)} km, thời gian di chuyển dự kiến: $_customRouteDurationText.',
+      route: TrekkingRoute(
+        id: '${customId}_route',
+        name: customName,
+        distanceKm: _customRouteDistanceKm!,
+        elevationGainMeters: 100,
+        difficultyLevel: 2,
+        estimatedDurationDays: 1,
+        isVerified: true,
+      ),
+      isVerified: true,
+      media: const [],
+    );
+
+    await StorageService.saveCustomRouteJson(customId, jsonEncode(model.toJson()));
+    await StorageService.addTripDestination(customId);
+    await StorageService.setSelectedTripDestination(customId);
+    await _loadTripDestinations();
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
+          backgroundColor: const Color(0xFF141E18),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: const BorderSide(color: AppColors.emerald, width: 1.2),
+          ),
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle, color: AppColors.emerald, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Đã đồng bộ "$customName" sang Lịch Trình!',
+                  style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+      // Chuyển sang tab Lịch trình để người dùng thấy ngay
+      MainNavigationScreen.switchToTab(2);
+    }
   }
 
   Future<void> _selectTripDestination(Destination dest, {bool animateCamera = true}) async {
@@ -447,132 +543,297 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
     );
   }
 
-  /// Modal chọn địa điểm cho Điểm Đi A hoặc Điểm Đến B từ danh sách địa danh hoặc GPS
+  /// Modal chọn địa điểm cho Điểm Đi A hoặc Điểm Đến B:
+  /// Tích hợp Tìm kiếm địa chỉ chuẩn xác Google Maps Style (OSM Nominatim) + GPS + Chạm bản đồ
   void _showLocationPickerSheet({required bool forOrigin}) {
     HapticFeedback.mediumImpact();
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: const Color(0xFF141916),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) {
-        return Container(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(color: AppColors.borderSubtle, borderRadius: BorderRadius.circular(2)),
-                ),
-              ),
-              const SizedBox(height: 14),
-              Text(
-                forOrigin ? 'Chọn Điểm Xuất Phát (A)' : 'Chọn Điểm Đến (B)',
-                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              // Tùy chọn 1: Vị trí GPS hiện tại
-              ListTile(
-                leading: const CircleAvatar(
-                  backgroundColor: AppColors.emerald,
-                  radius: 16,
-                  child: Icon(Icons.my_location, size: 16, color: Colors.black),
-                ),
-                title: const Text('Vị trí GPS hiện tại của bạn', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-                subtitle: Text(
-                  '${_currentLocation.latitude.toStringAsFixed(4)}, ${_currentLocation.longitude.toStringAsFixed(4)}',
-                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
-                ),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  setState(() {
-                    if (forOrigin) {
-                      _customOriginPoint = _currentLocation;
-                      _customOriginName = 'Vị trí hiện tại của bạn';
-                    } else {
-                      _customDestinationPoint = _currentLocation;
-                      _customDestinationName = 'Vị trí GPS của bạn';
-                    }
+        final searchCtrl = TextEditingController();
+        List<GeocodingResult> searchResults = [];
+        bool isSearching = false;
+        Timer? debounceTimer;
+
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            void performSearch(String text) {
+              debounceTimer?.cancel();
+              if (text.trim().length < 2) {
+                setModalState(() {
+                  searchResults = [];
+                  isSearching = false;
+                });
+                return;
+              }
+              debounceTimer = Timer(const Duration(milliseconds: 400), () async {
+                setModalState(() => isSearching = true);
+                final res = await GeocodingService.searchAddress(text);
+                if (ctx.mounted) {
+                  setModalState(() {
+                    searchResults = res;
+                    isSearching = false;
                   });
-                  _calculateCustomRoute();
-                },
+                }
+              });
+            }
+
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(ctx).viewInsets.bottom,
               ),
-              // Tùy chọn 2: Chạm ghim trên bản đồ
-              ListTile(
-                leading: const CircleAvatar(
-                  backgroundColor: AppColors.alpineCyan,
-                  radius: 16,
-                  child: Icon(Icons.touch_app, size: 16, color: Colors.black),
+              child: Container(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.85,
                 ),
-                title: const Text('Chạm trực tiếp trên bản đồ', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-                subtitle: const Text('Thả ghim tại bất kỳ cung đèo, ngọn núi hoặc suối ngòi nào', style: TextStyle(color: AppColors.textSecondary, fontSize: 11)),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  setState(() {
-                    if (forOrigin) {
-                      _isPickingOriginOnMap = true;
-                      _isPickingDestinationOnMap = false;
-                    } else {
-                      _isPickingDestinationOnMap = true;
-                      _isPickingOriginOnMap = false;
-                    }
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
-                      backgroundColor: const Color(0xFF141E18),
-                      content: Text(
-                        forOrigin ? 'Hãy chạm vào vị trí bạn muốn xuất phát trên bản đồ' : 'Hãy chạm vào vị trí bạn muốn đến trên bản đồ',
-                        style: const TextStyle(color: Colors.white, fontSize: 12.5),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 36,
+                        height: 4,
+                        decoration: BoxDecoration(color: AppColors.borderSubtle, borderRadius: BorderRadius.circular(2)),
                       ),
                     ),
-                  );
-                },
-              ),
-              const Divider(color: AppColors.borderSubtle),
-              const Text('Hoặc chọn từ Địa danh Khám phá:', style: TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 6),
-              // Danh sách các địa danh
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 220),
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: _tripDestinations.length,
-                  separatorBuilder: (c, _) => const SizedBox(height: 4),
-                  itemBuilder: (c, idx) {
-                    final d = _tripDestinations[idx];
-                    final loc = _getDestLatLng(d);
-                    return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                      dense: true,
-                      leading: const Icon(Icons.landscape_rounded, color: AppColors.summitGold, size: 18),
-                      title: Text(d.name, style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w600)),
-                      subtitle: Text(d.province ?? 'Việt Nam', style: const TextStyle(color: AppColors.textSecondary, fontSize: 10.5)),
-                      onTap: () {
-                        Navigator.pop(ctx);
-                        setState(() {
-                          if (forOrigin) {
-                            _customOriginPoint = loc;
-                            _customOriginName = d.name;
-                          } else {
-                            _customDestinationPoint = loc;
-                            _customDestinationName = d.name;
-                          }
-                        });
-                        _calculateCustomRoute();
-                      },
-                    );
-                  },
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: forOrigin ? AppColors.emerald.withValues(alpha: 0.2) : const Color(0xFFEF4444).withValues(alpha: 0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            forOrigin ? Icons.trip_origin : Icons.place,
+                            size: 16,
+                            color: forOrigin ? AppColors.emerald : const Color(0xFFEF4444),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          forOrigin ? 'Chọn Điểm Xuất Phát (A)' : 'Chọn Điểm Đến (B)',
+                          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Ô Tìm Kiếm Địa Chỉ Google Maps Style
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceHigh,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.alpineCyan.withValues(alpha: 0.6), width: 1.2),
+                      ),
+                      child: TextField(
+                        controller: searchCtrl,
+                        style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                        textInputAction: TextInputAction.search,
+                        onChanged: performSearch,
+                        onSubmitted: (val) {
+                          debounceTimer?.cancel();
+                          performSearch(val);
+                        },
+                        decoration: InputDecoration(
+                          hintText: forOrigin
+                              ? 'Tìm địa chỉ xuất phát (ví dụ: Chợ Bến Thành, Đà Lạt...)'
+                              : 'Tìm địa chỉ đích đến (ví dụ: Đèo Hải Vân, Sapa...)',
+                          hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                          prefixIcon: const Icon(Icons.search, color: AppColors.alpineCyan, size: 20),
+                          suffixIcon: searchCtrl.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear, size: 18, color: AppColors.textMuted),
+                                  onPressed: () {
+                                    searchCtrl.clear();
+                                    setModalState(() {
+                                      searchResults = [];
+                                      isSearching = false;
+                                    });
+                                  },
+                                )
+                              : null,
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Danh sách kết quả tìm kiếm địa chỉ thời gian thực
+                    if (isSearching)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.alpineCyan)),
+                              SizedBox(width: 8),
+                              Text('Đang tra cứu địa chỉ chính xác...', style: TextStyle(color: AppColors.alpineCyan, fontSize: 11.5)),
+                            ],
+                          ),
+                        ),
+                      )
+                    else if (searchResults.isNotEmpty) ...[
+                      const Text('Kết quả tìm kiếm địa chỉ:', style: TextStyle(color: AppColors.alpineCyan, fontSize: 11.5, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 6),
+                      Flexible(
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: searchResults.length,
+                          separatorBuilder: (c, _) => const Divider(color: AppColors.borderSubtle, height: 1),
+                          itemBuilder: (c, idx) {
+                            final r = searchResults[idx];
+                            return ListTile(
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                              leading: const CircleAvatar(
+                                radius: 14,
+                                backgroundColor: Color(0xFF1E2822),
+                                child: Icon(Icons.location_on, size: 16, color: AppColors.alpineCyan),
+                              ),
+                              title: Text(
+                                r.title,
+                                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              subtitle: Text(
+                                r.subtitle.isNotEmpty ? r.subtitle : r.displayName,
+                                style: const TextStyle(color: AppColors.textSecondary, fontSize: 10.5),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              onTap: () {
+                                Navigator.pop(ctx);
+                                setState(() {
+                                  if (forOrigin) {
+                                    _customOriginPoint = r.position;
+                                    _customOriginName = r.title;
+                                  } else {
+                                    _customDestinationPoint = r.position;
+                                    _customDestinationName = r.title;
+                                  }
+                                });
+                                _mapController.move(r.position, 14.5);
+                                _calculateCustomRoute();
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ] else ...[
+                      // Tùy chọn 1: Vị trí GPS hiện tại
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const CircleAvatar(
+                          backgroundColor: AppColors.emerald,
+                          radius: 16,
+                          child: Icon(Icons.my_location, size: 16, color: Colors.black),
+                        ),
+                        title: const Text('Vị trí GPS hiện tại của bạn', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                        subtitle: Text(
+                          '${_currentLocation.latitude.toStringAsFixed(4)}, ${_currentLocation.longitude.toStringAsFixed(4)}',
+                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                        ),
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          setState(() {
+                            if (forOrigin) {
+                              _customOriginPoint = _currentLocation;
+                              _customOriginName = 'Vị trí hiện tại của bạn';
+                            } else {
+                              _customDestinationPoint = _currentLocation;
+                              _customDestinationName = 'Vị trí GPS của bạn';
+                            }
+                          });
+                          _calculateCustomRoute();
+                        },
+                      ),
+                      // Tùy chọn 2: Chạm ghim trên bản đồ
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const CircleAvatar(
+                          backgroundColor: AppColors.alpineCyan,
+                          radius: 16,
+                          child: Icon(Icons.touch_app, size: 16, color: Colors.black),
+                        ),
+                        title: const Text('Chạm trực tiếp trên bản đồ', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                        subtitle: const Text('Thả ghim tại bất kỳ cung đèo, ngọn núi hoặc suối ngòi nào', style: TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          setState(() {
+                            if (forOrigin) {
+                              _isPickingOriginOnMap = true;
+                              _isPickingDestinationOnMap = false;
+                            } else {
+                              _isPickingDestinationOnMap = true;
+                              _isPickingOriginOnMap = false;
+                            }
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              behavior: SnackBarBehavior.floating,
+                              margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
+                              backgroundColor: const Color(0xFF141E18),
+                              content: Text(
+                                forOrigin ? 'Hãy chạm vào vị trí bạn muốn xuất phát trên bản đồ' : 'Hãy chạm vào vị trí bạn muốn đến trên bản đồ',
+                                style: const TextStyle(color: Colors.white, fontSize: 12.5),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      if (_tripDestinations.isNotEmpty) ...[
+                        const Divider(color: AppColors.borderSubtle),
+                        const Text('Hoặc chọn từ Địa danh Khám phá:', style: TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 6),
+                        Flexible(
+                          child: ListView.separated(
+                            shrinkWrap: true,
+                            itemCount: _tripDestinations.length,
+                            separatorBuilder: (c, _) => const SizedBox(height: 4),
+                            itemBuilder: (c, idx) {
+                              final d = _tripDestinations[idx];
+                              final loc = _getDestLatLng(d);
+                              return ListTile(
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                                dense: true,
+                                leading: const Icon(Icons.landscape_rounded, color: AppColors.summitGold, size: 18),
+                                title: Text(d.name, style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w600)),
+                                subtitle: Text(d.province ?? 'Việt Nam', style: const TextStyle(color: AppColors.textSecondary, fontSize: 10.5)),
+                                onTap: () {
+                                  Navigator.pop(ctx);
+                                  setState(() {
+                                    if (forOrigin) {
+                                      _customOriginPoint = loc;
+                                      _customOriginName = d.name;
+                                    } else {
+                                      _customDestinationPoint = loc;
+                                      _customDestinationName = d.name;
+                                    }
+                                  });
+                                  _calculateCustomRoute();
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ],
+                  ],
                 ),
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -1318,107 +1579,162 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                 ] else ...[
                   // Danh sách (List) các địa điểm đã chọn trong Chuyến đi
                   if (_tripDestinations.isNotEmpty) ...[
-                  SizedBox(
-                    height: 44,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: _tripDestinations.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index == _tripDestinations.length) {
-                          // Nút Thêm Điểm từ tab Khám phá
+                    SizedBox(
+                      height: 44,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: _tripDestinations.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == _tripDestinations.length) {
+                            // Nút Thêm Điểm từ tab Khám phá
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 6),
+                              child: BouncingButton(
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  MainNavigationScreen.switchToTab(0);
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surfaceBase.withValues(alpha: 0.9),
+                                    borderRadius: AppRadius.roundedPill,
+                                    border: Border.all(color: AppColors.emerald.withValues(alpha: 0.5)),
+                                  ),
+                                  child: const Row(
+                                    children: [
+                                      Icon(Icons.add, size: 16, color: AppColors.emerald),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'Thêm điểm',
+                                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.emerald),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+
+                          final dest = _tripDestinations[index];
+                          final isSelected = _selectedTripDestination?.id == dest.id;
+
                           return Padding(
                             padding: const EdgeInsets.only(right: 6),
                             child: BouncingButton(
-                              onTap: () {
-                                HapticFeedback.lightImpact();
-                                MainNavigationScreen.switchToTab(0);
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                              onTap: () => _selectTripDestination(dest),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                 decoration: BoxDecoration(
-                                  color: AppColors.surfaceBase.withValues(alpha: 0.9),
+                                  color: isSelected ? AppColors.emerald : AppColors.surfaceBase.withValues(alpha: 0.9),
                                   borderRadius: AppRadius.roundedPill,
-                                  border: Border.all(color: AppColors.emerald.withValues(alpha: 0.5)),
+                                  border: Border.all(
+                                    color: isSelected ? AppColors.emerald : AppColors.borderSubtle,
+                                    width: isSelected ? 1.5 : 1.0,
+                                  ),
+                                  boxShadow: isSelected
+                                      ? [
+                                          BoxShadow(
+                                            color: AppColors.emerald.withValues(alpha: 0.4),
+                                            blurRadius: 10,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ]
+                                      : null,
                                 ),
-                                child: const Row(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.add, size: 16, color: AppColors.emerald),
-                                    SizedBox(width: 4),
+                                    Icon(
+                                      Icons.place,
+                                      size: 14,
+                                      color: isSelected ? Colors.black : AppColors.summitGold,
+                                    ),
+                                    const SizedBox(width: 5),
                                     Text(
-                                      'Thêm điểm',
-                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.emerald),
+                                      dest.name,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                        color: isSelected ? Colors.black : Colors.white,
+                                      ),
+                                    ),
+                                    // Cho phép xóa bất kỳ địa điểm nào (kể cả điểm cuối cùng)
+                                    const SizedBox(width: 6),
+                                    GestureDetector(
+                                      onTap: () => _removeDestinationFromTrip(dest),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(2),
+                                        decoration: BoxDecoration(
+                                          color: isSelected ? Colors.black.withValues(alpha: 0.15) : Colors.white10,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.close,
+                                          size: 13,
+                                          color: isSelected ? Colors.black87 : AppColors.textMuted,
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
                             ),
                           );
-                        }
-
-                        final dest = _tripDestinations[index];
-                        final isSelected = _selectedTripDestination?.id == dest.id;
-
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 6),
-                          child: BouncingButton(
-                            onTap: () => _selectTripDestination(dest),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: isSelected ? AppColors.emerald : AppColors.surfaceBase.withValues(alpha: 0.9),
-                                borderRadius: AppRadius.roundedPill,
-                                border: Border.all(
-                                  color: isSelected ? AppColors.emerald : AppColors.borderSubtle,
-                                  width: isSelected ? 1.5 : 1.0,
-                                ),
-                                boxShadow: isSelected
-                                    ? [
-                                        BoxShadow(
-                                          color: AppColors.emerald.withValues(alpha: 0.4),
-                                          blurRadius: 10,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ]
-                                    : null,
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.place,
-                                    size: 14,
-                                    color: isSelected ? Colors.black : AppColors.summitGold,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    dest.name,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                                      color: isSelected ? Colors.black : Colors.white,
-                                    ),
-                                  ),
-                                  if (_tripDestinations.length > 1) ...[
-                                    const SizedBox(width: 6),
-                                    GestureDetector(
-                                      onTap: () => _removeDestinationFromTrip(dest),
-                                      child: Icon(
-                                        Icons.close,
-                                        size: 14,
-                                        color: isSelected ? Colors.black54 : AppColors.textMuted,
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
+                        },
+                      ),
+                    ),
+                  ] else ...[
+                    // Trạng thái khi chuyến đi trống: Cho phép Thêm điểm từ Khám phá hoặc Tạo lộ trình A-B
+                    Row(
+                      children: [
+                        BouncingButton(
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            MainNavigationScreen.switchToTab(0);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceBase.withValues(alpha: 0.9),
+                              borderRadius: AppRadius.roundedPill,
+                              border: Border.all(color: AppColors.emerald.withValues(alpha: 0.5)),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.explore_outlined, size: 14, color: AppColors.emerald),
+                                SizedBox(width: 5),
+                                Text('+ Khám phá địa điểm', style: TextStyle(color: AppColors.emerald, fontSize: 11.5, fontWeight: FontWeight.bold)),
+                              ],
                             ),
                           ),
-                        );
-                      },
+                        ),
+                        const SizedBox(width: 8),
+                        BouncingButton(
+                          onTap: _toggleCustomRouteMode,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceBase.withValues(alpha: 0.9),
+                              borderRadius: AppRadius.roundedPill,
+                              border: Border.all(color: AppColors.alpineCyan.withValues(alpha: 0.5)),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.alt_route_rounded, size: 14, color: AppColors.alpineCyan),
+                                SizedBox(width: 5),
+                                Text('Tạo lộ trình A-B', style: TextStyle(color: AppColors.alpineCyan, fontSize: 11.5, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                  ],
                   const SizedBox(height: 8),
                 ],
 
@@ -1463,7 +1779,6 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                     },
                   ),
                 ),
-                ],
               ],
             ),
           ),
@@ -2179,6 +2494,43 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                                 Text(
                                   'Bao Quát Toàn Tuyến Đường',
                                   style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12.5),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Nút Thêm Tuyến Đường A-B Này Vào Lịch Trình
+                    SizedBox(
+                      width: double.infinity,
+                      height: 44,
+                      child: BouncingButton(
+                        onTap: _addCustomRouteToTrip,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [AppColors.emerald, AppColors.neonGreen],
+                            ),
+                            borderRadius: AppRadius.roundedMd,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.emerald.withValues(alpha: 0.35),
+                                blurRadius: 10,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: const Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.playlist_add_check_rounded, size: 18, color: Colors.black),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Thêm Lộ Trình Này Vào Lịch Trình',
+                                  style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 13),
                                 ),
                               ],
                             ),
