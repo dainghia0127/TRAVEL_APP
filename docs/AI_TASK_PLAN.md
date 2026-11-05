@@ -21,7 +21,7 @@
 
 ## 2. Giai Đoạn Hiện Tại & Trạng Thái Tổng Thể
 - **Giai đoạn hiện tại**: **GIAI ĐOẠN 12 — KHẮC PHỤC HIỂN THỊ ĐƠN POP-UP BẢN ĐỒ & TÙY BIẾN CHI PHÍ / THÊM KHOẢN CHI TỰ DO**.
-- **Trạng thái tổng thể**: `[x]` **Đã hoàn thành và kiểm chứng 100% qua 29/29 unit & widget tests.**
+- **Trạng thái tổng thể**: `[x]` **Đã hoàn thành và kiểm chứng 100% qua 31/31 unit & widget tests.**
 
 ---
 
@@ -229,27 +229,31 @@
   - Khi lộ trình A-B đã thêm vào lịch trình hoặc khi chọn lộ trình từ danh sách chuyến đi: Đặt `_isCustomRouteMode = false` và chọn `_selectedTripDestination = dest`.
   - Thêm điều kiện `_selectedTripDestination == null` vào cả Card Lộ trình A-B tự chọn và Mini Dock.
   - Kết quả: Khi lộ trình A-B đã thêm vào chuyến đi, bản đồ **chỉ hiển thị DUY NHẤT một pop-up Tuyến đường bộ thực tế**, giữ nguyên vẹn vệt đường màu xanh và 2 marker A, B; pop-up Lộ trình A-B tự chọn không bao giờ hiện đè lên nữa.
-- [x] Task 12.2: Tùy chỉnh chi phí linh hoạt & Tự thêm khoản chi tiêu đề + giá tiền (`trip_planner_screen.dart`):
-  - Xử lý triệt để lỗi parse tiền tệ có dấu phân cách: Nâng cấp `parseAmount` dùng Regex lọc sạch mọi ký tự không phải số (`text.replaceAll(RegExp(r'[^\d]'), '')`), cho phép nhập `150.000`, `150,000`, `150 000` mà không bị reset về 0.
-  - Bổ sung ô nhập "Tên khoản chi (ví dụ: Vé BOT, Thuê lều...)" và "Số tiền (VNĐ)" kèm nút "+ Thêm khoản chi này".
-  - Cho phép người dùng xem danh sách các khoản chi tự thêm kèm icon xóa `[X]` trực tiếp trong dialog tùy chỉnh cũng như trên thẻ Dự Toán Chi Phí.
-  - Tự động cộng tổng vào `_totalCostPerPerson` và chia đều theo số người tham gia.
-  - Cập nhật thanh phân đoạn chi phí (Segmented Cost Bar - thêm dải màu vàng hổ phách) và chú giải (Legend) phản ánh chính xác các khoản chi tự thêm.
+- [x] Task 12.2: Sửa triệt để lỗi tính toán chi phí (Phí bãi trại & Khoản chi tự thêm) (`trip_planner_screen.dart`):
+  - Phí bãi trại:
+    - Sửa công thức: Trước đây dùng `(_maxDays - 1) * _campFeePerNight`, khiến chuyến đi 1 ngày (lộ trình A-B) luôn có `(_maxDays - 1) = 0`, dẫn tới việc người dùng nhập hay xóa phí bãi trại thì tổng tiền vẫn luôn bằng 0.
+    - Cập nhật chuẩn: Nếu `_campFeePerNight <= 0` trả về đúng 0; nếu `_maxDays == 1` và có nhập phí bãi thì tính 1 lần; nếu `_maxDays > 1` thì tính theo số đêm `(_maxDays - 1)`.
+    - Khi người dùng xóa trắng ô phí bãi trại: Tự động gán = 0 và trừ sạch khỏi tổng chi phí ngay lập tức.
+    - Bổ sung nút Clear `[X]` nhanh trong TextField để người dùng 1 chạm là xóa sạch ô nhập.
+  - Khoản chi tự thêm:
+    - Bổ sung 2 chế độ áp dụng trực quan: **`Mỗi người`** (mặc định, cộng thẳng vào chi phí/người) và **`Chia cả đoàn`** (chia đều theo số người tham gia trong đoàn).
+    - Khắc phục lỗi nhập số tiền rồi bấm luôn "Lưu thay đổi": Tự động gom khoản chi đang gõ dở kể cả khi để trống tiêu đề (tự gán tên `'Khoản chi khác'`), tuyệt đối không làm mất số tiền người dùng vừa nhập.
+    - Hiển thị chi tiết trên Thẻ Dự Toán Chi Phí kèm huy hiệu `Mỗi người` hoặc `Chia cả đoàn` để minh bạch cách tính.
 - [x] Task 12.3: Kiểm thử tự động toàn diện:
-  - Bổ sung nhóm test `Trip Planner Expense & Custom Cost Logic Tests` trong `custom_route_and_geocoding_test.dart` kiểm tra hàm `parseAmount` và thuật toán tính tổng chi phí tự thêm chia theo người tham gia.
-  - Đạt 29/29 automated tests pass 100% và `flutter analyze` 0 issues.
+  - Bổ sung test cases trong `custom_route_and_geocoding_test.dart` kiểm tra cả 2 phương thức tính phí bãi trại (xóa về 0, đi 1 ngày, đi nhiều ngày) và khoản chi tự thêm (mỗi người vs chia đoàn).
+  - Đạt 31/31 automated tests pass 100% và `flutter analyze` 0 issues.
 
 ---
 
 ## 4. Công Việc Đang Thực Hiện
-- Đã hoàn thành toàn diện 2/2 yêu cầu người dùng, kiểm chứng 100% qua Flutter Analyze & Automated Tests (29/29 tests passed).
+- Đã hoàn thành toàn diện 2/2 yêu cầu người dùng, kiểm chứng 100% qua Flutter Analyze & Automated Tests (31/31 tests passed).
 - Sẵn sàng để người dùng chạy `push_to_github.bat` deploy lên GitHub Pages và kích hoạt workflow build.
 
 ---
 
 ## 5. Kết Quả Kiểm Thử Thực Tế
 - **`flutter analyze`**: **`No issues found!`** (0 lỗi, 0 cảnh báo - 100% clean).
-- **`flutter test`**: **`All tests passed!`** (29/29 unit & widget test pass 100%).
+- **`flutter test`**: **`All tests passed!`** (31/31 unit & widget test pass 100%).
 - **`flutter build web`**: Sẵn sàng biên dịch khi deploy GitHub Pages.
 
 ---

@@ -189,7 +189,28 @@ void main() {
       return int.tryParse(clean) ?? 0;
     }
 
-    test('parseAmount parses Vietnamese formatted currency strings correctly', () {
+    int calculateCampFee(int campFeePerNight, int maxDays) {
+      if (campFeePerNight <= 0) return 0;
+      final nights = maxDays > 1 ? (maxDays - 1) : 1;
+      return nights * campFeePerNight;
+    }
+
+    int calculateCustomCostPerPerson(List<Map<String, dynamic>> items, int participants) {
+      if (items.isEmpty) return 0;
+      int sum = 0;
+      for (final item in items) {
+        final amt = (item['amount'] as num?)?.toInt() ?? 0;
+        final isPerPerson = item['isPerPerson'] != false;
+        if (isPerPerson) {
+          sum += amt;
+        } else {
+          sum += participants > 0 ? (amt / participants).round() : amt;
+        }
+      }
+      return sum;
+    }
+
+    test('parseAmount parses Vietnamese formatted currency strings and empty strings', () {
       expect(parseAmount('150.000'), equals(150000));
       expect(parseAmount('50,000'), equals(50000));
       expect(parseAmount('1.250.000 đ'), equals(1250000));
@@ -198,19 +219,30 @@ void main() {
       expect(parseAmount(''), equals(0));
     });
 
-    test('Custom cost items are correctly summed per person', () {
+    test('Camp fee is 0 when user clears the field or sets to 0', () {
+      expect(calculateCampFee(0, 1), equals(0));
+      expect(calculateCampFee(0, 3), equals(0));
+    });
+
+    test('Camp fee calculates properly for 1-day trip and multi-day trips', () {
+      // Chuyến đi 1 ngày có nhập phí bãi trại: tính 1 lần phí bãi
+      expect(calculateCampFee(50000, 1), equals(50000));
+      // Chuyến đi 3 ngày 2 đêm: tính 2 đêm
+      expect(calculateCampFee(120000, 3), equals(240000));
+    });
+
+    test('Custom cost items handle both Per Person and Shared Group calculations', () {
       final customCostItems = [
-        {'title': 'Vé BOT cầu đường', 'amount': 70000},
-        {'title': 'Thuê lều trại', 'amount': 150000},
-        {'title': 'Nước uống & đá lạnh', 'amount': 80000},
+        {'title': 'Vé tham quan', 'amount': 100000, 'isPerPerson': true},
+        {'title': 'Vé BOT cầu đường', 'amount': 80000, 'isPerPerson': false},
       ];
 
-      final totalCustom = customCostItems.fold<int>(0, (sum, i) => sum + (i['amount'] as int? ?? 0));
-      expect(totalCustom, equals(300000));
-
-      final participants = 2;
-      final perPerson = (totalCustom / participants).round();
-      expect(perPerson, equals(150000));
+      final participants = 4;
+      // Vé tham quan: 100.000đ/người
+      // Vé BOT: 80.000đ chia 4 = 20.000đ/người
+      // Tổng chi phí tự thêm mỗi người: 120.000đ
+      final perPerson = calculateCustomCostPerPerson(customCostItems, participants);
+      expect(perPerson, equals(120000));
     });
   });
 }

@@ -83,11 +83,12 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   void _showCostConfigDialog() {
     HapticFeedback.mediumImpact();
     final gasCtrl = TextEditingController(text: _gasPrice.round().toString());
-    final foodCtrl = TextEditingController(text: _foodPerDay.toString());
-    final campCtrl = TextEditingController(text: _campFeePerNight.toString());
+    final foodCtrl = TextEditingController(text: _foodPerDay > 0 ? _foodPerDay.toString() : '');
+    final campCtrl = TextEditingController(text: _campFeePerNight > 0 ? _campFeePerNight.toString() : '');
 
     final newTitleCtrl = TextEditingController();
     final newAmountCtrl = TextEditingController();
+    bool isPerPersonNew = true;
 
     // Tạo bản sao danh sách khoản chi tự thêm để chỉnh sửa trong dialog
     final List<Map<String, dynamic>> tempCustomItems = List<Map<String, dynamic>>.from(
@@ -133,36 +134,61 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                         controller: gasCtrl,
                         keyboardType: TextInputType.number,
                         style: const TextStyle(color: Colors.white, fontSize: 13.5),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Giá xăng RON95 (đ/lít)',
-                          labelStyle: TextStyle(color: AppColors.textSecondary, fontSize: 12),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          border: OutlineInputBorder(),
+                          labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          border: const OutlineInputBorder(),
+                          suffixIcon: gasCtrl.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear, size: 16, color: AppColors.textMuted),
+                                  onPressed: () => setDialogState(() => gasCtrl.clear()),
+                                )
+                              : null,
                         ),
+                        onChanged: (_) => setDialogState(() {}),
                       ),
                       const SizedBox(height: 10),
                       TextField(
                         controller: foodCtrl,
                         keyboardType: TextInputType.number,
                         style: const TextStyle(color: Colors.white, fontSize: 13.5),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Ăn uống trung bình (đ/người/ngày)',
-                          labelStyle: TextStyle(color: AppColors.textSecondary, fontSize: 12),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          border: OutlineInputBorder(),
+                          labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                          hintText: '0 (để trống nếu tự túc)',
+                          hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          border: const OutlineInputBorder(),
+                          suffixIcon: foodCtrl.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear, size: 16, color: AppColors.textMuted),
+                                  onPressed: () => setDialogState(() => foodCtrl.clear()),
+                                )
+                              : null,
                         ),
+                        onChanged: (_) => setDialogState(() {}),
                       ),
                       const SizedBox(height: 10),
                       TextField(
                         controller: campCtrl,
                         keyboardType: TextInputType.number,
                         style: const TextStyle(color: Colors.white, fontSize: 13.5),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Phí bãi trại / lưu trú (đ/người/đêm)',
-                          labelStyle: TextStyle(color: AppColors.textSecondary, fontSize: 12),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          border: OutlineInputBorder(),
+                          labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                          hintText: '0 (để trống nếu không cắm trại)',
+                          hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 11),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          border: const OutlineInputBorder(),
+                          suffixIcon: campCtrl.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear, size: 16, color: AppColors.textMuted),
+                                  onPressed: () => setDialogState(() => campCtrl.clear()),
+                                )
+                              : null,
                         ),
+                        onChanged: (_) => setDialogState(() {}),
                       ),
                       const SizedBox(height: 16),
                       const Divider(color: AppColors.borderSubtle, height: 1),
@@ -179,7 +205,9 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                         ...tempCustomItems.asMap().entries.map((entry) {
                           final idx = entry.key;
                           final item = entry.value;
-                          final amt = item['amount'] as int;
+                          final amt = (item['amount'] as num?)?.toInt() ?? 0;
+                          final isPerPerson = item['isPerPerson'] != false;
+                          final costPerPerson = isPerPerson ? amt : (_participants > 0 ? (amt / _participants).round() : amt);
                           return Container(
                             margin: const EdgeInsets.only(bottom: 6),
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -193,16 +221,35 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                                 const Icon(Icons.receipt_outlined, size: 14, color: AppColors.alpineCyan),
                                 const SizedBox(width: 6),
                                 Expanded(
-                                  child: Text(
-                                    item['title'] as String,
-                                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item['title'] as String,
+                                        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        isPerPerson ? 'Mỗi người' : 'Chia cả đoàn ($_participants người)',
+                                        style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                Text(
-                                  '${amt.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} đ',
-                                  style: const TextStyle(color: AppColors.emerald, fontSize: 12, fontWeight: FontWeight.bold),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      '${amt.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} đ',
+                                      style: const TextStyle(color: AppColors.emerald, fontSize: 12, fontWeight: FontWeight.bold),
+                                    ),
+                                    if (!isPerPerson)
+                                      Text(
+                                        '= ${(costPerPerson / 1000).toInt()}k/người',
+                                        style: const TextStyle(color: AppColors.summitGold, fontSize: 10),
+                                      ),
+                                  ],
                                 ),
                                 const SizedBox(width: 4),
                                 GestureDetector(
@@ -257,6 +304,40 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                         ],
                       ),
                       const SizedBox(height: 8),
+
+                      // Bộ chọn loại tính chi phí (Mỗi người vs Chia cả đoàn)
+                      Row(
+                        children: [
+                          const Text('Áp dụng:', style: TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+                          const SizedBox(width: 6),
+                          ChoiceChip(
+                            label: const Text('Mỗi người', style: TextStyle(fontSize: 10.5)),
+                            selected: isPerPersonNew,
+                            selectedColor: AppColors.editorialPine,
+                            backgroundColor: const Color(0xFF141916),
+                            labelStyle: TextStyle(
+                              color: isPerPersonNew ? Colors.white : AppColors.textMuted,
+                              fontWeight: isPerPersonNew ? FontWeight.bold : FontWeight.normal,
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                            onSelected: (val) => setDialogState(() => isPerPersonNew = true),
+                          ),
+                          const SizedBox(width: 6),
+                          ChoiceChip(
+                            label: Text('Chia cả đoàn ($_participants ng)', style: const TextStyle(fontSize: 10.5)),
+                            selected: !isPerPersonNew,
+                            selectedColor: AppColors.editorialPine,
+                            backgroundColor: const Color(0xFF141916),
+                            labelStyle: TextStyle(
+                              color: !isPerPersonNew ? Colors.white : AppColors.textMuted,
+                              fontWeight: !isPerPersonNew ? FontWeight.bold : FontWeight.normal,
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                            onSelected: (val) => setDialogState(() => isPerPersonNew = false),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
                       SizedBox(
                         width: double.infinity,
                         height: 36,
@@ -268,13 +349,14 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                           icon: const Icon(Icons.add, size: 16, color: AppColors.alpineCyan),
                           label: const Text('+ Thêm khoản chi này', style: TextStyle(color: AppColors.alpineCyan, fontSize: 12, fontWeight: FontWeight.bold)),
                           onPressed: () {
-                            final title = newTitleCtrl.text.trim();
                             final amt = parseAmount(newAmountCtrl.text);
-                            if (title.isNotEmpty && amt > 0) {
+                            if (amt > 0) {
+                              final title = newTitleCtrl.text.trim().isEmpty ? 'Khoản chi khác' : newTitleCtrl.text.trim();
                               setDialogState(() {
                                 tempCustomItems.add({
                                   'title': title,
                                   'amount': amt,
+                                  'isPerPerson': isPerPersonNew,
                                 });
                                 newTitleCtrl.clear();
                                 newAmountCtrl.clear();
@@ -303,18 +385,22 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                     final f = parseAmount(foodCtrl.text);
                     final c = parseAmount(campCtrl.text);
 
-                    // Xử lý nếu người dùng gõ dở ở ô thêm khoản chi mà quên bấm nút thêm
-                    final pendingTitle = newTitleCtrl.text.trim();
+                    // Xử lý tự động gom khoản chi đang gõ dở nếu có số tiền
                     final pendingAmt = parseAmount(newAmountCtrl.text);
-                    if (pendingTitle.isNotEmpty && pendingAmt > 0) {
-                      tempCustomItems.add({'title': pendingTitle, 'amount': pendingAmt});
+                    if (pendingAmt > 0) {
+                      final pendingTitle = newTitleCtrl.text.trim().isEmpty ? 'Khoản chi khác' : newTitleCtrl.text.trim();
+                      tempCustomItems.add({
+                        'title': pendingTitle,
+                        'amount': pendingAmt,
+                        'isPerPerson': isPerPersonNew,
+                      });
                     }
 
                     if (mounted) {
                       setState(() {
                         if (g > 0) _gasPrice = g.toDouble();
-                        if (f >= 0) _foodPerDay = f;
-                        if (c >= 0) _campFeePerNight = c;
+                        _foodPerDay = f;
+                        _campFeePerNight = c;
                         _customCostItems = tempCustomItems;
                       });
                     }
@@ -789,14 +875,24 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   }
 
   int get _foodCostPerPerson => _maxDays * _foodPerDay;
-  int get _campFeePerPerson => (_maxDays - 1) * _campFeePerNight;
+  int get _campFeePerPerson {
+    if (_campFeePerNight <= 0) return 0;
+    final nights = _maxDays > 1 ? (_maxDays - 1) : 1;
+    return nights * _campFeePerNight;
+  }
   int get _customCostsPerPerson {
     if (_customCostItems.isEmpty) return 0;
     int sum = 0;
     for (final item in _customCostItems) {
-      sum += (item['amount'] as num?)?.toInt() ?? 0;
+      final amt = (item['amount'] as num?)?.toInt() ?? 0;
+      final isPerPerson = item['isPerPerson'] != false;
+      if (isPerPerson) {
+        sum += amt;
+      } else {
+        sum += _participants > 0 ? (amt / _participants).round() : amt;
+      }
     }
-    return _participants > 0 ? (sum / _participants).round() : sum;
+    return sum;
   }
 
   int get _totalCostPerPerson =>
@@ -2449,7 +2545,9 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                   final idx = entry.key;
                   final item = entry.value;
                   final title = item['title'] as String? ?? 'Khoản chi';
-                  final amount = item['amount'] as int? ?? 0;
+                  final amount = (item['amount'] as num?)?.toInt() ?? 0;
+                  final isPerPerson = item['isPerPerson'] != false;
+                  final costPerPerson = isPerPerson ? amount : (_participants > 0 ? (amount / _participants).round() : amount);
                   final formattedAmt = '${amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} đ';
                   return Container(
                     margin: const EdgeInsets.only(bottom: 6),
@@ -2464,17 +2562,31 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                         const Icon(Icons.receipt_long, size: 15, color: Color(0xFFD97706)),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: Text(
-                            title,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.editorialInk,
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                title,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.editorialInk,
+                                ),
+                              ),
+                              Text(
+                                isPerPerson
+                                    ? 'Mỗi người: $formattedAmt'
+                                    : 'Cả đoàn: $formattedAmt (${(costPerPerson / 1000).toInt()}k/người)',
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: AppColors.editorialMuted,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         Text(
-                          formattedAmt,
+                          '${(costPerPerson / 1000).toInt()}k/ng',
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
