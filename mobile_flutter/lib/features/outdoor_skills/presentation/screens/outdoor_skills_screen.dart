@@ -928,6 +928,54 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
         'TUYỆT ĐỐI KHÔNG để kẻ gian dồn bạn vào góc chết không có đường lùi.',
       ],
     },
+    {
+      'id': 'skill_pwa_guide',
+      'title': 'Cài đặt App lên iPhone chạy VĨNH VIỄN không hết hạn (PWA)',
+      'category': 'Cài đặt & Vận hành',
+      'categoryIcon': Icons.install_mobile_rounded,
+      'readTime': '2 phút thực hiện',
+      'desc': 'Cách kích hoạt và cài TRAVEL APP lên màn hình chính iPhone để sử dụng vĩnh viễn, không bao giờ bị giới hạn 7 ngày của chứng chỉ Apple Developer / Sideloadly.',
+      'priority': 'QUAN TRỌNG',
+      'accent': AppColors.summitGold,
+      'equipment': [
+        'Trình duyệt Safari trên iPhone (iOS 14+)',
+        'Đường link GitHub Pages của dự án',
+        'Kết nối Wifi hoặc 4G để cài đặt ban đầu',
+      ],
+      'steps': [
+        {
+          'number': '01',
+          'title': 'Bật GitHub Pages trong Cài Đặt Repo (Làm 1 lần)',
+          'diagramType': 'pwa_settings',
+          'tag': 'CẤU HÌNH GITHUB REPO',
+          'action': 'Vào GitHub trên máy tính hoặc trình duyệt: github.com/dainghia0127/TRAVEL_APP -> Bấm vào tab Settings (Cài đặt) -> Chọn Pages ở menu bên trái -> Tại mục Source, chọn "GitHub Actions" (thay vì Deploy from a branch). Đồng thời chuyển Repo sang Public tại mục Danger Zone.',
+          'keyRule': 'Repo chuyển sang Public và Source chọn GitHub Actions là điều kiện để GitHub Pages tự động phát hành web app.',
+          'tip': 'Mỗi khi chạy push_to_github.bat, hệ thống sẽ tự động cập nhật bản mới nhất lên GitHub Pages.',
+        },
+        {
+          'number': '02',
+          'title': 'Mở Safari trên iPhone truy cập link GitHub Pages',
+          'diagramType': 'pwa_safari',
+          'tag': 'TRUY CẬP BẰNG TRÌNH DUYỆT SAFARI',
+          'action': 'Mở trình duyệt Safari trên iPhone (lưu ý bắt buộc dùng Safari, không dùng Chrome/Cốc Cốc trên iOS vì Apple chỉ hỗ trợ PWA qua Safari). Gõ địa chỉ: https://dainghia0127.github.io/TRAVEL_APP/',
+          'keyRule': 'Bắt buộc sử dụng trình duyệt Safari của iPhone để kích hoạt tính năng Web App độc lập.',
+          'tip': 'Chờ 2-3 giây để ứng dụng tải dữ liệu offline ban đầu vào bộ nhớ đệm của iPhone.',
+        },
+        {
+          'number': '03',
+          'title': 'Thêm vào Màn Hình Chính (Add to Home Screen)',
+          'diagramType': 'pwa_install',
+          'tag': 'TẠO BIỂU TƯỢNG APP ĐỘC LẬP',
+          'action': 'Nhấn vào nút Chia Sẻ (Share - biểu tượng hình vuông có mũi tên chỉ lên ở thanh công cụ dưới đáy Safari) -> Cuộn xuống và chọn dòng "Thêm vào Màn hình chính" (Add to Home Screen) -> Nhấn nút "Thêm" (Add) ở góc trên bên phải màn hình.',
+          'keyRule': 'Biểu tượng TRAVEL APP sẽ xuất hiện trên màn hình chính như một ứng dụng cài từ App Store.',
+          'tip': 'Khi mở từ màn hình chính, app chạy toàn màn hình Standalone không có thanh Safari, lưu trữ ngoại tuyến và KHÔNG BAO GIỜ HẾT HẠN (không bị giới hạn 7 ngày như Sideloadly).',
+        },
+      ],
+      'donts': [
+        'KHÔNG sử dụng Chrome hoặc Google App trên iOS để thêm vào màn hình chính vì sẽ không được tối ưu chạy toàn màn hình.',
+        'KHÔNG xóa lịch sử & dữ liệu trang web của Safari nếu muốn duy trì toàn bộ dữ liệu lịch trình ngoại tuyến đã lưu.',
+      ],
+    },
   ];
 
   @override
@@ -1122,6 +1170,18 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
       visualIcon = Icons.kitchen;
       visualMetric = 'Treo đồ ăn: Cách lều 20m';
       annotationText = 'Đào rãnh thoát nước sâu 15cm • Treo túi đồ ăn lên cành cây cao';
+    } else if (diagramType == 'pwa_settings') {
+      visualIcon = Icons.settings_suggest_rounded;
+      visualMetric = 'GitHub: Source → Actions';
+      annotationText = 'Settings → Pages → Source chọn GitHub Actions • Chuyển Repo sang Public';
+    } else if (diagramType == 'pwa_safari') {
+      visualIcon = Icons.public;
+      visualMetric = 'Safari iOS: URL Pages';
+      annotationText = 'Mở Safari gõ: https://dainghia0127.github.io/TRAVEL_APP/';
+    } else if (diagramType == 'pwa_install') {
+      visualIcon = Icons.add_to_home_screen_rounded;
+      visualMetric = 'PWA: Chạy vĩnh viễn';
+      annotationText = 'Bấm nút Share ↑ → Thêm vào Màn hình chính • Chạy độc lập không hết hạn';
     }
 
     return Container(
@@ -1706,6 +1766,7 @@ class _OutdoorSkillsScreenState extends State<OutdoorSkillsScreen> {
       'Định hướng',
       'Kỹ năng sinh tồn',
       'Kinh nghiệm cuộc sống',
+      'Cài đặt & Vận hành',
     ];
     final filtered = _filteredSkills;
 

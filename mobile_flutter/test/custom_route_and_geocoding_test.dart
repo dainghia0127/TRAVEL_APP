@@ -40,6 +40,43 @@ void main() {
       expect(result.position.latitude, closeTo(10.7769, 0.0001));
       expect(result.position.longitude, closeTo(106.7009, 0.0001));
     });
+
+    test('GeocodingResult parses Photon Komoot GeoJSON accurately', () {
+      final feature = {
+        'type': 'Feature',
+        'properties': {
+          'name': 'Tòa S2.05 Vinhome Grand Park',
+          'street': 'Đường Nguyễn Xiển',
+          'locality': 'Vinhomes Grand Park',
+          'district': 'Long Bình',
+          'city': 'Thành phố Thủ Đức',
+          'country': 'Việt Nam',
+        },
+        'geometry': {
+          'type': 'Point',
+          'coordinates': [106.832719, 10.8376756],
+        },
+      };
+
+      final result = GeocodingResult.fromPhoton(feature);
+
+      expect(result.title, equals('Tòa S2.05 Vinhome Grand Park'));
+      expect(result.subtitle, contains('Long Bình'));
+      expect(result.subtitle, contains('Thủ Đức'));
+      expect(result.position.latitude, closeTo(10.8376, 0.0001));
+      expect(result.position.longitude, closeTo(106.8327, 0.0001));
+    });
+
+    test('GeocodingService normalizes typo in queries like vinhome granpark', () {
+      expect(
+        GeocodingService.normalizeQuery('vinhome granpark'),
+        equals('vinhomes grand park'),
+      );
+      expect(
+        GeocodingService.normalizeQuery('vinhomes gran park'),
+        equals('vinhomes grand park'),
+      );
+    });
   });
 
   group('StorageService Custom Route Tests', () {

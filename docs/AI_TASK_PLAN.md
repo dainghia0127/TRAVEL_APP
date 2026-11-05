@@ -153,18 +153,31 @@
   - Cấu hình PWA tối ưu chuẩn mực cho iPhone Safari (`manifest.json`, `index.html` với `viewport-fit=cover`, `black-translucent`, splash screen nền tối Dark Forest tránh chớp trắng).
   - Tạo GitHub Actions Workflow `.github/workflows/deploy_pwa_pages.yml`: Tự động biên dịch Flutter Web và deploy trực tiếp lên GitHub Pages (`https://dainghia0127.github.io/TRAVEL_APP/`) mỗi khi push code lên `main`.
   - Đảm bảo app chạy vĩnh viễn trên iPhone không bao giờ hết hạn (loại bỏ giới hạn 7 ngày của chứng chỉ Apple Free Developer qua Sideloadly).
+- [x] Task 9.7: Nâng cấp Multi-tier Smart Geocoder & Xử lý Typo ("vinhome granpark"):
+  - Tích hợp Photon Komoot API chống chặn mạng ISP tại Việt Nam, định tuyến tọa độ chuẩn xác.
+  - Xây dựng thuật toán `normalizeQuery`: Tự động nhận diện và chuyển đổi các từ khóa gõ nhanh/thiếu chữ ("vinhome granpark" ➔ "vinhomes grand park").
+- [x] Task 9.8: Tự động đóng SnackBar & Pop up khi xem lịch trình và khi đổi tab:
+  - Thêm `ScaffoldMessenger.of(context).hideCurrentSnackBar()` vào hành động `XEM LỊCH TRÌNH` và các hàm điều hướng tại `destination_detail_screen.dart`.
+  - Tự động đóng các pop up SnackBar còn dang dở khi người dùng chuyển qua lại giữa các tab tại `main_navigation_screen.dart`.
+- [x] Task 9.9: Ẩn toàn bộ nút bấm & Dọn sạch dữ liệu Lịch Trình khi xóa hết địa điểm:
+  - Khi `_tripDestinations.isEmpty`: Reset sạch `_daysItinerary = {}`, `_checklistItems = []`, `_isJourneyActive = false`.
+  - Ẩn hoàn toàn: Thanh tiến độ, Bộ chọn 2 Tab, Nút bắt đầu lộ trình, Nút đổi ngày, Nút thêm mốc.
+  - Hiển thị Empty State toàn màn hình với 2 nút hành động trực quan: "TẠO LỘ TRÌNH A-B TRÊN BẢN ĐỒ" và "Khám Phá Địa Danh Mới".
+- [x] Task 9.10: Lưu trữ Tài Liệu Hướng Dẫn PWA Vĩnh Viễn Trong App & Thư Mục Docs:
+  - Thêm chuyên đề mới `skill_pwa_guide` vào tab Cẩm Nang (`outdoor_skills_screen.dart`) kèm sơ đồ minh họa từng bước để người dùng có thể mở xem trực tiếp ngay trong app bất cứ lúc nào.
+  - Tạo file tài liệu chi tiết `docs/PWA_PERMANENT_GUIDE.md` lưu trữ trong project.
 
 ---
 
 ## 4. Công Việc Đang Thực Hiện
-- Hoàn thành toàn bộ các yêu cầu của Giai Đoạn 8 bao gồm Cloud Sync, Live Trekking, Bản đồ A-B Custom Routing và Quy trình Tự động nạp địa danh mới (Data Pipeline).
+- Hoàn thành toàn diện 4/4 yêu cầu người dùng, kiểm chứng 100% qua Flutter Analyze & Automated Tests.
 - Sẵn sàng bàn giao và hướng dẫn người dùng vận hành.
 
 ---
 
 ## 5. Kết Quả Kiểm Thử Thực Tế
 - **`flutter analyze`**: **`No issues found!`** (0 lỗi, 0 cảnh báo - 100% clean).
-- **`flutter test`**: **`All tests passed!`** (22/22 unit & widget test pass 100%).
+- **`flutter test`**: **`All tests passed!`** (24/24 unit & widget test pass 100%).
 - **`flutter build web`**: Sẵn sàng biên dịch khi cần.
 
 ---

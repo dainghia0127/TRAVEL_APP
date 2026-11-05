@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:mobile_flutter/core/services/storage_service.dart';
-import 'package:mobile_flutter/features/explore/data/models/destination_model.dart';
+import '../../../../core/services/storage_service.dart';
+import '../models/destination_model.dart';
 
+/// Kết quả đồng bộ đám mây
 class CloudSyncResult {
   final bool isSuccess;
   final bool isOffline;
@@ -12,7 +13,7 @@ class CloudSyncResult {
 
   const CloudSyncResult({
     required this.isSuccess,
-    this.isOffline = false,
+    required this.isOffline,
     required this.destinationCount,
     required this.message,
   });
@@ -26,8 +27,14 @@ abstract class IExploreLocalDataSource {
 
 class ExploreLocalDataSource implements IExploreLocalDataSource {
   static const String _assetPath = 'assets/data/destinations_seed.json';
+
+  // Endpoint Cloud tải trực tiếp từ GitHub Raw
   static const String _cloudSeedUrl =
       'https://raw.githubusercontent.com/dainghia0127/TRAVEL_APP/main/mobile_flutter/assets/data/destinations_seed.json';
+
+  // Endpoint dự phòng từ GitHub Pages
+  static const String _pagesSeedUrl =
+      'https://dainghia0127.github.io/TRAVEL_APP/assets/assets/data/destinations_seed.json';
 
   // Static RAM Cache: Toàn bộ app chỉ parse JSON đúng 1 lần duy nhất trong toàn vòng đời
   static List<DestinationModel>? _cachedDestinations;
@@ -63,7 +70,6 @@ class ExploreLocalDataSource implements IExploreLocalDataSource {
                 .toList() ??
             [];
       } catch (e) {
-        // Fallback an toàn nếu có lỗi giải mã
         list = [];
       }
     }
@@ -84,41 +90,45 @@ class ExploreLocalDataSource implements IExploreLocalDataSource {
     return list;
   }
 
-  /// Đồng bộ dữ liệu địa danh mới nhất từ Cloud (GitHub Raw endpoint)
+  /// Đồng bộ dữ liệu địa danh mới nhất từ Cloud (GitHub Raw endpoint + Pages Fallback)
   @override
   Future<CloudSyncResult> syncFromCloud() async {
     String? failureReason;
-    try {
-      final response = await http
-          .get(Uri.parse(_cloudSeedUrl))
-          .timeout(const Duration(seconds: 6));
+    final endpoints = [_cloudSeedUrl, _pagesSeedUrl];
 
-      if (response.statusCode == 200 && response.body.isNotEmpty) {
-        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-        final list = (decoded['destinations'] as List<dynamic>?)
-                ?.map((e) => DestinationModel.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [];
+    for (final url in endpoints) {
+      try {
+        final response = await http
+            .get(Uri.parse(url))
+            .timeout(const Duration(seconds: 5));
 
-        if (list.isNotEmpty) {
-          // Lưu vào bộ nhớ máy SharedPreferences để dùng lâu dài kể cả khi offline
-          await StorageService.saveSyncedDestinationsJson(response.body);
-          invalidateCache();
-          final refreshedList = await getSeedDestinations();
-          return CloudSyncResult(
-            isSuccess: true,
-            isOffline: false,
-            destinationCount: refreshedList.length,
-            message: 'Đã đồng bộ thành công ${refreshedList.length} địa điểm mới nhất từ Đám Mây (Cloud)!',
-          );
+        if (response.statusCode == 200 && response.body.isNotEmpty) {
+          final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+          final list = (decoded['destinations'] as List<dynamic>?)
+                  ?.map((e) => DestinationModel.fromJson(e as Map<String, dynamic>))
+                  .toList() ??
+              [];
+
+          if (list.isNotEmpty) {
+            // Lưu vào bộ nhớ máy SharedPreferences để dùng lâu dài kể cả khi offline
+            await StorageService.saveSyncedDestinationsJson(response.body);
+            invalidateCache();
+            final refreshedList = await getSeedDestinations();
+            return CloudSyncResult(
+              isSuccess: true,
+              isOffline: false,
+              destinationCount: refreshedList.length,
+              message: 'Đã đồng bộ thành công ${refreshedList.length} địa điểm mới nhất từ Đám Mây (Cloud)!',
+            );
+          }
+        } else if (response.statusCode == 404) {
+          failureReason = 'Kho lưu trữ GitHub đang ở chế độ Riêng Tư (Private).\nHãy vào Cài đặt (Settings) trên GitHub chuyển Repo sang Public để tự động tải.';
+        } else {
+          failureReason = 'Máy chủ trả về mã HTTP ${response.statusCode}.';
         }
-      } else if (response.statusCode == 404) {
-        failureReason = 'Kho lưu trữ GitHub đang ở chế độ Riêng Tư (Private). Hãy chuyển Repo sang Public để tải tự động.';
-      } else {
-        failureReason = 'Máy chủ trả về mã HTTP ${response.statusCode}.';
+      } catch (_) {
+        failureReason = 'Không thể kết nối đến máy chủ Cloud (Kiểm tra kết nối mạng).';
       }
-    } catch (_) {
-      failureReason = 'Không thể kết nối đến máy chủ Cloud (Kiểm tra kết nối mạng).';
     }
 
     // Đọc dữ liệu local hiện có trong máy
@@ -140,4 +150,3 @@ class ExploreLocalDataSource implements IExploreLocalDataSource {
     _cachedDestinations = null;
   }
 }
-

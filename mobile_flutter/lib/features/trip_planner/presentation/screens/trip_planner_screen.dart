@@ -209,12 +209,19 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
       }
     }
 
-    // Khi người dùng đã xóa hết địa điểm: giữ nguyên rỗng, không tự ý nạp lại
+    // Khi người dùng đã xóa hết địa điểm: dọn sạch dữ liệu hành trình, giữ nguyên rỗng, không tự ý nạp lại
     if (loaded.isEmpty) {
       if (mounted) {
         setState(() {
           _tripDestinations = [];
           _selectedDestination = null;
+          _daysItinerary = {};
+          _checklistItems = [];
+          _checkedItems = {};
+          _isJourneyActive = false;
+          _distanceFromUserKm = 0.0;
+          _maxDays = 1;
+          _selectedDay = 1;
         });
       }
       return;
@@ -815,89 +822,6 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                  ] else ...[
-                    // Khối Empty State khi người dùng đã xóa hết địa điểm
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.editorialSurface,
-                        borderRadius: AppRadius.roundedLg,
-                        border: Border.all(color: AppColors.editorialBorder),
-                      ),
-                      child: Column(
-                        children: [
-                          const Icon(Icons.alt_route_rounded, size: 36, color: AppColors.editorialPine),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Chưa có địa điểm nào trong chuyến đi',
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.editorialInk),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'Bạn có thể tự chọn tuyến đường A ➔ B trên bản đồ hoặc chọn địa danh từ mục Khám phá.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 11.5, color: AppColors.editorialMuted),
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: BouncingButton(
-                                  onTap: () {
-                                    HapticFeedback.lightImpact();
-                                    MainNavigationScreen.openCustomRouteOnMap = true;
-                                    MainNavigationScreen.switchToTab(1);
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.editorialPine,
-                                      borderRadius: AppRadius.roundedPill,
-                                    ),
-                                    child: const Center(
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Icon(Icons.alt_route_rounded, size: 16, color: Colors.white),
-                                          SizedBox(width: 6),
-                                          Text(
-                                            'Tạo Điểm A-B Trên Bản Đồ',
-                                            style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              BouncingButton(
-                                onTap: () {
-                                  HapticFeedback.lightImpact();
-                                  MainNavigationScreen.switchToTab(0);
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.editorialSurface,
-                                    borderRadius: AppRadius.roundedPill,
-                                    border: Border.all(color: AppColors.editorialBorder),
-                                  ),
-                                  child: const Row(
-                                    children: [
-                                      Icon(Icons.explore_outlined, size: 16, color: AppColors.editorialInk),
-                                      SizedBox(width: 4),
-                                      Text('Khám phá', style: TextStyle(color: AppColors.editorialInk, fontSize: 12, fontWeight: FontWeight.w600)),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
 
                   // Destination Info Summary Card
@@ -941,68 +865,190 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                     const SizedBox(height: 10),
                   ],
 
-                  // Progress Bar
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: AppColors.editorialSurface,
-                      borderRadius: AppRadius.roundedMd,
-                      border: Border.all(color: AppColors.editorialBorder),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Tiến độ chuẩn bị hành trang',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.editorialInk,
+                  // Chỉ hiển thị Progress Bar và 2-Tab Selector khi chuyến đi có ít nhất 1 địa điểm
+                  if (_tripDestinations.isNotEmpty) ...[
+                    // Progress Bar
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: AppColors.editorialSurface,
+                        borderRadius: AppRadius.roundedMd,
+                        border: Border.all(color: AppColors.editorialBorder),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Tiến độ chuẩn bị hành trang',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.editorialInk,
+                                ),
                               ),
-                            ),
-                            Text(
-                              '${(progress * 100).toInt()}%',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.editorialPine,
+                              Text(
+                                '${(progress * 100).toInt()}%',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.editorialPine,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        ClipRRect(
-                          borderRadius: AppRadius.roundedPill,
-                          child: LinearProgressIndicator(
-                            value: progress,
-                            minHeight: 5,
-                            backgroundColor: AppColors.editorialBorder,
-                            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.editorialPine),
+                            ],
                           ),
-                        ),
+                          const SizedBox(height: 6),
+                          ClipRRect(
+                            borderRadius: AppRadius.roundedPill,
+                            child: LinearProgressIndicator(
+                              value: progress,
+                              minHeight: 5,
+                              backgroundColor: AppColors.editorialBorder,
+                              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.editorialPine),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Main 2-Tab Selector
+                    Row(
+                      children: [
+                        _buildHeaderTab(0, 'Trục Lộ Trình (Timeline)', Icons.timeline),
+                        const SizedBox(width: 8),
+                        _buildHeaderTab(1, 'Hành Trang & Chi Phí', Icons.account_balance_wallet_outlined),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Main 2-Tab Selector
-                  Row(
-                    children: [
-                      _buildHeaderTab(0, 'Trục Lộ Trình (Timeline)', Icons.timeline),
-                      const SizedBox(width: 8),
-                      _buildHeaderTab(1, 'Hành Trang & Chi Phí', Icons.account_balance_wallet_outlined),
-                    ],
-                  ),
+                  ],
                 ],
               ),
             ),
 
-            // Tab Content Body
+            // Tab Content Body: Khi không có địa điểm thì ẩn toàn bộ và hiển thị Empty State toàn màn hình
             Expanded(
-              child: _activeTab == 0 ? _buildContinuousTimelineView() : _buildBudgetAndPackView(),
+              child: _tripDestinations.isEmpty
+                  ? _buildEmptyTripPlannerView()
+                  : (_activeTab == 0 ? _buildContinuousTimelineView() : _buildBudgetAndPackView()),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Giao diện Trạng thái Rỗng toàn màn hình khi chưa có hoặc đã xóa hết địa điểm
+  Widget _buildEmptyTripPlannerView() {
+    return Center(
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppColors.editorialPine.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.editorialPine.withValues(alpha: 0.3), width: 1.5),
+              ),
+              child: const Icon(Icons.alt_route_rounded, size: 40, color: AppColors.editorialPine),
+            ),
+            const SizedBox(height: 18),
+            const Text(
+              'Chưa Có Địa Điểm Nào Trong Kế Hoạch',
+              style: TextStyle(
+                fontFamily: 'serif',
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: AppColors.editorialInk,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Bạn có thể tự chọn tuyến đường xuất phát và đích đến (A ➔ B) trên bản đồ, hoặc chọn các đỉnh núi, đèo dốc từ mục Khám phá.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                color: AppColors.editorialMuted,
+                height: 1.45,
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: BouncingButton(
+                onTap: () {
+                  HapticFeedback.mediumImpact();
+                  MainNavigationScreen.openCustomRouteOnMap = true;
+                  MainNavigationScreen.switchToTab(1);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [AppColors.editorialPine, Color(0xFF143022)],
+                    ),
+                    borderRadius: AppRadius.roundedMd,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.editorialPine.withValues(alpha: 0.35),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.add_road_rounded, color: Colors.white, size: 18),
+                        SizedBox(width: 8),
+                        Text(
+                          'TẠO LỘ TRÌNH A-B TRÊN BẢN ĐỒ',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 0.3),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              height: 46,
+              child: BouncingButton(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  MainNavigationScreen.switchToTab(0);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.editorialSurface,
+                    borderRadius: AppRadius.roundedMd,
+                    border: Border.all(color: AppColors.editorialBorder, width: 1.2),
+                  ),
+                  child: const Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.explore_outlined, color: AppColors.editorialInk, size: 18),
+                        SizedBox(width: 8),
+                        Text(
+                          'Khám Phá Địa Danh Mới',
+                          style: TextStyle(color: AppColors.editorialInk, fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         ),

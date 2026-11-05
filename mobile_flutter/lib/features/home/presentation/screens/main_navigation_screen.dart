@@ -46,6 +46,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   void _handleExternalTabChange() {
     final newIndex = MainNavigationScreen.activeTabNotifier.value;
     if (_currentIndex != newIndex && mounted) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       setState(() => _currentIndex = newIndex);
     }
   }
@@ -92,6 +93,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   void _onTabSelected(int index) {
     if (_currentIndex != index) {
       HapticFeedback.selectionClick();
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
       MainNavigationScreen.activeTabNotifier.value = index;
       setState(() => _currentIndex = index);
     }

@@ -179,6 +179,7 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
             label: 'XEM LỊCH TRÌNH',
             textColor: AppColors.summitGold,
             onPressed: () {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
               Navigator.of(context).pop();
               MainNavigationScreen.switchToTab(2);
             },
@@ -189,12 +190,14 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
   }
 
   void _navigateToMap() {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     StorageService.setSelectedTripDestination(_destId);
     Navigator.of(context).pop();
     MainNavigationScreen.switchToTab(1);
   }
 
   void _navigateToTripPlanner() {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     StorageService.setSelectedTripDestination(_destId);
     Navigator.of(context).pop();
     MainNavigationScreen.switchToTab(2);
