@@ -2,8 +2,10 @@ name: Auto Enrich Trekking Destinations
 
 on:
   schedule:
-    # Tự động chạy định kỳ vào 00:00 Chủ Nhật hàng tuần (UTC)
-    - cron: '0 0 * * 0'
+    # Tự động chạy định kỳ vào 00:00 mỗi ngày (17:00 UTC = 00:00 GMT+7 Giờ Việt Nam)
+    - cron: '0 17 * * *'
+    # Mốc dự phòng 00:00 UTC hàng ngày
+    - cron: '0 0 * * *'
   workflow_dispatch:
     inputs:
       count:
@@ -46,3 +48,4 @@ jobs:
           git add mobile_flutter/assets/data/destinations_seed.json
           git commit -m "chore(destinations): auto-enrich new trekking spots from outdoor cloud pool [skip ci]"
           git push origin main
+

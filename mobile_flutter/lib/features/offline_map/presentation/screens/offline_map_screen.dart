@@ -662,6 +662,34 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
     return 'ĐỊA HÌNH • ESRI TOPO';
   }
 
+  /// Tính toán vị trí đáy động cho cụm nút điều khiển bên phải (Zoom in/out, Live GPS, Layer, Vị trí)
+  /// Đảm bảo không bao giờ bị che khuất khi pop-up thu gọn, mở rộng hay khi có thanh khôi phục
+  double get _mapControlsBottomOffset {
+    if (_selectedTripDestination != null) {
+      if (_isCardCollapsed) {
+        // Pop-up thu gọn (mini bar cao ~75px + margin đáy 20px = 95px) -> Nút zoom out nằm ngay trên thanh
+        return 105.0;
+      } else {
+        // Pop-up mở rộng (card chi tiết cao ~290px + margin đáy 20px) -> Nâng lên phía trên card
+        return 320.0;
+      }
+    }
+    if (_selectedWaypoint != null) {
+      // Waypoint preview sheet cao ~180px + margin 20px
+      return 215.0;
+    }
+    if (_isCustomRouteMode && _customRouteDistanceKm != null) {
+      // Floating card kết quả A-B cao ~210px + margin 20px
+      return 245.0;
+    }
+    if (_lastActiveDestination != null && !_isCustomRouteMode) {
+      // Thanh mini bar "Mở lại lộ trình: ..." ở đáy (cao ~48px + margin 24px = 72px)
+      return 88.0;
+    }
+    // Trạng thái bình thường không có card nào ở đáy
+    return 28.0;
+  }
+
   @override
   Widget build(BuildContext context) {
     const filters = ['Tất cả', 'Nguồn nước', 'Cắm trại', 'Cửa rừng', 'Đích đến'];
@@ -1440,10 +1468,12 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
             ),
           ),
 
-          // Floating Map Control Buttons on the Right & Live GPS Status Indicator
-          Positioned(
+          // Floating Map Control Buttons on the Right & Live GPS Status Indicator (Tự động trượt lên/xuống mượt mà tránh che nút zoom)
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutCubic,
             right: 16,
-            bottom: (_selectedTripDestination != null || _selectedWaypoint != null) ? 240 : 32,
+            bottom: _mapControlsBottomOffset,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [

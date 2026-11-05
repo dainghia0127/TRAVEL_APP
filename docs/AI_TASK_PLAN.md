@@ -126,8 +126,15 @@
   - Hiển thị Floating Card tóm tắt lộ trình A-B và nút bao quát toàn tuyến đường.
 - [x] Task 8.4: Tự Động Hóa Thu Thập & Đồng Bộ Dữ Liệu Địa Danh Mới (Automated Content Ingestion Pipeline):
   - Phát triển công cụ tự động hóa `tools/auto_destinations_updater.py`: Quản lý kho dữ liệu dã ngoại tuyển chọn chất lượng cao (Curated Outdoor Reservoir), kiểm tra chống trùng lặp thông minh và tự động chèn địa danh chuẩn cấu trúc vào `destinations_seed.json`.
-  - Thiết lập GitHub Actions Workflow `.github/workflows/auto_sync_destinations.yml`: Tự động kích hoạt hàng tuần (Chủ Nhật) hoặc chạy thủ công bằng 1 click (`workflow_dispatch`), tự động commit và đẩy lên nhánh `main` kèm cờ `[skip ci]` không làm tốn tài nguyên build iOS.
+  - Thiết lập GitHub Actions Workflow `.github/workflows/auto_sync_destinations.yml`: Tự động kích hoạt hàng ngày vào lúc 00:00 (17:00 UTC = 00:00 GMT+7 giờ VN) và dự phòng 00:00 UTC hoặc chạy thủ công bằng 1 click (`workflow_dispatch`), tự động commit và đẩy lên nhánh `main` kèm cờ `[skip ci]` không làm tốn tài nguyên build iOS.
   - Khi có địa danh mới trên GitHub, app người dùng tự động kéo về qua Cloud Sync khi bấm Làm mới/Refresh, không cần nhập liệu thủ công và không cần cài lại file IPA.
+- [x] Task 8.5: Tối Ưu Bản Đồ - Chống Che Khuất Nút Zoom Out Khi Pop-up Thu Gọn:
+  - Bổ sung getter `_mapControlsBottomOffset` tính toán vị trí đáy linh hoạt cho cụm nút điều khiển bên phải theo từng trạng thái:
+    - Khi pop-up thu gọn (mini bar): cụm nút hạ xuống `bottom: 105.0` (ngay trên mép trên thanh mini bar 95px), nút Zoom Out hoàn toàn lộ diện, không bị che khuất.
+    - Khi pop-up mở rộng: cụm nút nâng lên `bottom: 320.0` (trên mép trên card chi tiết).
+    - Khi đóng pop-up có thanh khôi phục "Mở lại lộ trình...": cụm nút hạ xuống `bottom: 88.0` (trên thanh 72px).
+    - Khi bình thường: cụm nút ở `bottom: 28.0`.
+  - Chuyển cụm nút điều khiển thành `AnimatedPositioned` (thời gian chuyển động 250ms, easeOutCubic) giúp các nút trượt lên/xuống mượt mà tự nhiên.
 
 ---
 
