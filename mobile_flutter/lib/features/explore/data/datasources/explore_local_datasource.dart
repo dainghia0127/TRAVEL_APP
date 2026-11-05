@@ -36,58 +36,60 @@ class ExploreLocalDataSource implements IExploreLocalDataSource {
   static const String _pagesSeedUrl =
       'https://dainghia0127.github.io/TRAVEL_APP/assets/assets/data/destinations_seed.json';
 
-  // Static RAM Cache: Toàn bộ app chỉ parse JSON đúng 1 lần duy nhất trong toàn vòng đời
+  // Static RAM Cache: Lưu trữ danh sách địa danh seed để không phải parse JSON lặp lại
   static List<DestinationModel>? _cachedDestinations;
 
   @override
   Future<List<DestinationModel>> getSeedDestinations() async {
-    // 1. Kiểm tra RAM cache
+    // 1. Kiểm tra RAM cache của các địa danh seed
+    List<DestinationModel> seedList = [];
     if (_cachedDestinations != null && _cachedDestinations!.isNotEmpty) {
-      return _cachedDestinations!;
-    }
-
-    List<DestinationModel> list = [];
-
-    // 2. Kiểm tra bộ nhớ máy (SharedPreferences) đã từng đồng bộ từ Cloud chưa
-    try {
-      final savedCloudJson = await StorageService.getSyncedDestinationsJson();
-      if (savedCloudJson != null && savedCloudJson.trim().isNotEmpty) {
-        final Map<String, dynamic> decoded = jsonDecode(savedCloudJson) as Map<String, dynamic>;
-        list = (decoded['destinations'] as List<dynamic>?)
-                ?.map((e) => DestinationModel.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [];
-      }
-    } catch (_) {}
-
-    // 3. Fallback đọc file JSON từ asset bundle nội bộ trong máy nếu chưa có cloud cache
-    if (list.isEmpty) {
+      seedList = List<DestinationModel>.from(_cachedDestinations!);
+    } else {
+      // 2. Kiểm tra bộ nhớ máy (SharedPreferences) đã từng đồng bộ từ Cloud chưa
       try {
-        final jsonString = await rootBundle.loadString(_assetPath);
-        final Map<String, dynamic> decoded = jsonDecode(jsonString) as Map<String, dynamic>;
-        list = (decoded['destinations'] as List<dynamic>?)
-                ?.map((e) => DestinationModel.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [];
-      } catch (e) {
-        list = [];
+        final savedCloudJson = await StorageService.getSyncedDestinationsJson();
+        if (savedCloudJson != null && savedCloudJson.trim().isNotEmpty) {
+          final Map<String, dynamic> decoded = jsonDecode(savedCloudJson) as Map<String, dynamic>;
+          seedList = (decoded['destinations'] as List<dynamic>?)
+                  ?.map((e) => DestinationModel.fromJson(e as Map<String, dynamic>))
+                  .toList() ??
+              [];
+        }
+      } catch (_) {}
+
+      // 3. Fallback đọc file JSON từ asset bundle nội bộ trong máy nếu chưa có cloud cache
+      if (seedList.isEmpty) {
+        try {
+          final jsonString = await rootBundle.loadString(_assetPath);
+          final Map<String, dynamic> decoded = jsonDecode(jsonString) as Map<String, dynamic>;
+          seedList = (decoded['destinations'] as List<dynamic>?)
+                  ?.map((e) => DestinationModel.fromJson(e as Map<String, dynamic>))
+                  .toList() ??
+              [];
+        } catch (e) {
+          seedList = [];
+        }
       }
+
+      _cachedDestinations = seedList;
     }
 
-    // 4. Nạp thêm các Lộ trình tự chọn A-B do người dùng tạo (Custom Routes)
+    final List<DestinationModel> fullList = List<DestinationModel>.from(seedList);
+
+    // 4. LUÔN LUÔN nạp các Lộ trình tự chọn A-B mới nhất do người dùng tạo (Custom Routes)
     try {
       final customJsonList = await StorageService.getAllCustomRoutesJson();
       for (final cJson in customJsonList) {
         final decoded = jsonDecode(cJson) as Map<String, dynamic>;
         final model = DestinationModel.fromJson(decoded);
-        if (!list.any((d) => d.id == model.id)) {
-          list.add(model);
+        if (!fullList.any((d) => d.id == model.id)) {
+          fullList.add(model);
         }
       }
     } catch (_) {}
 
-    _cachedDestinations = list;
-    return list;
+    return fullList;
   }
 
   /// Đồng bộ dữ liệu địa danh mới nhất từ Cloud (GitHub Raw endpoint + Pages Fallback)

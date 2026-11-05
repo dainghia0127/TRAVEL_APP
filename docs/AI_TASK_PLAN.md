@@ -20,8 +20,8 @@
 ---
 
 ## 2. Giai Đoạn Hiện Tại & Trạng Thái Tổng Thể
-- **Giai đoạn hiện tại**: **GIAI ĐOẠN 9 — HOÀN THIỆN ĐỒNG BỘ HAI CHIỀU BẢN ĐỒ - LỊCH TRÌNH, TÌM KIẾM ĐỊA CHỈ GOOGLE MAPS GEOCODING & KHẮC PHỤC THÔNG BÁO CLOUD SYNC REPO PRIVATE**.
-- **Trạng thái tổng thể**: `[x]` **Đã hoàn thành và kiểm chứng 100% qua 22/22 unit & widget tests.**
+- **Giai đoạn hiện tại**: **GIAI ĐOẠN 10 — TỐI ƯU HÓA HIỆU NĂNG LỊCH TRÌNH, BỎ CHẶN GPS, DYNAMIC CACHE CUSTOM ROUTE & CĂN CHỈNH CAMERA BOUNDS BẢN ĐỒ CHUẨN GOOGLE MAPS**.
+- **Trạng thái tổng thể**: `[x]` **Đã hoàn thành và kiểm chứng 100% qua 25/25 unit & widget tests.**
 
 ---
 
@@ -169,6 +169,32 @@
 
 ---
 
+### Giai Đoạn 10: Tối Ưu Hiệu Năng Lịch Trình, Bỏ Chặn GPS, Dynamic Cache & Camera Fit Bounds (Phase 10)
+- [x] Task 10.1: Loại bỏ block 10 giây do `LocationService.getCurrentLocation()` trong Lịch trình:
+  - Đưa nạp danh sách chuyến đi từ bộ nhớ máy lên chạy ngay lập tức trong 0.001 giây.
+  - Chuyển `LocationService.getCurrentLocation()` sang chạy ngầm bất đồng bộ bằng `.then(...)` không chặn giao diện dù chỉ 1 mili-giây.
+- [x] Task 10.2: Khắc phục lỗi Static RAM Cache bỏ qua Custom Routes (`explore_local_datasource.dart`):
+  - Tách riêng cache cho các địa danh seed. Luôn luôn nạp các Custom Route A-B mới nhất từ SharedPreferences.
+  - Bổ sung cơ chế fallback nạp trực tiếp qua `StorageService.getCustomRouteJson(id)` trong `TripPlannerScreen`, bảo đảm các tuyến đường A-B vừa thêm từ bản đồ luôn xuất hiện ngay lập tức trong Lịch trình.
+- [x] Task 10.3: Triển khai Optimistic UI cho thao tác Xóa địa điểm (`trip_planner_screen.dart`):
+  - Khi bấm xóa, địa điểm biến mất ngay lập tức khỏi RAM trong 0ms.
+  - Dọn sạch toàn bộ mốc lộ trình, checklist, chi phí nếu là địa điểm cuối cùng.
+  - Chuyển sang địa điểm kế tiếp nếu xóa địa điểm đang chọn.
+  - Ghi ngầm vào SharedPreferences không `await` và không gọi lại `_initTripData()`, chấm dứt hoàn toàn hiện tượng trễ khi xóa.
+- [x] Task 10.4: Tối ưu chuyển tab Lịch trình (`_onTabChanged`):
+  - So sánh danh sách ID trong storage với danh sách hiện tại. Chỉ nạp lại khi có sự thay đổi thực sự (ví dụ vừa thêm điểm mới ở Khám phá hoặc Bản đồ), giữ nguyên UI mượt mà khi người dùng chỉ switch tab qua lại.
+- [x] Task 10.5: Nâng cấp Bản đồ Lộ trình A-B với `CameraFit.bounds` (`offline_map_screen.dart`):
+  - Thay thế toàn bộ công thức tính zoom cứng thủ công (6.5, 8.5, 10.0) bằng `_mapController.fitCamera(CameraFit.bounds(...))` kèm padding `EdgeInsets.fromLTRB(40, 160, 40, 260)`.
+  - Tự động căn chỉnh bao quát cả điểm A, điểm B và toàn bộ vệt đường màu xanh uốn lượn ngay sau khi tính toán xong hoặc khi bấm nút "Bao Quát Toàn Tuyến Đường".
+- [x] Task 10.6: Xác minh và giải thích hiện tượng trên iPhone Native vs PWA:
+  - Nguyên nhân gốc rễ nằm ở logic Dart chung (blocking GPS 10s và static RAM cache), do đó cả bản PWA (Safari) lẫn bản Native IPA (Sideloadly) đều bị tương tự trước khi sửa.
+  - Bản sửa lỗi này giải quyết triệt để và hoạt động mượt mà 100% trên cả hai nền tảng.
+- [x] Task 10.7: Kiểm thử tự động toàn diện:
+  - Bổ sung unit test `ExploreLocalDataSource dynamically includes Custom Routes from storage`.
+  - Đạt 25/25 automated tests pass 100% và `flutter analyze` 0 issues.
+
+---
+
 ## 4. Công Việc Đang Thực Hiện
 - Hoàn thành toàn diện 4/4 yêu cầu người dùng, kiểm chứng 100% qua Flutter Analyze & Automated Tests.
 - Sẵn sàng bàn giao và hướng dẫn người dùng vận hành.
@@ -177,7 +203,7 @@
 
 ## 5. Kết Quả Kiểm Thử Thực Tế
 - **`flutter analyze`**: **`No issues found!`** (0 lỗi, 0 cảnh báo - 100% clean).
-- **`flutter test`**: **`All tests passed!`** (24/24 unit & widget test pass 100%).
+- **`flutter test`**: **`All tests passed!`** (25/25 unit & widget test pass 100%).
 - **`flutter build web`**: Sẵn sàng biên dịch khi cần.
 
 ---

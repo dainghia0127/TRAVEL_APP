@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile_flutter/core/services/geocoding_service.dart';
 import 'package:mobile_flutter/core/services/storage_service.dart';
+import 'package:mobile_flutter/features/explore/data/datasources/explore_local_datasource.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -123,6 +124,27 @@ void main() {
       // Việc đọc danh sách phải tôn trọng danh sách rỗng, không tự ý nạp 2 điểm mẫu
       final trips = await StorageService.getTripDestinations();
       expect(trips, isEmpty);
+    });
+
+    test('ExploreLocalDataSource dynamically includes Custom Routes from storage', () async {
+      final customModel = {
+        'id': 'custom_test_999',
+        'slug': 'custom-route-ab',
+        'name': 'Bến Thành ➔ Landmark 81',
+        'province': 'TP. Hồ Chí Minh',
+        'country_name': 'Việt Nam',
+        'country_ids': ['VN'],
+        'region_id': 'vn_custom',
+        'category_ids': ['custom_route'],
+        'center_latitude': 10.795,
+        'center_longitude': 106.721,
+        'is_verified': true,
+      };
+      await StorageService.saveCustomRouteJson('custom_test_999', jsonEncode(customModel));
+
+      final datasource = ExploreLocalDataSource();
+      final all = await datasource.getSeedDestinations();
+      expect(all.any((d) => d.id == 'custom_test_999'), isTrue);
     });
   });
 }

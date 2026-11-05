@@ -431,6 +431,21 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
     });
   }
 
+  void _fitRouteBounds(List<LatLng> points) {
+    if (points.isEmpty) return;
+    try {
+      final bounds = LatLngBounds.fromPoints(points);
+      _mapController.fitCamera(
+        CameraFit.bounds(
+          bounds: bounds,
+          padding: const EdgeInsets.fromLTRB(40, 160, 40, 260),
+        ),
+      );
+    } catch (_) {
+      _mapController.move(points.first, 12.0);
+    }
+  }
+
   /// Tính toán lộ trình đường bộ thực tế giữa Điểm Đi A và Điểm Đến B
   Future<void> _calculateCustomRoute() async {
     final start = _customOriginPoint ?? _currentLocation;
@@ -452,8 +467,9 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
         _customRouteDurationText = routeResult.durationText;
         _isLoadingCustomRoute = false;
       });
-      // Di chuyển camera bao quát điểm đến
-      _mapController.move(end, 13.0);
+      // Di chuyển camera bao quát toàn bộ tuyến đường vừa tính xong
+      final allPoints = [start, end, ...routeResult.points];
+      _fitRouteBounds(allPoints);
     }
   }
 
@@ -723,8 +739,11 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                                     _customDestinationName = r.title;
                                   }
                                 });
-                                _mapController.move(r.position, 14.5);
-                                _calculateCustomRoute();
+                                if (forOrigin && _customDestinationPoint == null) {
+                                  _mapController.move(r.position, 14.5);
+                                } else {
+                                  _calculateCustomRoute();
+                                }
                               },
                             );
                           },
@@ -2227,18 +2246,11 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                                 onTap: () {
                                   HapticFeedback.lightImpact();
                                   final target = _getDestLatLng(_selectedTripDestination!);
-                                  // Căn giữa bao quát toàn bộ tuyến đường thực tế
-                                  final centerLat = (_currentLocation.latitude + target.latitude) / 2.0;
-                                  final centerLng = (_currentLocation.longitude + target.longitude) / 2.0;
-                                  double zoom = 12.0;
-                                  if (_distanceToSelectedKm > 400) {
-                                    zoom = 6.5;
-                                  } else if (_distanceToSelectedKm > 150) {
-                                    zoom = 8.5;
-                                  } else if (_distanceToSelectedKm > 50) {
-                                    zoom = 10.0;
-                                  }
-                                  _mapController.move(LatLng(centerLat, centerLng), zoom);
+                                  // Căn chỉnh camera bao quát toàn bộ tuyến đường thực tế
+                                  final points = _routingPolyline.isNotEmpty
+                                      ? [_currentLocation, target, ..._routingPolyline]
+                                      : [_currentLocation, target];
+                                  _fitRouteBounds(points);
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
@@ -2467,17 +2479,10 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                           final target = _customDestinationPoint;
                           if (target != null) {
                             final start = _customOriginPoint ?? _currentLocation;
-                            final centerLat = (start.latitude + target.latitude) / 2.0;
-                            final centerLng = (start.longitude + target.longitude) / 2.0;
-                            double zoom = 12.0;
-                            if (_customRouteDistanceKm! > 400) {
-                              zoom = 6.5;
-                            } else if (_customRouteDistanceKm! > 150) {
-                              zoom = 8.5;
-                            } else if (_customRouteDistanceKm! > 50) {
-                              zoom = 10.0;
-                            }
-                            _mapController.move(LatLng(centerLat, centerLng), zoom);
+                            final points = _customRoutePolyline.isNotEmpty
+                                ? [start, target, ..._customRoutePolyline]
+                                : [start, target];
+                            _fitRouteBounds(points);
                           }
                         },
                         child: Container(

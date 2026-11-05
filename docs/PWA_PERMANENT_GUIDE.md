@@ -60,3 +60,4 @@
   * Tối ưu hiển thị tràn viền cho iPhone có Tai thỏ (Notch) và Dynamic Island.
   * Tích hợp Splash Screen nền đen dã ngoại chống chớp trắng khi khởi động.
   * Sử dụng vĩnh viễn, không lo bị khóa sau 7 ngày!
+

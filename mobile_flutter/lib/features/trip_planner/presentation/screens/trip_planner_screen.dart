@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
@@ -5,6 +6,7 @@ import 'package:mobile_flutter/core/theme/app_theme.dart';
 import 'package:mobile_flutter/core/services/storage_service.dart';
 import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
 import 'package:mobile_flutter/features/explore/data/datasources/explore_local_datasource.dart';
+import 'package:mobile_flutter/features/explore/data/models/destination_model.dart';
 import 'package:mobile_flutter/features/explore/domain/entities/destination.dart';
 import 'package:mobile_flutter/features/home/presentation/screens/main_navigation_screen.dart';
 import 'package:mobile_flutter/features/offline_map/services/location_service.dart';
@@ -184,20 +186,20 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     super.dispose();
   }
 
-  void _onTabChanged() {
+  void _onTabChanged() async {
     if (MainNavigationScreen.activeTabNotifier.value == 2 && mounted) {
-      _initTripData();
+      final tripIds = await StorageService.getTripDestinations();
+      final currentIds = _tripDestinations.map((d) => d.id).toList();
+      final isDifferent = tripIds.length != currentIds.length ||
+          !tripIds.every((id) => currentIds.contains(id));
+      if (isDifferent || _selectedDestination == null) {
+        _initTripData();
+      }
     }
   }
 
   Future<void> _initTripData() async {
-    // 1. Lấy vị trí GPS hiện tại
-    final loc = await LocationService.getCurrentLocation();
-    if (loc != null) {
-      _userLocation = loc;
-    }
-
-    // 2. Tải danh sách địa điểm chuyến đi
+    // 1. Tải danh sách địa điểm chuyến đi NGAY LẬP TỨC (Không chờ GPS chặn giao diện)
     final tripIds = await StorageService.getTripDestinations();
     final allDestinations = await ExploreLocalDataSource().getSeedDestinations();
     final List<Destination> loaded = [];
@@ -206,6 +208,15 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
       final found = allDestinations.where((d) => d.id == id);
       if (found.isNotEmpty) {
         loaded.add(found.first);
+      } else {
+        // Fallback đọc trực tiếp Custom Route từ SharedPreferences
+        final cJson = await StorageService.getCustomRouteJson(id);
+        if (cJson != null && cJson.isNotEmpty) {
+          try {
+            final decoded = jsonDecode(cJson) as Map<String, dynamic>;
+            loaded.add(DestinationModel.fromJson(decoded));
+          } catch (_) {}
+        }
       }
     }
 
@@ -245,6 +256,22 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
         _selectDestination(active, updateChecklist: true);
       }
     }
+
+    // 2. Lấy vị trí GPS trong nền bất đồng bộ để cập nhật khoảng cách (Tuyệt đối không await chặn UI)
+    LocationService.getCurrentLocation().then((loc) {
+      if (loc != null && mounted) {
+        setState(() {
+          _userLocation = loc;
+          if (_selectedDestination != null) {
+            final target = LatLng(
+              _selectedDestination!.centerLatitude ?? 11.6420,
+              _selectedDestination!.centerLongitude ?? 108.4230,
+            );
+            _distanceFromUserKm = const Distance().as(LengthUnit.Kilometer, loc, target);
+          }
+        });
+      }
+    });
   }
 
   Future<void> _selectDestination(Destination dest, {bool updateChecklist = true}) async {
@@ -329,8 +356,41 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
 
   Future<void> _removeDestination(Destination dest) async {
     HapticFeedback.mediumImpact();
-    await StorageService.removeTripDestination(dest.id);
-    await _initTripData();
+    // 1. Optimistic UI: Xóa khỏi danh sách ngay lập tức trong RAM (0 mili-giây)
+    final updatedList = List<Destination>.from(_tripDestinations)..removeWhere((d) => d.id == dest.id);
+
+    if (updatedList.isEmpty) {
+      setState(() {
+        _tripDestinations = [];
+        _selectedDestination = null;
+        _daysItinerary = {};
+        _checklistItems = [];
+        _checkedItems = {};
+        _isJourneyActive = false;
+        _distanceFromUserKm = 0.0;
+        _maxDays = 1;
+        _selectedDay = 1;
+      });
+      await StorageService.removeTripDestination(dest.id);
+      await StorageService.setSelectedTripDestination('');
+      return;
+    }
+
+    Destination? newActive = _selectedDestination;
+    if (_selectedDestination?.id == dest.id) {
+      newActive = updatedList.first;
+    }
+
+    setState(() {
+      _tripDestinations = updatedList;
+    });
+
+    if (newActive != null && newActive.id != _selectedDestination?.id) {
+      _selectDestination(newActive, updateChecklist: true);
+    }
+
+    // 2. Ghi bộ nhớ ngầm không chặn UI
+    StorageService.removeTripDestination(dest.id);
   }
 
   // Dự toán chi phí nhiên liệu tính theo cự ly thực tế và giá xăng thời gian thực
