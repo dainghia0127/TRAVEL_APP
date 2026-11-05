@@ -20,8 +20,8 @@
 ---
 
 ## 2. Giai Đoạn Hiện Tại & Trạng Thái Tổng Thể
-- **Giai đoạn hiện tại**: **HOÀN THÀNH TOÀN BỘ CÁC GIAI ĐOẠN DỰ ÁN (ALL PHASES COMPLETED)**.
-- **Trạng thái tổng thể**: `[x]` **Toàn bộ tính năng đã triển khai, kiểm thử tự động 100% Passed (0 lỗi, 0 cảnh báo), đã biên dịch thành công bản Web Viewer.**
+- **Giai đoạn hiện tại**: **GIAI ĐOẠN 8 — ĐỒNG BỘ ĐÁM MÂY (CLOUD SYNC), LỊCH TRÌNH LIVE TREKKING & BẢN ĐỒ TỰ CHỌN LỘ TRÌNH A-B**.
+- **Trạng thái tổng thể**: `[~]` **Đang thực hiện triển khai 3 tính năng nâng cấp quan trọng theo yêu cầu.**
 
 ---
 
@@ -105,15 +105,37 @@
 
 ---
 
+### Giai Đoạn 8: Nâng Cấp 3 Tính Năng Cốt Lõi Mới (Phase 8)
+- [x] Task 8.1: Triển khai Cơ Chế Đồng Bộ Đám Mây Tự Động (Cloud Sync) cho màn hình Khám Phá:
+  - Tải dữ liệu JSON cập nhật từ GitHub Cloud Raw endpoint khi có mạng và người dùng bấm Refresh hoặc kéo vuốt.
+  - Tự động nạp và lưu vào Local Storage (`SharedPreferences`) để mở rộng danh sách địa danh mà không cần build lại app hay cài lại file IPA.
+  - Giữ cơ chế Offline-First: khi không có mạng, dùng dữ liệu đã lưu hoặc asset seed nội bộ, tuyệt đối không làm gián đoạn app.
+- [x] Task 8.2: Nâng cấp Lịch Trình (Trip Timeline - Milestone Tracking & Live Trekking Mode):
+  - Chuẩn hóa cự ly mốc: Cho phép người dùng nhập cự ly km thực tế hoặc chọn số km tùy ý khi thêm mốc (loại bỏ hoàn toàn gán cứng `+ 5 km`).
+  - Bổ sung nút bấm "BẮT ĐẦU LỊCH TRÌNH THỰC TẾ" (Start Journey / Live Trekking Mode):
+    - Quản lý trạng thái hành trình thực địa trực quan (Garmin HUD style).
+    - Cho phép check-in hoàn thành từng mốc: Mốc đổi màu sang Xanh lá Emerald/Neon (`AppColors.emerald`), kèm huy hiệu/dấu tick `[✓]` thể hiện đã hoàn thành mốc.
+    - Cột dọc timeline spine đổi màu xanh lá emerald theo mốc đã hoàn thành.
+    - Hiển thị thanh tiến độ phần trăm hoàn thành hành trình ngày.
+- [x] Task 8.3: Bản Đồ Google Maps Style - Tự Chọn Điểm Bắt Đầu & Điểm Đích (Custom A-to-B Routing):
+  - Thêm nút chuyển chế độ "Lộ trình A-B" ngay trên Top Header.
+  - Hộp nhập Google Maps Style:
+    - Điểm bắt đầu (A): Mặc định Vị trí GPS hiện tại, hoặc chọn trên bản đồ / danh sách địa danh.
+    - Điểm kết thúc (B): Chạm hoặc nhấn giữ bất kỳ đâu trên bản đồ để thả ghim đích, hoặc chọn từ danh sách.
+  - Hỗ trợ nút đảo chiều (Swap A ⇄ B), tính toán và vẽ tuyến đường bộ OSRM thực tế kèm cự ly km và thời gian di chuyển.
+  - Hiển thị Floating Card tóm tắt lộ trình A-B và nút bao quát toàn tuyến đường.
+
+---
+
 ## 4. Công Việc Đang Thực Hiện
-- Toàn bộ 6/6 yêu cầu của Giai Đoạn 6 đã được triển khai, kiểm thử 100% Passed và sẵn sàng đẩy lên GitHub.
+- Hoàn thành toàn bộ 3/3 yêu cầu của Giai Đoạn 8. Kiểm thử 18/18 test passed, 0 lỗi, 0 cảnh báo.
 
 ---
 
 ## 5. Kết Quả Kiểm Thử Thực Tế
 - **`flutter analyze`**: **`No issues found!`** (0 lỗi, 0 cảnh báo - 100% clean).
-- **`flutter test`**: **`All tests passed!`** (15/15 unit & widget test pass 100%).
-- **`flutter build web`**: **Biên dịch thành công** thư mục phân phối web tại `TRAVEL_APP/mobile_flutter/build/web`.
+- **`flutter test`**: **`All tests passed!`** (18/18 unit & widget test pass 100%).
+- **`flutter build web`**: Sẵn sàng biên dịch khi cần.
 
 ---
 
@@ -123,7 +145,6 @@ TRAVEL_APP/
 ├── GEMINI.md                                 # 10 quy tắc lập trình AI riêng cho TRAVEL_APP
 ├── AGENTS.md                                 # Bản chuẩn hóa quy tắc cho coding agents
 ├── README.md                                 # Tổng quan dự án & sứ mệnh
-├── TRAVEL_APP_PLAN.md                        # Kế hoạch ban đầu
 ├── docs/
 │   ├── 01_ARCHITECTURE.md                    # Kiến trúc kỹ thuật & chiến lược bản đồ offline
 │   ├── 02_FUNCTIONAL_SPECS.md                # Đặc tả 5 phân hệ cốt lõi & 5 tính năng an toàn
@@ -137,21 +158,30 @@ TRAVEL_APP/
     │   ├── core/
     │   │   ├── theme/app_theme.dart          # Pure Dark OLED Theme ngoài trời
     │   │   ├── constants/app_constants.dart  # Hằng số, danh mục, số khẩn cấp
-    │   │   └── services/storage_service.dart # Local storage SharedPreferences
+    │   │   └── services/storage_service.dart # Local storage SharedPreferences (hỗ trợ Cloud Sync)
     │   └── features/
     │       ├── home/screens/main_navigation_screen.dart
-    │       ├── explore/screens/explore_screen.dart
+    │       ├── explore/
+    │       │   ├── data/datasources/explore_local_datasource.dart # Tải Cloud Sync từ GitHub
+    │       │   ├── presentation/controllers/explore_controller.dart
+    │       │   └── presentation/screens/explore_screen.dart
     │       ├── offline_map/
-    │       │   ├── screens/offline_map_screen.dart
+    │       │   ├── screens/offline_map_screen.dart # Bản đồ A-B Custom Routing Google Maps style
     │       │   └── services/location_service.dart
-    │       ├── trip_planner/screens/trip_planner_screen.dart
+    │       ├── trip_planner/screens/trip_planner_screen.dart # Live Trekking & Check-in mốc
     │       ├── outdoor_skills/screens/outdoor_skills_screen.dart
-    │       ├── safety/screens/safety_sos_screen.dart
-    │       └── weather_safety/services/weather_service.dart
-    └── build/web/                            # Bản Web Viewer hoàn chỉnh
+    │       ├── safety/screens/safety_sos_screen.dart # Chuyên biệt SOS Cứu hộ khẩn cấp
+    │       └── weather_safety/
+    │           ├── screens/weather_climate_screen.dart # Trang Thời tiết và khí hậu độc lập
+    │           └── services/weather_service.dart
+    └── test/
+        ├── asset_load_test.dart
+        ├── explore_editorial_feed_test.dart
+        ├── widget_test.dart
+        └── phase8_features_test.dart         # Test case cho Cloud Sync & Live Trekking
 ```
 
 ---
 
 ## 7. Bước Tiếp Theo
-- Bàn giao sản phẩm hoàn chỉnh cho người dùng nghiệm thu. Hướng dẫn cách chạy trên máy tính (Windows desktop / Web) hoặc điện thoại thật.
+- Bàn giao kết quả và báo cáo chi tiết bằng tiếng Việt cho người dùng nghiệm thu.

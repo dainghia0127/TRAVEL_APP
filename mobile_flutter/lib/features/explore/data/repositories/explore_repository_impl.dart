@@ -84,6 +84,11 @@ class ExploreRepositoryImpl implements IExploreRepository {
   }
 
   @override
+  Future<CloudSyncResult> syncFromCloud() async {
+    return await localDataSource.syncFromCloud();
+  }
+
+  @override
   void invalidateCache() {
     localDataSource.invalidateCache();
   }

@@ -93,7 +93,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
   /// Làm mới lại dữ liệu từ nguồn thực tế và cập nhật lại cự ly
   Future<void> _handleRefresh() async {
     HapticFeedback.mediumImpact();
-    await _controller.refresh();
+    final syncResult = await _controller.syncAndRefresh();
     if (mounted) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -103,17 +103,41 @@ class _ExploreScreenState extends State<ExploreScreen> {
           backgroundColor: const Color(0xFF141916),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
-            side: const BorderSide(color: Color(0xFF2E4537), width: 1.5),
+            side: BorderSide(
+              color: syncResult.isSuccess ? AppColors.emerald : AppColors.tacticalOrange,
+              width: 1.5,
+            ),
           ),
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 4),
           content: Row(
             children: [
-              const Icon(Icons.check_circle_rounded, color: AppColors.summitGold, size: 20),
+              Icon(
+                syncResult.isSuccess ? Icons.cloud_done_rounded : Icons.cloud_off_rounded,
+                color: syncResult.isSuccess ? AppColors.emerald : AppColors.tacticalOrange,
+                size: 22,
+              ),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  'Đã làm mới dữ liệu thực tế (${_controller.destinations.length} địa điểm)',
-                  style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      syncResult.isSuccess
+                          ? 'Đồng Bộ Đám Mây Thành Công!'
+                          : 'Chế Độ Ngoại Tuyến (Offline)',
+                      style: TextStyle(
+                        color: syncResult.isSuccess ? AppColors.emerald : AppColors.tacticalOrange,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      syncResult.message,
+                      style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+                    ),
+                  ],
                 ),
               ),
             ],

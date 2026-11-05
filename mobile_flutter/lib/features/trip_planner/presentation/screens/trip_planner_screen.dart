@@ -22,6 +22,7 @@ class TripPlannerScreen extends StatefulWidget {
 class _TripPlannerScreenState extends State<TripPlannerScreen> {
   int _activeTab = 0; // 0: Lịch trình (Timeline), 1: Chi phí & Hành trang
   int _selectedDay = 1; // 1, 2, 3
+  bool _isJourneyActive = false; // Trạng thái: Đang bật chế độ đi hành trình thực địa
   int _participants = 4;
   String _selectedVehicle = 'Xe máy số (110cc)';
 
@@ -339,9 +340,11 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   }
 
   void _addNewDestinationModal() {
+    HapticFeedback.mediumImpact();
     final titleController = TextEditingController();
     final locationController = TextEditingController();
     final timeController = TextEditingController(text: '14:00');
+    final distanceController = TextEditingController(text: '3.5');
 
     showModalBottomSheet(
       context: context,
@@ -413,23 +416,54 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              TextField(
-                controller: timeController,
-                style: const TextStyle(color: AppColors.editorialInk, fontSize: 14),
-                decoration: InputDecoration(
-                  labelText: 'Thời gian dự kiến (VD: 15:30)',
-                  labelStyle: const TextStyle(color: AppColors.editorialMuted),
-                  filled: true,
-                  fillColor: AppColors.editorialSurface,
-                  border: OutlineInputBorder(
-                    borderRadius: AppRadius.roundedMd,
-                    borderSide: const BorderSide(color: AppColors.editorialBorder),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 4,
+                    child: TextField(
+                      controller: timeController,
+                      style: const TextStyle(color: AppColors.editorialInk, fontSize: 14),
+                      decoration: InputDecoration(
+                        labelText: 'Thời gian (VD: 15:30)',
+                        labelStyle: const TextStyle(color: AppColors.editorialMuted),
+                        filled: true,
+                        fillColor: AppColors.editorialSurface,
+                        border: OutlineInputBorder(
+                          borderRadius: AppRadius.roundedMd,
+                          borderSide: const BorderSide(color: AppColors.editorialBorder),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: AppRadius.roundedMd,
+                          borderSide: const BorderSide(color: AppColors.editorialBorder),
+                        ),
+                      ),
+                    ),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: AppRadius.roundedMd,
-                    borderSide: const BorderSide(color: AppColors.editorialBorder),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    flex: 5,
+                    child: TextField(
+                      controller: distanceController,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      style: const TextStyle(color: AppColors.editorialInk, fontSize: 14),
+                      decoration: InputDecoration(
+                        labelText: 'Cự ly chặng (km)',
+                        hintText: 'VD: 3.5 hoặc 8',
+                        labelStyle: const TextStyle(color: AppColors.editorialMuted),
+                        filled: true,
+                        fillColor: AppColors.editorialSurface,
+                        border: OutlineInputBorder(
+                          borderRadius: AppRadius.roundedMd,
+                          borderSide: const BorderSide(color: AppColors.editorialBorder),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: AppRadius.roundedMd,
+                          borderSide: const BorderSide(color: AppColors.editorialBorder),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
               const SizedBox(height: 20),
               SizedBox(
@@ -438,15 +472,23 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 child: BouncingButton(
                   onTap: () {
                     if (titleController.text.trim().isNotEmpty) {
+                      final rawDist = distanceController.text.trim();
+                      final formattedDist = rawDist.isEmpty
+                          ? '+ 0 km'
+                          : (rawDist.toLowerCase().contains('km')
+                              ? (rawDist.startsWith('+') ? rawDist : '+ $rawDist')
+                              : '+ $rawDist km');
+
                       setState(() {
                         _daysItinerary[_selectedDay]?.add({
                           'id': 'custom_${DateTime.now().millisecondsSinceEpoch}',
-                          'time': timeController.text.trim(),
+                          'time': timeController.text.trim().isEmpty ? '14:00' : timeController.text.trim(),
                           'title': titleController.text.trim(),
                           'location': locationController.text.trim().isEmpty ? 'Điểm mốc tự thêm' : locationController.text.trim(),
                           'type': 'custom',
-                          'distance': '+ 5 km',
+                          'distance': formattedDist,
                           'elevation': '--',
+                          'isCompleted': false,
                         });
                       });
                       Navigator.pop(context);
@@ -471,6 +513,91 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
           ),
         );
       },
+    );
+  }
+
+  /// Bật/Tắt chế độ Đi Lịch Trình Thực Địa (Live Trekking Mode)
+  void _toggleJourneyMode() {
+    HapticFeedback.heavyImpact();
+    setState(() {
+      _isJourneyActive = !_isJourneyActive;
+    });
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
+        backgroundColor: _isJourneyActive ? const Color(0xFF0F261B) : const Color(0xFF261814),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: _isJourneyActive ? AppColors.emerald : AppColors.tacticalOrange,
+            width: 1.5,
+          ),
+        ),
+        content: Row(
+          children: [
+            Icon(
+              _isJourneyActive ? Icons.navigation_rounded : Icons.pause_circle_filled_rounded,
+              color: _isJourneyActive ? AppColors.emerald : AppColors.tacticalOrange,
+              size: 22,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                _isJourneyActive
+                    ? 'Đã BẮT ĐẦU LỊCH TRÌNH THỰC ĐỊA! Chạm vào mốc hoặc dấu tick khi di chuyển đến để hoàn thành.'
+                    : 'Đã tạm dừng chế độ hành trình thực địa.',
+                style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Đánh dấu hoặc hủy đánh dấu hoàn thành một mốc lịch trình
+  void _toggleMilestoneCompletion(Map<String, dynamic> stop) {
+    HapticFeedback.mediumImpact();
+    setState(() {
+      final current = stop['isCompleted'] == true;
+      stop['isCompleted'] = !current;
+    });
+    final isDone = stop['isCompleted'] == true;
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
+        backgroundColor: const Color(0xFF141E18),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+          side: BorderSide(
+            color: isDone ? AppColors.emerald : AppColors.editorialMuted,
+            width: 1.2,
+          ),
+        ),
+        content: Row(
+          children: [
+            Icon(
+              isDone ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
+              color: isDone ? AppColors.emerald : AppColors.editorialMuted,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                isDone ? 'Đã hoàn thành mốc: "${stop['title']}" ✓' : 'Đã bỏ đánh dấu mốc: "${stop['title']}"',
+                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -945,6 +1072,174 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 ),
               ),
 
+              const SizedBox(height: 10),
+
+              // 2.5 NÚT BẮT ĐẦU LỊCH TRÌNH / BANNER TRẠNG THÁI HÀNH TRÌNH LIVE TREKKING
+              if (!_isJourneyActive)
+                BouncingButton(
+                  onTap: _toggleJourneyMode,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF1B3B2B), Color(0xFF14291F)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.summitGold.withValues(alpha: 0.6), width: 1.2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.25),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: const BoxDecoration(
+                            color: AppColors.summitGold,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.play_arrow_rounded, color: Colors.black, size: 18),
+                        ),
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'BẮT ĐẦU LỊCH TRÌNH THỰC TẾ',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                              SizedBox(height: 1),
+                              Text(
+                                'Check-in & tick xanh từng mốc khi di chuyển',
+                                style: TextStyle(color: AppColors.summitGold, fontSize: 10.5, fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right_rounded, color: AppColors.summitGold, size: 20),
+                      ],
+                    ),
+                  ),
+                )
+              else ...[
+                // Banner đang chạy Live Trekking HUD
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0F261B),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.emerald, width: 1.4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.emerald.withValues(alpha: 0.15),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.emerald,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              const Text(
+                                'HÀNH TRÌNH ĐANG DIỄN RA (LIVE)',
+                                style: TextStyle(
+                                  color: AppColors.emerald,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                          BouncingButton(
+                            onTap: _toggleJourneyMode,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF2E1C1A),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: AppColors.editorialTerracotta.withValues(alpha: 0.6)),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.stop_rounded, size: 12, color: AppColors.editorialTerracotta),
+                                  SizedBox(width: 3),
+                                  Text(
+                                    'Kết thúc',
+                                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.editorialTerracotta),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Builder(builder: (context) {
+                        final completed = currentDayStops.where((s) => s['isCompleted'] == true).length;
+                        final total = currentDayStops.length;
+                        final pct = total == 0 ? 0.0 : (completed / total);
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Tiến độ ngày $_selectedDay: $completed/$total mốc',
+                                  style: const TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w600),
+                                ),
+                                Text(
+                                  '${(pct * 100).round()}% Hoàn thành',
+                                  style: const TextStyle(color: AppColors.emerald, fontSize: 11.5, fontWeight: FontWeight.w800),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: pct,
+                                minHeight: 6,
+                                color: AppColors.emerald,
+                                backgroundColor: const Color(0xFF1B3B2B),
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+              ],
+
               const SizedBox(height: 12),
 
               // 3. Action Add Stop Button (Ghim cố định)
@@ -1033,6 +1328,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
               final stop = currentDayStops[index];
               final isStart = index == 0;
               final isEnd = index == currentDayStops.length - 1;
+              final isCompleted = stop['isCompleted'] == true;
 
               return Padding(
                 key: ValueKey(stop['id']),
@@ -1045,32 +1341,49 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                       width: 32,
                       child: Column(
                         children: [
-                          Container(
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              color: isStart
-                                  ? AppColors.editorialPine
-                                  : (isEnd ? AppColors.editorialTerracotta : AppColors.editorialSurface),
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: isStart || isEnd ? Colors.white : AppColors.editorialPine,
-                                width: 2,
+                          GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () => _toggleMilestoneCompletion(stop),
+                            child: Container(
+                              width: 26,
+                              height: 26,
+                              decoration: BoxDecoration(
+                                color: isCompleted
+                                    ? AppColors.emerald
+                                    : (isStart
+                                        ? AppColors.editorialPine
+                                        : (isEnd ? AppColors.editorialTerracotta : AppColors.editorialSurface)),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: isCompleted ? Colors.white : (isStart || isEnd ? Colors.white : AppColors.editorialPine),
+                                  width: 2,
+                                ),
+                                boxShadow: isCompleted
+                                    ? [
+                                        BoxShadow(
+                                          color: AppColors.emerald.withValues(alpha: 0.45),
+                                          blurRadius: 6,
+                                          offset: const Offset(0, 1),
+                                        ),
+                                      ]
+                                    : null,
                               ),
-                            ),
-                            child: Center(
-                              child: Icon(
-                                isStart ? Icons.flag : (isEnd ? Icons.check : Icons.circle),
-                                size: 11,
-                                color: isStart || isEnd ? Colors.white : AppColors.editorialPine,
+                              child: Center(
+                                child: Icon(
+                                  isCompleted
+                                      ? Icons.check_rounded
+                                      : (isStart ? Icons.flag : (isEnd ? Icons.check : Icons.circle)),
+                                  size: isCompleted ? 14 : 11,
+                                  color: isCompleted || isStart || isEnd ? Colors.white : AppColors.editorialPine,
+                                ),
                               ),
                             ),
                           ),
                           if (!isEnd)
                             Container(
-                              width: 2,
+                              width: 2.5,
                               height: 68,
-                              color: AppColors.editorialBorder,
+                              color: isCompleted ? AppColors.emerald : AppColors.editorialBorder,
                             ),
                         ],
                       ),
@@ -1084,69 +1397,125 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                         margin: const EdgeInsets.only(bottom: 12),
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         decoration: BoxDecoration(
-                          color: AppColors.editorialSurface,
+                          color: isCompleted
+                              ? const Color(0xFF132219)
+                              : AppColors.editorialSurface,
                           borderRadius: AppRadius.roundedMd,
-                          border: Border.all(color: AppColors.editorialBorder, width: 1.2),
-                          boxShadow: const [
+                          border: Border.all(
+                            color: isCompleted ? AppColors.emerald : AppColors.editorialBorder,
+                            width: isCompleted ? 1.6 : 1.2,
+                          ),
+                          boxShadow: [
                             BoxShadow(
-                              color: Color(0x0817221B),
+                              color: isCompleted
+                                  ? AppColors.emerald.withValues(alpha: 0.1)
+                                  : const Color(0x0817221B),
                               blurRadius: 8,
-                              offset: Offset(0, 2),
+                              offset: const Offset(0, 2),
                             ),
                           ],
                         ),
                         child: Row(
                           children: [
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        stop['time'] as String,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w800,
-                                          color: AppColors.editorialPine,
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () => _toggleMilestoneCompletion(stop),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          stop['time'] as String,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w800,
+                                            color: isCompleted ? AppColors.emerald : AppColors.editorialPine,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.editorialBg,
-                                          borderRadius: AppRadius.roundedSm,
-                                          border: Border.all(color: AppColors.editorialBorder),
+                                        const SizedBox(width: 8),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: isCompleted
+                                                ? AppColors.emerald.withValues(alpha: 0.15)
+                                                : AppColors.editorialBg,
+                                            borderRadius: AppRadius.roundedSm,
+                                            border: Border.all(
+                                              color: isCompleted
+                                                  ? AppColors.emerald.withValues(alpha: 0.4)
+                                                  : AppColors.editorialBorder,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            stop['distance'] as String,
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w600,
+                                              color: isCompleted ? AppColors.emerald : AppColors.editorialMuted,
+                                            ),
+                                          ),
                                         ),
-                                        child: Text(
-                                          stop['distance'] as String,
-                                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.editorialMuted),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    stop['title'] as String,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.editorialInk,
+                                        if (isCompleted) ...[
+                                          const SizedBox(width: 6),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.emerald.withValues(alpha: 0.15),
+                                              borderRadius: BorderRadius.circular(4),
+                                              border: Border.all(color: AppColors.emerald.withValues(alpha: 0.4)),
+                                            ),
+                                            child: const Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(Icons.check_circle_rounded, size: 10, color: AppColors.emerald),
+                                                SizedBox(width: 3),
+                                                Text(
+                                                  'HOÀN THÀNH',
+                                                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: AppColors.emerald),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ],
                                     ),
-                                  ),
-                                  Text(
-                                    stop['location'] as String,
-                                    style: const TextStyle(fontSize: 12, color: AppColors.editorialMuted),
-                                  ),
-                                ],
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      stop['title'] as String,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: isCompleted ? AppColors.emerald : AppColors.editorialInk,
+                                      ),
+                                    ),
+                                    Text(
+                                      stop['location'] as String,
+                                      style: const TextStyle(fontSize: 12, color: AppColors.editorialMuted),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
 
-                            // Micro Action Controls (Up / Down / Drag Handle)
+                            // Micro Action Controls (Check-in Tick Button + Up / Down / Drag Handle)
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
+                                // Check-in Button
+                                BouncingButton(
+                                  onTap: () => _toggleMilestoneCompletion(stop),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                    child: Icon(
+                                      isCompleted ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
+                                      color: isCompleted ? AppColors.emerald : AppColors.editorialMuted,
+                                      size: 22,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
                                 if (index > 0)
                                   InkWell(
                                     onTap: () {

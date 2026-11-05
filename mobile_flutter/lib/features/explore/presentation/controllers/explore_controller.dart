@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_flutter/core/services/storage_service.dart';
+import 'package:mobile_flutter/features/explore/data/datasources/explore_local_datasource.dart';
 import 'package:mobile_flutter/features/explore/domain/entities/destination.dart';
 import 'package:mobile_flutter/features/explore/domain/repositories/i_explore_repository.dart';
 
@@ -26,6 +27,7 @@ class ExploreController extends ChangeNotifier {
   String _searchQuery = '';
   bool _isLoading = false;
   String? _errorMessage;
+  CloudSyncResult? _lastSyncResult;
 
   List<Destination> _destinations = [];
   Set<String> _favoriteIds = {};
@@ -44,6 +46,7 @@ class ExploreController extends ChangeNotifier {
   String get searchQuery => _searchQuery;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  CloudSyncResult? get lastSyncResult => _lastSyncResult;
   List<Destination> get destinations => _destinations;
   Set<String> get favoriteIds => _favoriteIds;
 
@@ -191,10 +194,21 @@ class ExploreController extends ChangeNotifier {
     }
   }
 
-  /// Làm mới lại toàn bộ dữ liệu điểm đến thực tế (Xóa cache và fetch lại)
-  Future<void> refresh() async {
+  /// Đồng bộ dữ liệu mới nhất từ Cloud GitHub và làm mới UI
+  Future<CloudSyncResult> syncAndRefresh() async {
+    _isLoading = true;
+    notifyListeners();
+
+    final result = await repository.syncFromCloud();
+    _lastSyncResult = result;
     repository.invalidateCache();
     await fetchDestinations();
+    return result;
+  }
+
+  /// Làm mới lại toàn bộ dữ liệu điểm đến thực tế (Đồng bộ đám mây hoặc đọc cache nội bộ)
+  Future<void> refresh() async {
+    await syncAndRefresh();
   }
 }
 

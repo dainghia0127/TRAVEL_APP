@@ -47,6 +47,19 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
   bool _isLoadingRoute = false;
   bool _isActualRoad = false;
 
+  // CHẾ ĐỘ TỰ CHỌN LỘ TRÌNH GOOGLE MAPS STYLE (TÙY CHỌN ĐIỂM ĐI A & ĐIỂM ĐẾN B)
+  bool _isCustomRouteMode = false;
+  LatLng? _customOriginPoint;
+  String _customOriginName = 'Vị trí hiện tại của bạn';
+  LatLng? _customDestinationPoint;
+  String _customDestinationName = 'Chạm bản đồ để đặt đích';
+  bool _isPickingOriginOnMap = false;
+  bool _isPickingDestinationOnMap = false;
+  List<LatLng> _customRoutePolyline = [];
+  double? _customRouteDistanceKm;
+  String _customRouteDurationText = '';
+  bool _isLoadingCustomRoute = false;
+
   // Waypoint được chọn để xem chi tiết
   Map<String, dynamic>? _selectedWaypoint;
   bool _isCardCollapsed = false;
@@ -294,6 +307,277 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
     }
   }
 
+  /// Bật / Tắt chế độ Chọn Lộ Trình Tự Do Google Maps (Custom Route Mode)
+  void _toggleCustomRouteMode() {
+    HapticFeedback.mediumImpact();
+    setState(() {
+      _isCustomRouteMode = !_isCustomRouteMode;
+      if (_isCustomRouteMode) {
+        _customOriginPoint ??= _currentLocation;
+        _customOriginName = 'Vị trí hiện tại của bạn';
+        _selectedTripDestination = null;
+        _selectedWaypoint = null;
+      } else {
+        _clearCustomRoute();
+      }
+    });
+  }
+
+  void _clearCustomRoute() {
+    setState(() {
+      _customRoutePolyline.clear();
+      _customDestinationPoint = null;
+      _customDestinationName = 'Chạm bản đồ để đặt đích';
+      _customRouteDistanceKm = null;
+      _customRouteDurationText = '';
+      _isPickingOriginOnMap = false;
+      _isPickingDestinationOnMap = false;
+    });
+  }
+
+  /// Tính toán lộ trình đường bộ thực tế giữa Điểm Đi A và Điểm Đến B
+  Future<void> _calculateCustomRoute() async {
+    final start = _customOriginPoint ?? _currentLocation;
+    final end = _customDestinationPoint;
+    if (end == null) return;
+
+    setState(() => _isLoadingCustomRoute = true);
+
+    final routeResult = await RoutingService.getActualRoute(
+      start: start,
+      end: end,
+      isDomestic: true,
+    );
+
+    if (mounted) {
+      setState(() {
+        _customRoutePolyline = routeResult.points;
+        _customRouteDistanceKm = routeResult.distanceKm;
+        _customRouteDurationText = routeResult.durationText;
+        _isLoadingCustomRoute = false;
+      });
+      // Di chuyển camera bao quát điểm đến
+      _mapController.move(end, 13.0);
+    }
+  }
+
+  /// Đảo ngược vị trí Điểm Đi A và Điểm Đến B
+  void _swapCustomRoutePoints() {
+    HapticFeedback.selectionClick();
+    if (_customDestinationPoint == null) return;
+    setState(() {
+      final tempPt = _customOriginPoint ?? _currentLocation;
+      final tempNm = _customOriginName;
+
+      _customOriginPoint = _customDestinationPoint;
+      _customOriginName = _customDestinationName;
+
+      _customDestinationPoint = tempPt;
+      _customDestinationName = tempNm;
+    });
+    _calculateCustomRoute();
+  }
+
+  /// Xử lý chạm vào bản đồ
+  void _handleMapTap(LatLng point) {
+    if (_selectedWaypoint != null) {
+      setState(() => _selectedWaypoint = null);
+      return;
+    }
+
+    if (_isCustomRouteMode) {
+      HapticFeedback.selectionClick();
+      if (_isPickingOriginOnMap) {
+        setState(() {
+          _customOriginPoint = point;
+          _customOriginName = 'Tọa độ: ${point.latitude.toStringAsFixed(3)}, ${point.longitude.toStringAsFixed(3)}';
+          _isPickingOriginOnMap = false;
+        });
+        if (_customDestinationPoint != null) {
+          _calculateCustomRoute();
+        }
+      } else {
+        setState(() {
+          _customDestinationPoint = point;
+          _customDestinationName = 'Ghim: ${point.latitude.toStringAsFixed(3)}, ${point.longitude.toStringAsFixed(3)}';
+          _isPickingDestinationOnMap = false;
+        });
+        _calculateCustomRoute();
+      }
+    }
+  }
+
+  /// Xử lý nhấn giữ trên bản đồ: Cắm ghim đích tức thì phong cách Google Maps!
+  void _handleMapLongPress(LatLng point) {
+    HapticFeedback.heavyImpact();
+    setState(() {
+      _isCustomRouteMode = true;
+      _customOriginPoint ??= _currentLocation;
+      _customOriginName = 'Vị trí hiện tại của bạn';
+      _customDestinationPoint = point;
+      _customDestinationName = 'Ghim cắm: ${point.latitude.toStringAsFixed(3)}, ${point.longitude.toStringAsFixed(3)}';
+      _selectedTripDestination = null;
+      _selectedWaypoint = null;
+    });
+    _calculateCustomRoute();
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 3),
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
+        backgroundColor: const Color(0xFF141E18),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+          side: const BorderSide(color: AppColors.alpineCyan, width: 1.2),
+        ),
+        content: Row(
+          children: [
+            const Icon(Icons.location_on, color: AppColors.alpineCyan, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Đã cắm ghim đích tại (${point.latitude.toStringAsFixed(3)}, ${point.longitude.toStringAsFixed(3)}) và tự động vẽ tuyến đường!',
+                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Modal chọn địa điểm cho Điểm Đi A hoặc Điểm Đến B từ danh sách địa danh hoặc GPS
+  void _showLocationPickerSheet({required bool forOrigin}) {
+    HapticFeedback.mediumImpact();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF141916),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(color: AppColors.borderSubtle, borderRadius: BorderRadius.circular(2)),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                forOrigin ? 'Chọn Điểm Xuất Phát (A)' : 'Chọn Điểm Đến (B)',
+                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              // Tùy chọn 1: Vị trí GPS hiện tại
+              ListTile(
+                leading: const CircleAvatar(
+                  backgroundColor: AppColors.emerald,
+                  radius: 16,
+                  child: Icon(Icons.my_location, size: 16, color: Colors.black),
+                ),
+                title: const Text('Vị trí GPS hiện tại của bạn', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                subtitle: Text(
+                  '${_currentLocation.latitude.toStringAsFixed(4)}, ${_currentLocation.longitude.toStringAsFixed(4)}',
+                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                ),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  setState(() {
+                    if (forOrigin) {
+                      _customOriginPoint = _currentLocation;
+                      _customOriginName = 'Vị trí hiện tại của bạn';
+                    } else {
+                      _customDestinationPoint = _currentLocation;
+                      _customDestinationName = 'Vị trí GPS của bạn';
+                    }
+                  });
+                  _calculateCustomRoute();
+                },
+              ),
+              // Tùy chọn 2: Chạm ghim trên bản đồ
+              ListTile(
+                leading: const CircleAvatar(
+                  backgroundColor: AppColors.alpineCyan,
+                  radius: 16,
+                  child: Icon(Icons.touch_app, size: 16, color: Colors.black),
+                ),
+                title: const Text('Chạm trực tiếp trên bản đồ', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                subtitle: const Text('Thả ghim tại bất kỳ cung đèo, ngọn núi hoặc suối ngòi nào', style: TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  setState(() {
+                    if (forOrigin) {
+                      _isPickingOriginOnMap = true;
+                      _isPickingDestinationOnMap = false;
+                    } else {
+                      _isPickingDestinationOnMap = true;
+                      _isPickingOriginOnMap = false;
+                    }
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      margin: const EdgeInsets.fromLTRB(16, 0, 16, 80),
+                      backgroundColor: const Color(0xFF141E18),
+                      content: Text(
+                        forOrigin ? 'Hãy chạm vào vị trí bạn muốn xuất phát trên bản đồ' : 'Hãy chạm vào vị trí bạn muốn đến trên bản đồ',
+                        style: const TextStyle(color: Colors.white, fontSize: 12.5),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const Divider(color: AppColors.borderSubtle),
+              const Text('Hoặc chọn từ Địa danh Khám phá:', style: TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 6),
+              // Danh sách các địa danh
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 220),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: _tripDestinations.length,
+                  separatorBuilder: (c, _) => const SizedBox(height: 4),
+                  itemBuilder: (c, idx) {
+                    final d = _tripDestinations[idx];
+                    final loc = _getDestLatLng(d);
+                    return ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                      dense: true,
+                      leading: const Icon(Icons.landscape_rounded, color: AppColors.summitGold, size: 18),
+                      title: Text(d.name, style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w600)),
+                      subtitle: Text(d.province ?? 'Việt Nam', style: const TextStyle(color: AppColors.textSecondary, fontSize: 10.5)),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        setState(() {
+                          if (forOrigin) {
+                            _customOriginPoint = loc;
+                            _customOriginName = d.name;
+                          } else {
+                            _customDestinationPoint = loc;
+                            _customDestinationName = d.name;
+                          }
+                        });
+                        _calculateCustomRoute();
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   List<Map<String, dynamic>> get _currentWaypoints {
     final dest = _selectedTripDestination;
     if (dest == null || dest.id.contains('ta_nang')) {
@@ -404,9 +688,10 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
               minZoom: 3.0,
               maxZoom: 19.0,
               onTap: (tapPosition, point) {
-                if (_selectedWaypoint != null) {
-                  setState(() => _selectedWaypoint = null);
-                }
+                _handleMapTap(point);
+              },
+              onLongPress: (tapPosition, point) {
+                _handleMapLongPress(point);
               },
             ),
             children: [
@@ -458,7 +743,7 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                   ),
 
                   // Đường tìm đường định tuyến tới điểm đến đã chọn (Routing Polyline)
-                  if (_routingPolyline.isNotEmpty) ...[
+                  if (_routingPolyline.isNotEmpty && !_isCustomRouteMode) ...[
                     Polyline(
                       points: _routingPolyline,
                       strokeWidth: 9.0,
@@ -468,6 +753,20 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                       points: _routingPolyline,
                       strokeWidth: 5.0,
                       color: AppColors.alpineCyan,
+                    ),
+                  ],
+
+                  // Tuyến đường tự do Google Maps (Custom Route Polyline A ➔ B)
+                  if (_customRoutePolyline.isNotEmpty && _isCustomRouteMode) ...[
+                    Polyline(
+                      points: _customRoutePolyline,
+                      strokeWidth: 9.0,
+                      color: Colors.black.withValues(alpha: 0.75),
+                    ),
+                    Polyline(
+                      points: _customRoutePolyline,
+                      strokeWidth: 5.5,
+                      color: const Color(0xFF38BDF8), // Google Maps Cyan Route
                     ),
                   ],
                 ],
@@ -514,6 +813,43 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                               .scale(begin: const Offset(0.85, 0.85), end: const Offset(1.15, 1.15), duration: 1200.ms, curve: Curves.easeInOut),
                     ),
                   ),
+
+                  // Marker Điểm Xuất Phát Tùy Chọn A (Custom Route Origin)
+                  if (_isCustomRouteMode && _customOriginPoint != null)
+                    Marker(
+                      point: _customOriginPoint!,
+                      width: 50,
+                      height: 50,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: AppColors.emerald,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 2),
+                              boxShadow: const [BoxShadow(color: Colors.black45, blurRadius: 6, offset: Offset(0, 2))],
+                            ),
+                            child: const Text('A', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13)),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                  // Marker Điểm Đích Tùy Chọn B (Custom Route Destination - Google Maps Red Pin)
+                  if (_isCustomRouteMode && _customDestinationPoint != null)
+                    Marker(
+                      point: _customDestinationPoint!,
+                      width: 50,
+                      height: 50,
+                      child: const Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.location_on, color: Color(0xFFEF4444), size: 38),
+                        ],
+                      ),
+                    ),
 
                   // Markers cho TẤT CẢ các điểm đến trong chuyến đi
                   ..._tripDestinations.map((dest) {
@@ -652,6 +988,40 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                           ),
                           const SizedBox(width: 6),
 
+                          // Nút Lộ Trình A-B (Google Maps Mode)
+                          BouncingButton(
+                            onTap: _toggleCustomRouteMode,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: _isCustomRouteMode ? AppColors.alpineCyan : AppColors.surfaceHigh,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: _isCustomRouteMode ? AppColors.alpineCyan : AppColors.borderSubtle,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.alt_route_rounded,
+                                    size: 11,
+                                    color: _isCustomRouteMode ? Colors.black : Colors.white,
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                    _isCustomRouteMode ? 'Thoát A-B' : 'Lộ trình A-B',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w800,
+                                      color: _isCustomRouteMode ? Colors.black : Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+
                           // Toggle Online / Offline Mode
                           Container(
                             decoration: BoxDecoration(
@@ -743,8 +1113,183 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                 ),
                 const SizedBox(height: 8),
 
-                // Danh sách (List) các địa điểm đã chọn trong Chuyến đi
-                if (_tripDestinations.isNotEmpty) ...[
+                // GIAO DIỆN TÙY CHỌN LỘ TRÌNH GOOGLE MAPS STYLE (KHI Ở CHẾ ĐỘ A-B)
+                if (_isCustomRouteMode) ...[
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceBase.withValues(alpha: 0.95),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: AppColors.alpineCyan.withValues(alpha: 0.7), width: 1.2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Hàng Điểm Đi A
+                        Row(
+                          children: [
+                            Container(
+                              width: 22,
+                              height: 22,
+                              decoration: const BoxDecoration(
+                                color: AppColors.emerald,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Center(
+                                child: Text('A', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 11)),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () => _showLocationPickerSheet(forOrigin: true),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surfaceHigh,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: _isPickingOriginOnMap ? AppColors.emerald : AppColors.borderSubtle,
+                                      width: _isPickingOriginOnMap ? 1.5 : 1.0,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          _isPickingOriginOnMap ? '👉 Hãy chạm bản đồ để đặt A...' : _customOriginName,
+                                          style: TextStyle(
+                                            color: _isPickingOriginOnMap ? AppColors.emerald : Colors.white,
+                                            fontSize: 11.5,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      const Icon(Icons.arrow_drop_down, color: AppColors.textMuted, size: 18),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            // Nút Đảo Chiều Swap A ⇄ B
+                            BouncingButton(
+                              onTap: _swapCustomRoutePoints,
+                              child: Container(
+                                padding: const EdgeInsets.all(7),
+                                decoration: BoxDecoration(
+                                  color: AppColors.surfaceHigh,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: AppColors.borderSubtle),
+                                ),
+                                child: const Icon(Icons.swap_vert_rounded, size: 18, color: AppColors.alpineCyan),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        // Hàng Điểm Đến B
+                        Row(
+                          children: [
+                            Container(
+                              width: 22,
+                              height: 22,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFEF4444),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Center(
+                                child: Text('B', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 11)),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () => _showLocationPickerSheet(forOrigin: false),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surfaceHigh,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: _isPickingDestinationOnMap ? const Color(0xFFEF4444) : AppColors.borderSubtle,
+                                      width: _isPickingDestinationOnMap ? 1.5 : 1.0,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          _isPickingDestinationOnMap
+                                              ? '👉 Hãy chạm bản đồ để đặt đích B...'
+                                              : _customDestinationName,
+                                          style: TextStyle(
+                                            color: _isPickingDestinationOnMap
+                                                ? const Color(0xFFEF4444)
+                                                : (_customDestinationPoint == null ? AppColors.textMuted : Colors.white),
+                                            fontSize: 11.5,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      const Icon(Icons.arrow_drop_down, color: AppColors.textMuted, size: 18),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            // Nút Xóa B
+                            BouncingButton(
+                              onTap: _clearCustomRoute,
+                              child: Container(
+                                padding: const EdgeInsets.all(7),
+                                decoration: BoxDecoration(
+                                  color: AppColors.surfaceHigh,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: AppColors.borderSubtle),
+                                ),
+                                child: const Icon(Icons.close_rounded, size: 18, color: AppColors.textMuted),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (_isLoadingCustomRoute)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 8),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 12,
+                                  height: 12,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.alpineCyan),
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Đang tính toán tuyến đường bộ thực tế qua OSRM...',
+                                  style: TextStyle(color: AppColors.alpineCyan, fontSize: 10.5, fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ] else ...[
+                  // Danh sách (List) các địa điểm đã chọn trong Chuyến đi
+                  if (_tripDestinations.isNotEmpty) ...[
                   SizedBox(
                     height: 44,
                     child: ListView.builder(
@@ -890,6 +1435,7 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                     },
                   ),
                 ),
+                ],
               ],
             ),
           ),
@@ -1473,8 +2019,150 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
               ),
             ),
 
+          // Card Kết Quả Lộ Trình Google Maps Tự Chọn (Custom A-to-B Floating Card)
+          if (_isCustomRouteMode && _customRouteDistanceKm != null)
+            Positioned(
+              left: 14,
+              right: 14,
+              bottom: 20,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceElevated,
+                  borderRadius: AppRadius.roundedXl,
+                  border: Border.all(color: AppColors.alpineCyan, width: 1.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.6),
+                      blurRadius: 20,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppColors.alpineCyan.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: AppColors.alpineCyan.withValues(alpha: 0.4)),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.directions_outlined, size: 13, color: AppColors.alpineCyan),
+                              SizedBox(width: 4),
+                              Text(
+                                'LỘ TRÌNH ĐƯỜNG BỘ TỰ CHỌN (A ➔ B)',
+                                style: TextStyle(
+                                  color: AppColors.alpineCyan,
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.4,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          icon: const Icon(Icons.close, size: 18, color: AppColors.textMuted),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: _clearCustomRoute,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        const Icon(Icons.route, color: AppColors.neonGreen, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '$_customOriginName  ➔  $_customDestinationName',
+                            style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TacticalBadge(
+                            icon: Icons.straighten,
+                            label: 'Khoảng cách',
+                            value: '${_customRouteDistanceKm!.toStringAsFixed(1)} km',
+                          ),
+                        ),
+                        Container(width: 1, height: 22, color: AppColors.borderSubtle),
+                        Expanded(
+                          child: TacticalBadge(
+                            icon: Icons.timer_outlined,
+                            label: 'Ước tính di chuyển',
+                            value: _customRouteDurationText,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 44,
+                      child: BouncingButton(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          final target = _customDestinationPoint;
+                          if (target != null) {
+                            final start = _customOriginPoint ?? _currentLocation;
+                            final centerLat = (start.latitude + target.latitude) / 2.0;
+                            final centerLng = (start.longitude + target.longitude) / 2.0;
+                            double zoom = 12.0;
+                            if (_customRouteDistanceKm! > 400) {
+                              zoom = 6.5;
+                            } else if (_customRouteDistanceKm! > 150) {
+                              zoom = 8.5;
+                            } else if (_customRouteDistanceKm! > 50) {
+                              zoom = 10.0;
+                            }
+                            _mapController.move(LatLng(centerLat, centerLng), zoom);
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.alpineCyan,
+                            borderRadius: AppRadius.roundedMd,
+                          ),
+                          child: const Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.center_focus_strong, size: 16, color: Colors.black),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Bao Quát Toàn Tuyến Đường',
+                                  style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12.5),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
           // Nút khôi phục Pop-up lộ trình khi lỡ tay đóng
-          if (_selectedTripDestination == null && _selectedWaypoint == null && _lastActiveDestination != null)
+          if (_selectedTripDestination == null && _selectedWaypoint == null && _lastActiveDestination != null && !_isCustomRouteMode)
             Positioned(
               left: 20,
               right: 20,

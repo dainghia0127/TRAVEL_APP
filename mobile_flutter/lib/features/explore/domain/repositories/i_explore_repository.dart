@@ -1,3 +1,4 @@
+import 'package:mobile_flutter/features/explore/data/datasources/explore_local_datasource.dart';
 import 'package:mobile_flutter/features/explore/domain/entities/destination.dart';
 
 /// Interface hợp đồng dữ liệu của Phân hệ Khám phá
@@ -23,6 +24,9 @@ abstract class IExploreRepository {
     int? difficultyLevel,
     String userCountryCode = 'VN',
   });
+
+  /// Đồng bộ dữ liệu địa danh từ Cloud về máy
+  Future<CloudSyncResult> syncFromCloud();
 
   /// Xóa cache trong bộ nhớ để làm mới dữ liệu từ nguồn
   void invalidateCache();

@@ -5,6 +5,33 @@ class StorageService {
   static const String _keyChecklist = 'travel_checklist';
   static const String _keyTripDestinations = 'travel_trip_destinations';
   static const String _keySelectedTripDestId = 'travel_selected_trip_dest_id';
+  static const String _keySyncedDestinationsJson = 'travel_synced_destinations_json';
+  static const String _keyLastSyncTimestamp = 'travel_last_sync_timestamp';
+
+  /// Lưu chuỗi JSON địa danh đồng bộ từ Cloud về máy
+  static Future<bool> saveSyncedDestinationsJson(String jsonString) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyLastSyncTimestamp, DateTime.now().toIso8601String());
+    return prefs.setString(_keySyncedDestinationsJson, jsonString);
+  }
+
+  /// Lấy chuỗi JSON địa danh đã đồng bộ từ Cloud lưu trong máy
+  static Future<String?> getSyncedDestinationsJson() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keySyncedDestinationsJson);
+  }
+
+  /// Lấy thời điểm đồng bộ đám mây gần nhất
+  static Future<DateTime?> getLastSyncTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    final str = prefs.getString(_keyLastSyncTimestamp);
+    if (str != null) {
+      try {
+        return DateTime.parse(str);
+      } catch (_) {}
+    }
+    return null;
+  }
 
   /// Lưu danh sách yêu thích
   static Future<bool> saveFavorites(List<String> favorites) async {
