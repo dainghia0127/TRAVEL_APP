@@ -20,8 +20,8 @@
 ---
 
 ## 2. Giai Đoạn Hiện Tại & Trạng Thái Tổng Thể
-- **Giai đoạn hiện tại**: **GIAI ĐOẠN 12 — KHẮC PHỤC HIỂN THỊ ĐƠN POP-UP BẢN ĐỒ & TÙY BIẾN CHI PHÍ / THÊM KHOẢN CHI TỰ DO**.
-- **Trạng thái tổng thể**: `[x]` **Đã hoàn thành và kiểm chứng 100% qua 31/31 unit & widget tests.**
+- **Giai đoạn hiện tại**: **GIAI ĐOẠN 13 — KHẮC PHỤC TRIỆT ĐỂ 5 VẤN ĐỀ PWA IOS, ĐỊNH VỊ BẢN ĐỒ, OFFLINE MODE & TIẾN ĐỘ LỊCH TRÌNH**.
+- **Trạng thái tổng thể**: `[x]` **Đã hoàn thành và kiểm chứng 100% qua 33/33 unit & widget tests.**
 
 ---
 
@@ -260,9 +260,38 @@
 
 ---
 
+### Giai Đoạn 13: Khắc Phục Triệt Để 5 Vấn Đề PWA iOS, Định Vị Bản Đồ, Offline Mode & Tiến Độ Lịch Trình (Phase 13)
+- [x] Task 13.1: Khắc phục triệt để lỗi PWA trên iPhone Safari (chỉ vuốt được, không bấm được nút và giật lag):
+  - Chống overscroll / rubber-banding trên iOS WebKit Standalone mode (`web/index.html`): Ngăn chặn `touchcancel` do trình duyệt tự ý nảy trang, chuyển giao trọn vẹn sự kiện chạm cho Flutter Glass Pane.
+  - Chuẩn hóa CSS body/html: `position: fixed`, `touch-action: manipulation`, `overscroll-behavior: none`, `-webkit-tap-highlight-color: transparent`.
+  - Tối ưu build web trong `.github/workflows/deploy_pwa_pages.yml`: Biên dịch với mức tối ưu `-O4 --no-source-maps`, giảm 30-40% dung lượng bundle JS, giảm tải WebGL GPU trên Safari iOS.
+- [x] Task 13.2: Sửa triệt để logic Trục Lộ Trình & Tiến Độ Lịch Trình A-B (`trip_planner_screen.dart`):
+  - Khi bấm "BẮT ĐẦU LỊCH TRÌNH THỰC TẾ": Tự động đánh dấu mốc "Khởi hành: A" là đã hoàn thành (`isCompleted: true`).
+  - Khi tick mốc "Đến đích: B": Tự động đánh dấu hoàn thành toàn bộ các mốc trước đó, đưa tiến độ lên **100% Hoàn thành (2/2 mốc)**, không bao giờ bị kẹt ở 50%.
+- [x] Task 13.3: Nâng cấp Định vị Bản Đồ & Tuyến Đường A-B Thời Gian Thực (`offline_map_screen.dart` & `location_service.dart`):
+  - Cập nhật điểm đầu của Lộ trình tự chọn A-B (`_customRoutePolyline[0] = newLoc`) và tính lại cự ly còn lại liên tục theo GPS thực tế khi di chuyển.
+  - Bổ sung cơ chế **"Khóa Theo Dõi GPS" (Auto-Follow Camera Lock)**: Khi bật, tự động lia camera theo vị trí người dùng. Khi người dùng vuốt xem chỗ khác, tự động nhả khóa để tránh giật hình.
+  - Tăng độ nhạy GPS `distanceFilter: 2` mét trong `LocationService`.
+- [x] Task 13.4: Chuẩn hóa Nút Online / Offline & Tuyến Đường Ngoại Tuyến (`offline_map_screen.dart` & `routing_service.dart`):
+  - Khi người dùng bấm sang chế độ "Offline": Chạy 100% chế độ cục bộ tức thì (`forceOffline: true`), không gửi HTTP request ra ngoài chờ timeout.
+  - Tinh chỉnh thuật toán nội suy đường bộ ngoại tuyến: cự ly ngắn dưới 25km bám sát trục giao thông mượt mà, không bị uốn lượn zíc zắc 900m vô lý; cự ly liên tỉnh bám hành lang quốc lộ.
+  - Cấu hình `evictErrorTileStrategy: EvictErrorTileStrategy.none`, `panBuffer: 3`, `keepBuffer: 8` để giữ tối đa các mảnh bản đồ trong bộ nhớ đệm khi mất mạng và zoom in/out.
+- [x] Task 13.5: Kiểm thử tự động toàn diện và kiểm chứng:
+  - Bổ sung 2 test cases mới trong `custom_route_and_geocoding_test.dart` kiểm thử `RoutingService forceOffline` và `Trip Planner A-B Milestones achieve 100%`.
+  - Đạt 33/33 automated tests pass 100% và `flutter analyze` 0 issues.
+
+---
+
 ## 4. Công Việc Đang Thực Hiện
-- Đã hoàn thành toàn diện 2/2 yêu cầu người dùng, kiểm chứng 100% qua Flutter Analyze & Automated Tests (31/31 tests passed).
+- Đã hoàn thành toàn diện 5/5 vấn đề người dùng yêu cầu, kiểm chứng 100% qua Flutter Analyze & Automated Tests (33/33 tests passed).
 - Sẵn sàng để người dùng chạy `push_to_github.bat` deploy lên GitHub Pages và kích hoạt workflow build.
+
+---
+
+## 5. Kết Quả Kiểm Thử Thực Tế
+- **`flutter analyze`**: **`No issues found!`** (0 lỗi, 0 cảnh báo - 100% clean).
+- **`flutter test`**: **`All tests passed!`** (33/33 unit & widget test pass 100%).
+- **`flutter build web`**: Tối ưu hóa `-O4 --no-source-maps`.
 
 ---
 

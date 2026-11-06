@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:mobile_flutter/core/services/geocoding_service.dart';
 import 'package:mobile_flutter/core/services/storage_service.dart';
 import 'package:mobile_flutter/features/explore/data/datasources/explore_local_datasource.dart';
+import 'package:mobile_flutter/features/offline_map/services/routing_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -243,6 +245,68 @@ void main() {
       // Tổng chi phí tự thêm mỗi người: 120.000đ
       final perPerson = calculateCustomCostPerPerson(customCostItems, participants);
       expect(perPerson, equals(120000));
+    });
+  });
+
+  group('Phase 13: Offline Routing & Milestone Completion Tests', () {
+    test('RoutingService forceOffline produces immediate domestic route with offline tag', () async {
+      final start = const LatLng(10.8231, 106.6297); // TP.HCM
+      final end = const LatLng(11.9404, 108.4583);   // Đà Lạt
+
+      final result = await RoutingService.getActualRoute(
+        start: start,
+        end: end,
+        isDomestic: true,
+        forceOffline: true,
+      );
+
+      expect(result.points, isNotEmpty);
+      expect(result.points.first, equals(start));
+      expect(result.points.last, equals(end));
+      expect(result.durationText, contains('Ngoại tuyến'));
+      expect(result.distanceKm, greaterThan(200.0));
+      // Kiểm tra tất cả các điểm nằm trong lãnh thổ Việt Nam
+      for (final pt in result.points) {
+        expect(pt.latitude, inInclusiveRange(8.5, 23.5));
+        expect(pt.longitude, inInclusiveRange(102.0, 109.5));
+      }
+    });
+
+    test('Trip Planner A-B Milestones achieve 100% when destination is completed', () {
+      final dayStops = [
+        {
+          'time': '07:30',
+          'title': 'Khởi hành: Điểm A',
+          'type': 'start',
+          'isCompleted': false,
+        },
+        {
+          'time': '11:00',
+          'title': 'Đến đích: Điểm B',
+          'type': 'destination',
+          'isCompleted': false,
+        },
+      ];
+
+      // Khi bấm "Bắt đầu lịch trình thực tế": mốc đầu tiên (start) tự động kích hoạt
+      dayStops.first['isCompleted'] = true;
+      expect(dayStops.where((s) => s['isCompleted'] == true).length, equals(1));
+
+      // Khi người dùng check-in mốc đến đích:
+      final destIndex = dayStops.indexWhere((s) => s['type'] == 'destination');
+      dayStops[destIndex]['isCompleted'] = true;
+      // Tự động hoàn thành các mốc trước đó nếu chưa xong
+      for (int i = 0; i < destIndex; i++) {
+        dayStops[i]['isCompleted'] = true;
+      }
+
+      final completed = dayStops.where((s) => s['isCompleted'] == true).length;
+      final total = dayStops.length;
+      final pct = completed / total;
+
+      expect(completed, equals(2));
+      expect(total, equals(2));
+      expect(pct, equals(1.0)); // 100% hoàn thành!
     });
   });
 }

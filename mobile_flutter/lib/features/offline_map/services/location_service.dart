@@ -42,7 +42,7 @@ class LocationService {
     return Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.bestForNavigation,
-        distanceFilter: 5, // Cập nhật mỗi khi di chuyển 5 mét
+        distanceFilter: 2, // Cập nhật tức thì khi di chuyển từ 2 mét
       ),
     );
   }

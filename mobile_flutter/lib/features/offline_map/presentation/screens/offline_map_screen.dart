@@ -36,6 +36,7 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
   // Chế độ Bản Đồ: Trực Tuyến (Online) vs Ngoại Tuyến (Offline)
   bool _isOnlineMode = true;
   bool _hasGpsFix = false;
+  bool _isAutoFollowGps = true; // Tự động khóa và lia camera theo bước chân GPS
   double _gpsAccuracy = 5.0;
   StreamSubscription<Position>? _positionStreamSub;
   Timer? _offlineSyncTimer;
@@ -185,7 +186,12 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
           _gpsAccuracy = pos.accuracy;
         });
 
-        // Khi người dùng di chuyển: cập nhật cự ly và line bản đồ theo thực tế
+        // Tự động căn tâm camera theo bước chân khi đang bật Auto-Follow GPS
+        if (_isAutoFollowGps) {
+          _mapController.move(newLoc, _mapController.camera.zoom);
+        }
+
+        // 1. Khi người dùng di chuyển trong Chuyến Đi: cập nhật cự ly và line bản đồ theo thực tế
         if (_selectedTripDestination != null) {
           final targetLoc = _getDestLatLng(_selectedTripDestination!);
           final updatedDistKm = const Distance().as(LengthUnit.Kilometer, newLoc, targetLoc);
@@ -196,6 +202,19 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
               _routingPolyline[0] = newLoc;
             }
           });
+        }
+
+        // 2. Khi đang ở chế độ Lộ Trình A-B: Cập nhật cự ly và điểm đầu theo bước chân thời gian thực
+        if (_isCustomRouteMode || _customRoutePolyline.isNotEmpty) {
+          if (_customDestinationPoint != null) {
+            final updatedDistKm = const Distance().as(LengthUnit.Kilometer, newLoc, _customDestinationPoint!);
+            setState(() {
+              _customRouteDistanceKm = updatedDistKm;
+              if (_customRoutePolyline.isNotEmpty) {
+                _customRoutePolyline[0] = newLoc;
+              }
+            });
+          }
         }
       }, onError: (_) {
         if (mounted) setState(() => _hasGpsFix = false);
@@ -432,6 +451,7 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
       start: _currentLocation,
       end: targetLoc,
       isDomestic: isDomestic,
+      forceOffline: !_isOnlineMode,
     );
 
     if (mounted && _selectedTripDestination?.id == dest.id) {
@@ -452,14 +472,19 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
   }
 
   Future<void> _fetchUserLocation() async {
-    setState(() => _isLocating = true);
+    HapticFeedback.selectionClick();
+    setState(() {
+      _isLocating = true;
+      _isAutoFollowGps = true; // Kích hoạt khóa tâm theo dõi GPS
+    });
     final pos = await LocationService.getCurrentLocation();
     if (pos != null && mounted) {
       setState(() {
         _currentLocation = pos;
         _isLocating = false;
+        _hasGpsFix = true;
       });
-      _mapController.move(pos, 14.0);
+      _mapController.move(pos, 15.0);
 
       // Cập nhật lại tuyến đường thực tế từ vị trí GPS mới
       if (_selectedTripDestination != null) {
@@ -469,6 +494,7 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
           start: pos,
           end: targetLoc,
           isDomestic: isDomestic,
+          forceOffline: !_isOnlineMode,
         );
         if (mounted) {
           setState(() {
@@ -550,6 +576,7 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
       start: start,
       end: end,
       isDomestic: true,
+      forceOffline: !_isOnlineMode,
     );
 
     if (mounted) {
@@ -1087,6 +1114,12 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
               initialZoom: 13.0,
               minZoom: 3.0,
               maxZoom: 19.0,
+              onPositionChanged: (camera, hasGesture) {
+                // Khi người dùng chủ động kéo/vuốt bản đồ, tạm tắt auto follow để không bị giật camera
+                if (hasGesture && _isAutoFollowGps) {
+                  setState(() => _isAutoFollowGps = false);
+                }
+              },
               onTap: (tapPosition, point) {
                 _handleMapTap(point);
               },
@@ -1102,9 +1135,10 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                   subdomains: const ['0', '1', '2', '3'],
                   fallbackUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
                   userAgentPackageName: 'com.traveloutdoor.travel_app',
+                  evictErrorTileStrategy: EvictErrorTileStrategy.none,
                   maxNativeZoom: 20,
-                  panBuffer: 2,
-                  keepBuffer: 6,
+                  panBuffer: 3,
+                  keepBuffer: 8,
                 ),
               ] else if (_currentLayer == 'streets')
                 TileLayer(
@@ -1112,9 +1146,10 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                   subdomains: const ['0', '1', '2', '3'],
                   fallbackUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                   userAgentPackageName: 'com.traveloutdoor.travel_app',
+                  evictErrorTileStrategy: EvictErrorTileStrategy.none,
                   maxNativeZoom: 20,
-                  panBuffer: 2,
-                  keepBuffer: 6,
+                  panBuffer: 3,
+                  keepBuffer: 8,
                 )
               else
                 TileLayer(
@@ -1122,9 +1157,10 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                   subdomains: const ['0', '1', '2', '3'],
                   fallbackUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                   userAgentPackageName: 'com.traveloutdoor.travel_app',
+                  evictErrorTileStrategy: EvictErrorTileStrategy.none,
                   maxNativeZoom: 20,
-                  panBuffer: 2,
-                  keepBuffer: 6,
+                  panBuffer: 3,
+                  keepBuffer: 8,
                 ),
 
               // Cung đường mòn mẫu & Đường tìm đường định tuyến (Wayfinding Routing)
@@ -1441,6 +1477,27 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                                         _isOnlineMode = true;
                                         _syncStatusText = 'Đang đồng bộ trực tuyến...';
                                       });
+                                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          behavior: SnackBarBehavior.floating,
+                                          duration: Duration(seconds: 2),
+                                          margin: EdgeInsets.fromLTRB(16, 0, 16, 80),
+                                          backgroundColor: Color(0xFF141E18),
+                                          content: Row(
+                                            children: [
+                                              Icon(Icons.wifi, color: AppColors.emerald, size: 18),
+                                              SizedBox(width: 8),
+                                              Expanded(
+                                                child: Text(
+                                                  'Chế độ Trực Tuyến: Định tuyến OSRM độ chính xác cao và nạp bản đồ từ Internet.',
+                                                  style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
                                     }
                                   },
                                   child: Container(
@@ -1475,6 +1532,27 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                                     if (_isOnlineMode) {
                                       HapticFeedback.selectionClick();
                                       setState(() => _isOnlineMode = false);
+                                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          behavior: SnackBarBehavior.floating,
+                                          duration: Duration(seconds: 3),
+                                          margin: EdgeInsets.fromLTRB(16, 0, 16, 80),
+                                          backgroundColor: Color(0xFF261914),
+                                          content: Row(
+                                            children: [
+                                              Icon(Icons.cloud_off, color: AppColors.tacticalOrange, size: 18),
+                                              SizedBox(width: 8),
+                                              Expanded(
+                                                child: Text(
+                                                  'Chế độ Ngoại Tuyến (100% Offline): Bản đồ ưu tiên mảnh ngói đã lưu đệm, định tuyến nội suy cục bộ.',
+                                                  style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
                                     }
                                   },
                                   child: Container(
@@ -1963,8 +2041,10 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
                 ),
                 const SizedBox(height: 10),
                 _buildMapButton(
-                  icon: Icons.my_location,
-                  iconColor: _isLocating ? AppColors.tacticalOrange : AppColors.emerald,
+                  icon: _isAutoFollowGps ? Icons.gps_fixed : Icons.my_location,
+                  iconColor: _isLocating
+                      ? AppColors.tacticalOrange
+                      : (_isAutoFollowGps ? AppColors.neonGreen : AppColors.textSecondary),
                   onTap: _fetchUserLocation,
                 ),
                 const SizedBox(height: 10),

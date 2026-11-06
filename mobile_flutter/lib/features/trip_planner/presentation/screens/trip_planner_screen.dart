@@ -1514,6 +1514,17 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     HapticFeedback.heavyImpact();
     setState(() {
       _isJourneyActive = !_isJourneyActive;
+      // Khi bấm "Bắt đầu lịch trình thực tế": Tự động đánh dấu mốc Xuất phát (mốc đầu tiên)
+      // là đã hoàn thành vì người dùng đã bắt đầu rời điểm khởi hành!
+      if (_isJourneyActive) {
+        final currentStops = _daysItinerary[_selectedDay];
+        if (currentStops != null && currentStops.isNotEmpty) {
+          final firstStop = currentStops.first;
+          if (firstStop['type'] == 'start') {
+            firstStop['isCompleted'] = true;
+          }
+        }
+      }
     });
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -1539,7 +1550,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
             Expanded(
               child: Text(
                 _isJourneyActive
-                    ? 'Đã BẮT ĐẦU LỊCH TRÌNH THỰC ĐỊA! Chạm vào mốc hoặc dấu tick khi di chuyển đến để hoàn thành.'
+                    ? 'Đã BẮT ĐẦU LỊCH TRÌNH! Mốc xuất phát đã kích hoạt, chạm vào mốc đích khi tới nơi để hoàn tất 100%.'
                     : 'Đã tạm dừng chế độ hành trình thực địa.',
                 style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w600),
               ),
@@ -1553,9 +1564,21 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   /// Đánh dấu hoặc hủy đánh dấu hoàn thành một mốc lịch trình
   void _toggleMilestoneCompletion(Map<String, dynamic> stop) {
     HapticFeedback.mediumImpact();
+    final currentStops = _daysItinerary[_selectedDay] ?? [];
+    final stopIndex = currentStops.indexOf(stop);
+
     setState(() {
       final current = stop['isCompleted'] == true;
-      stop['isCompleted'] = !current;
+      final newStatus = !current;
+      stop['isCompleted'] = newStatus;
+
+      // Nếu người dùng tick hoàn thành mốc Đến Đích (hoặc mốc phía sau):
+      // Tự động hoàn thành các mốc trước đó (đặc biệt là mốc Khởi hành xuất phát)
+      if (newStatus && stopIndex > 0) {
+        for (int i = 0; i < stopIndex; i++) {
+          currentStops[i]['isCompleted'] = true;
+        }
+      }
     });
     final isDone = stop['isCompleted'] == true;
     ScaffoldMessenger.of(context).hideCurrentSnackBar();

@@ -45,83 +45,87 @@ class RoutingService {
 
   /// Lấy tuyến đường thực tế từ vị trí [start] tới [end]
   /// Nếu [isDomestic] là true, bảo đảm tuyến đường 100% nằm trong lãnh thổ Việt Nam.
+  /// Nếu [forceOffline] là true, lập tức dùng thuật toán nội suy ngoại tuyến không chờ mạng.
   static Future<RoutingResult> getActualRoute({
     required LatLng start,
     required LatLng end,
     bool isDomestic = false,
+    bool forceOffline = false,
   }) async {
     final cacheKey =
-        '${isDomestic ? "dom_" : ""}${start.latitude.toStringAsFixed(3)},${start.longitude.toStringAsFixed(3)}->${end.latitude.toStringAsFixed(3)},${end.longitude.toStringAsFixed(3)}';
+        '${forceOffline ? "off_" : ""}${isDomestic ? "dom_" : ""}${start.latitude.toStringAsFixed(3)},${start.longitude.toStringAsFixed(3)}->${end.latitude.toStringAsFixed(3)},${end.longitude.toStringAsFixed(3)}';
 
     if (_cache.containsKey(cacheKey)) {
       return _cache[cacheKey]!;
     }
 
-    try {
-      // Xây dựng danh sách tọa độ mốc cho OSRM
-      final List<LatLng> waypoints = [start];
+    if (!forceOffline) {
+      try {
+        // Xây dựng danh sách tọa độ mốc cho OSRM
+        final List<LatLng> waypoints = [start];
 
-      if (isDomestic) {
-        // Nếu là chuyến đi nội địa Việt Nam, chèn các trạm trung chuyển hành lang Bắc - Nam
-        // để ép OSRM dẫn đường hoàn toàn trong nước, không đi tắt qua Lào hay Campuchia
-        final corridorNodes = _resolveDomesticTransitWaypoints(start, end);
-        waypoints.addAll(corridorNodes);
-      }
+        if (isDomestic) {
+          // Nếu là chuyến đi nội địa Việt Nam, chèn các trạm trung chuyển hành lang Bắc - Nam
+          // để ép OSRM dẫn đường hoàn toàn trong nước, không đi tắt qua Lào hay Campuchia
+          final corridorNodes = _resolveDomesticTransitWaypoints(start, end);
+          waypoints.addAll(corridorNodes);
+        }
 
-      waypoints.add(end);
+        waypoints.add(end);
 
-      // Tạo chuỗi tọa độ định dạng: lng,lat;lng,lat;...
-      final coordsParam = waypoints.map((p) => '${p.longitude.toStringAsFixed(5)},${p.latitude.toStringAsFixed(5)}').join(';');
+        // Tạo chuỗi tọa độ định dạng: lng,lat;lng,lat;...
+        final coordsParam = waypoints.map((p) => '${p.longitude.toStringAsFixed(5)},${p.latitude.toStringAsFixed(5)}').join(';');
 
-      final url = Uri.parse(
-        'https://router.project-osrm.org/route/v1/driving/$coordsParam?overview=full&geometries=geojson',
-      );
+        final url = Uri.parse(
+          'https://router.project-osrm.org/route/v1/driving/$coordsParam?overview=full&geometries=geojson',
+        );
 
-      final response = await http.get(url).timeout(const Duration(seconds: 8));
+        final response = await http.get(url).timeout(const Duration(seconds: 8));
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body) as Map<String, dynamic>;
-        final code = data['code'] as String?;
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body) as Map<String, dynamic>;
+          final code = data['code'] as String?;
 
-        if (code == 'Ok') {
-          final routes = data['routes'] as List<dynamic>?;
-          if (routes != null && routes.isNotEmpty) {
-            final firstRoute = routes[0] as Map<String, dynamic>;
-            final geometry = firstRoute['geometry'] as Map<String, dynamic>?;
-            final coordinates = geometry?['coordinates'] as List<dynamic>?;
+          if (code == 'Ok') {
+            final routes = data['routes'] as List<dynamic>?;
+            if (routes != null && routes.isNotEmpty) {
+              final firstRoute = routes[0] as Map<String, dynamic>;
+              final geometry = firstRoute['geometry'] as Map<String, dynamic>?;
+              final coordinates = geometry?['coordinates'] as List<dynamic>?;
 
-            if (coordinates != null && coordinates.isNotEmpty) {
-              List<LatLng> roadPoints = [];
-              for (final coord in coordinates) {
-                if (coord is List && coord.length >= 2) {
-                  final double lng = (coord[0] as num).toDouble();
-                  final double lat = (coord[1] as num).toDouble();
-                  final p = LatLng(lat, lng);
-                  roadPoints.add(isDomestic ? _clampToVietnamTerritory(p) : p);
+              if (coordinates != null && coordinates.isNotEmpty) {
+                List<LatLng> roadPoints = [];
+                for (final coord in coordinates) {
+                  if (coord is List && coord.length >= 2) {
+                    final double lng = (coord[0] as num).toDouble();
+                    final double lat = (coord[1] as num).toDouble();
+                    final p = LatLng(lat, lng);
+                    roadPoints.add(isDomestic ? _clampToVietnamTerritory(p) : p);
+                  }
                 }
+
+                final double distanceMeters = (firstRoute['distance'] as num?)?.toDouble() ?? 0.0;
+                final double durationSeconds = (firstRoute['duration'] as num?)?.toDouble() ?? 0.0;
+
+                final double distKm = distanceMeters / 1000.0;
+                final String durationStr = _formatDuration(durationSeconds, distKm);
+
+                final result = RoutingResult(
+                  points: roadPoints,
+                  distanceKm: distKm,
+                  durationText: durationStr,
+                  isActualRoadRoute: true,
+                );
+
+                _cache[cacheKey] = result;
+                return result;
               }
-
-              final double distanceMeters = (firstRoute['distance'] as num?)?.toDouble() ?? 0.0;
-              final double durationSeconds = (firstRoute['duration'] as num?)?.toDouble() ?? 0.0;
-
-              final double distKm = distanceMeters / 1000.0;
-              final String durationStr = _formatDuration(durationSeconds, distKm);
-
-              final result = RoutingResult(
-                points: roadPoints,
-                distanceKm: distKm,
-                durationText: durationStr,
-                isActualRoadRoute: true,
-              );
-
-              _cache[cacheKey] = result;
-              return result;
             }
           }
         }
+      } catch (_) {
+        // Fallback khi mất mạng hoặc timeout
       }
-    } catch (_) {
-      // Fallback khi mất mạng hoặc timeout
     }
 
     // Fallback: Sinh tuyến đường nội địa hình chữ S hoặc đường dã ngoại cong thực tế
@@ -222,33 +226,39 @@ class RoutingService {
 
   /// Sinh tuyến đường nội địa hình chữ S mềm mại ôm trọn dải đất Việt Nam khi Offline
   static RoutingResult _generateDomesticSCurveRoute(LatLng start, LatLng end) {
+    final directDistKm = const Distance().as(LengthUnit.Kilometer, start, end);
     final corridorNodes = _resolveDomesticTransitWaypoints(start, end);
     final List<LatLng> keyNodes = [start, ...corridorNodes, end];
     final List<LatLng> finalPoints = [];
 
+    // Điều chỉnh biên độ sóng phù hợp với cự ly:
+    // Cự ly ngắn (< 25km): uốn lượn cực nhẹ (gần như bám thẳng trục giao thông); cự ly dài: uốn lượn nhẹ tự nhiên
+    final double maxWave = directDistKm < 25 ? 0.0015 : (directDistKm < 100 ? 0.004 : 0.008);
+
     for (int k = 0; k < keyNodes.length - 1; k++) {
       final segStart = keyNodes[k];
       final segEnd = keyNodes[k + 1];
-      const int steps = 10;
+      const int steps = 12;
 
       for (int i = (k == 0 ? 0 : 1); i <= steps; i++) {
         final double t = i / steps;
         final double lat = segStart.latitude + (segEnd.latitude - segStart.latitude) * t;
         final double lng = segStart.longitude + (segEnd.longitude - segStart.longitude) * t;
 
-        // Tạo độ uốn lượn nhẹ tự nhiên bám theo địa hình
-        final double wave = 0.008 * (1.0 - (2.0 * t - 1.0).abs());
+        // Tạo độ uốn lượn mượt mà tự nhiên bám theo địa hình
+        final double wave = maxWave * (1.0 - (2.0 * t - 1.0).abs());
         final rawPoint = LatLng(lat + (i % 2 == 0 ? wave : -wave * 0.5), lng + (i % 2 != 0 ? wave : -wave * 0.4));
         finalPoints.add(_clampToVietnamTerritory(rawPoint));
       }
     }
 
-    final distKm = const Distance().as(LengthUnit.Kilometer, start, end) * 1.25; // Đường bộ thực tế dài hơn đường chim bay ~25%
+    final distKm = directDistKm * 1.25; // Đường bộ thực tế dài hơn đường chim bay ~25%
+    final durationStr = _formatDuration(0, distKm);
 
     return RoutingResult(
       points: finalPoints,
       distanceKm: distKm,
-      durationText: _formatDuration(0, distKm),
+      durationText: '$durationStr (Ngoại tuyến)',
       isActualRoadRoute: true,
     );
   }

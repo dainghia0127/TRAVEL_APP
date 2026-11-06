@@ -59,8 +59,9 @@ jobs:
         run: |
           cd mobile_flutter
           # Tự động gán base-href ứng với tên repo GitHub (mặc định /TRAVEL_APP/)
+          # Tối ưu hóa -O4 và loại bỏ source maps để ứng dụng nhẹ nhất, mượt nhất trên Safari iPhone
           REPO_NAME="${{ github.event.repository.name }}"
-          flutter build web --release --base-href "/${REPO_NAME}/"
+          flutter build web --release --base-href "/${REPO_NAME}/" -O4 --no-source-maps
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
