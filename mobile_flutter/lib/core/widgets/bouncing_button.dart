@@ -46,48 +46,28 @@ class _BouncingButtonState extends State<BouncingButton> with SingleTickerProvid
     super.dispose();
   }
 
-  void _onTapDown(TapDownDetails details) {
-    if (widget.onTap != null) {
-      _controller.forward();
-    }
-  }
-
-  void _onTapUp(TapUpDetails details) {
-    if (widget.onTap != null) {
-      _controller.reverse();
-    }
-  }
-
-  void _onTapCancel() {
-    if (widget.onTap != null) {
-      _controller.reverse();
-    }
+  void _triggerTap() {
+    if (widget.onTap == null) return;
+    _controller.forward().then((_) {
+      if (mounted) _controller.reverse();
+    });
+    HapticFeedback.lightImpact();
+    widget.onTap!();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.onTap == null) {
+      return widget.child;
+    }
     return MouseRegion(
-      cursor: widget.onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-          hoverColor: Colors.transparent,
-          focusColor: Colors.transparent,
-          onTap: widget.onTap != null
-              ? () {
-                  HapticFeedback.lightImpact();
-                  widget.onTap?.call();
-                }
-              : null,
-          onTapDown: widget.onTap != null ? _onTapDown : null,
-          onTapUp: widget.onTap != null ? _onTapUp : null,
-          onTapCancel: widget.onTap != null ? _onTapCancel : null,
-          child: ScaleTransition(
-            scale: _scaleAnimation,
-            child: widget.child,
-          ),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _triggerTap,
+        child: ScaleTransition(
+          scale: _scaleAnimation,
+          child: widget.child,
         ),
       ),
     );
