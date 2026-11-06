@@ -33,37 +33,16 @@
 
   <style>
     html, body {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      width: 100%;
-      height: 100%;
       margin: 0;
       padding: 0;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
-      overscroll-behavior: none;
-      -webkit-overflow-scrolling: auto;
       touch-action: manipulation;
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      user-select: none;
       -webkit-tap-highlight-color: transparent;
       background-color: #0B1510;
       color: #E6E8EA;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    /* Đảm bảo Flutter Glass Pane trải rộng toàn màn hình và nhận trọn vẹn sự kiện chạm */
-    flt-glass-pane {
-      position: absolute !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
-      touch-action: manipulation !important;
-      overscroll-behavior: none !important;
     }
 
     #splash-loading {
@@ -78,8 +57,8 @@
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      transition: opacity 0.35s ease-out;
-      pointer-events: auto;
+      transition: opacity 0.3s ease-out;
+      pointer-events: none;
     }
     .splash-logo {
       width: 88px;
@@ -111,49 +90,43 @@
   </div>
 
   <script>
-    // iOS Standalone PWA Touch-Fix: Chặn triệt để hiện tượng overscroll bounce của WebKit
-    // làm hủy bỏ (touchcancel) sự kiện chạm vào các nút của Flutter
+    // iOS Standalone PWA Touch & Viewport Fix
     (function() {
-      var isIosStandalone = window.navigator.standalone === true || 
-                            window.matchMedia('(display-mode: standalone)').matches;
+      var isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      var isStandalone = window.navigator.standalone === true || 
+                         window.matchMedia('(display-mode: standalone)').matches;
 
-      // Chặn rubber-banding nảy trang trên iOS WebClip PWA
-      document.addEventListener('touchmove', function(e) {
-        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
-          return; // Cho phép cuộn và chọn văn bản trong ô nhập liệu
+      // 1. Kích hoạt WebKit touch engine trên iOS PWA
+      window.addEventListener('touchstart', function() {}, { passive: true });
+
+      // 2. Tự động reset viewport scroll để tránh "dead-zone" ở đáy màn hình (GitHub Issue #115829)
+      window.addEventListener('blur', function() {
+        setTimeout(function() {
+          window.scrollTo(0, 0);
+        }, 100);
+      }, true);
+
+      // 3. Đánh thức Flutter view scheduler khi người dùng chuyển đổi app
+      document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+          window.dispatchEvent(new Event('resize'));
         }
-        // Cho phép Flutter Glass Pane tự quản lý cuộn bên trong canvas mà không bị trình duyệt can thiệp
-      }, { passive: true });
+      });
 
-      // Tự động gỡ bỏ Splash Screen mượt mà và an toàn
-      var hasDismissedSplash = false;
+      // 4. Tự động gỡ bỏ Splash Screen mượt mà và an toàn
       function dismissSplash() {
-        if (hasDismissedSplash) return;
-        hasDismissedSplash = true;
         var splash = document.getElementById('splash-loading');
-        if (splash) {
-          splash.style.pointerEvents = 'none'; // Giải phóng click ngay lập tức
+        if (splash && splash.parentNode) {
           splash.style.opacity = '0';
           setTimeout(function() {
             if (splash.parentNode) splash.parentNode.removeChild(splash);
-          }, 350);
+          }, 300);
         }
       }
 
-      // Lắng nghe khi Flutter engine nạp xong frame đầu tiên
       window.addEventListener('flutter-first-frame', dismissSplash);
-
-      // Dự phòng: Nếu flutter-first-frame không kích hoạt, gỡ bỏ sau khi trang load
       window.addEventListener('load', function() {
-        var checkFlutter = setInterval(function() {
-          if (window._flutter && (window._flutter.loader || window._flutter.buildConfig)) {
-            setTimeout(dismissSplash, 300);
-            clearInterval(checkFlutter);
-          }
-        }, 100);
-
-        // Giới hạn tối đa 2.2 giây luôn luôn ẩn splash để không bao giờ bị kẹt
-        setTimeout(dismissSplash, 2200);
+        setTimeout(dismissSplash, 1500);
       });
     })();
   </script>

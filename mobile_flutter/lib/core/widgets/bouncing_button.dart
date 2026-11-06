@@ -66,20 +66,29 @@ class _BouncingButtonState extends State<BouncingButton> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTapDown: widget.onTap != null ? _onTapDown : null,
-      onTapUp: widget.onTap != null ? _onTapUp : null,
-      onTapCancel: widget.onTap != null ? _onTapCancel : null,
-      onTap: widget.onTap != null
-          ? () {
-              HapticFeedback.lightImpact();
-              widget.onTap?.call();
-            }
-          : null,
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: widget.child,
+    return MouseRegion(
+      cursor: widget.onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          focusColor: Colors.transparent,
+          onTap: widget.onTap != null
+              ? () {
+                  HapticFeedback.lightImpact();
+                  widget.onTap?.call();
+                }
+              : null,
+          onTapDown: widget.onTap != null ? _onTapDown : null,
+          onTapUp: widget.onTap != null ? _onTapUp : null,
+          onTapCancel: widget.onTap != null ? _onTapCancel : null,
+          child: ScaleTransition(
+            scale: _scaleAnimation,
+            child: widget.child,
+          ),
+        ),
       ),
     );
   }
