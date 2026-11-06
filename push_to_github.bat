@@ -23,11 +23,16 @@ if %errorlevel% neq 0 (
 )
 
 :: 2. Thiet lap remote dam bao dinh danh dung tai khoan chu so huu dainghia0127
-echo [2/3] Kiem tra ket noi den repository dainghia0127/TRAVEL_APP...
+echo [2/4] Kiem tra ket noi den repository dainghia0127/TRAVEL_APP...
 git remote set-url origin https://dainghia0127@github.com/dainghia0127/TRAVEL_APP.git
 
-:: 3. Day commit len GitHub
-echo [3/3] Dang day ma nguon len nhanh main tren GitHub...
+:: 3. Tu dong keo cac commit tu dong moi nhat tren GitHub ve truoc (chong loi fetch first)
+echo [3/4] Dang dong bo commit moi nhat tu GitHub ve may (git pull --rebase)...
+git pull --rebase origin main
+echo.
+
+:: 4. Day commit len GitHub
+echo [4/4] Dang day ma nguon len nhanh main tren GitHub...
 echo.
 git push origin main
 
