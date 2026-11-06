@@ -48,9 +48,7 @@ class _BouncingButtonState extends State<BouncingButton> with SingleTickerProvid
 
   void _triggerTap() {
     if (widget.onTap == null) return;
-    _controller.forward().then((_) {
-      if (mounted) _controller.reverse();
-    });
+    if (mounted) _controller.reverse();
     HapticFeedback.lightImpact();
     widget.onTap!();
   }
@@ -64,7 +62,14 @@ class _BouncingButtonState extends State<BouncingButton> with SingleTickerProvid
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
+        onTapDown: (_) {
+          _controller.forward();
+        },
+        onTapCancel: () {
+          if (mounted) _controller.reverse();
+        },
         onTap: _triggerTap,
+        onLongPress: _triggerTap,
         child: ScaleTransition(
           scale: _scaleAnimation,
           child: widget.child,

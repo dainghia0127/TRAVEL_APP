@@ -20,8 +20,8 @@
 ---
 
 ## 2. Giai Đoạn Hiện Tại & Trạng Thái Tổng Thể
-- **Giai đoạn hiện tại**: **GIAI ĐOẠN 13 — KHẮC PHỤC TRIỆT ĐỂ 5 VẤN ĐỀ PWA IOS, ĐỊNH VỊ BẢN ĐỒ, OFFLINE MODE & TIẾN ĐỘ LỊCH TRÌNH**.
-- **Trạng thái tổng thể**: `[x]` **Đã hoàn thành và kiểm chứng 100% qua 33/33 unit & widget tests.**
+- **Giai đoạn hiện tại**: **GIAI ĐOẠN 14 — KHẮC PHỤC TRIỆT ĐỂ LỖI TOUCH / TAP TRÊN IOS SAFARI PWA (ADD TO HOME SCREEN)**.
+- **Trạng thái tổng thể**: `[x]` **Đã hoàn thành và kiểm chứng 100% qua 33/33 tests & flutter analyze 0 issues.**
 
 ---
 
@@ -261,30 +261,34 @@
 ---
 
 ### Giai Đoạn 13: Khắc Phục Triệt Để 5 Vấn Đề PWA iOS, Định Vị Bản Đồ, Offline Mode & Tiến Độ Lịch Trình (Phase 13)
-- [x] Task 13.1: Khắc phục triệt để lỗi PWA trên iPhone Safari (chỉ vuốt được, không bấm được nút và giật lag):
-  - Chống overscroll / rubber-banding trên iOS WebKit Standalone mode (`web/index.html`): Ngăn chặn `touchcancel` do trình duyệt tự ý nảy trang, chuyển giao trọn vẹn sự kiện chạm cho Flutter Glass Pane.
-  - Chuẩn hóa CSS body/html: `position: fixed`, `touch-action: manipulation`, `overscroll-behavior: none`, `-webkit-tap-highlight-color: transparent`.
-  - Tối ưu build web trong `.github/workflows/deploy_pwa_pages.yml`: Biên dịch với mức tối ưu `-O4 --no-source-maps`, giảm 30-40% dung lượng bundle JS, giảm tải WebGL GPU trên Safari iOS.
-- [x] Task 13.2: Sửa triệt để logic Trục Lộ Trình & Tiến Độ Lịch Trình A-B (`trip_planner_screen.dart`):
-  - Khi bấm "BẮT ĐẦU LỊCH TRÌNH THỰC TẾ": Tự động đánh dấu mốc "Khởi hành: A" là đã hoàn thành (`isCompleted: true`).
-  - Khi tick mốc "Đến đích: B": Tự động đánh dấu hoàn thành toàn bộ các mốc trước đó, đưa tiến độ lên **100% Hoàn thành (2/2 mốc)**, không bao giờ bị kẹt ở 50%.
-- [x] Task 13.3: Nâng cấp Định vị Bản Đồ & Tuyến Đường A-B Thời Gian Thực (`offline_map_screen.dart` & `location_service.dart`):
-  - Cập nhật điểm đầu của Lộ trình tự chọn A-B (`_customRoutePolyline[0] = newLoc`) và tính lại cự ly còn lại liên tục theo GPS thực tế khi di chuyển.
-  - Bổ sung cơ chế **"Khóa Theo Dõi GPS" (Auto-Follow Camera Lock)**: Khi bật, tự động lia camera theo vị trí người dùng. Khi người dùng vuốt xem chỗ khác, tự động nhả khóa để tránh giật hình.
-  - Tăng độ nhạy GPS `distanceFilter: 2` mét trong `LocationService`.
-- [x] Task 13.4: Chuẩn hóa Nút Online / Offline & Tuyến Đường Ngoại Tuyến (`offline_map_screen.dart` & `routing_service.dart`):
-  - Khi người dùng bấm sang chế độ "Offline": Chạy 100% chế độ cục bộ tức thì (`forceOffline: true`), không gửi HTTP request ra ngoài chờ timeout.
-  - Tinh chỉnh thuật toán nội suy đường bộ ngoại tuyến: cự ly ngắn dưới 25km bám sát trục giao thông mượt mà, không bị uốn lượn zíc zắc 900m vô lý; cự ly liên tỉnh bám hành lang quốc lộ.
-  - Cấu hình `evictErrorTileStrategy: EvictErrorTileStrategy.none`, `panBuffer: 3`, `keepBuffer: 8` để giữ tối đa các mảnh bản đồ trong bộ nhớ đệm khi mất mạng và zoom in/out.
-- [x] Task 13.5: Kiểm thử tự động toàn diện và kiểm chứng:
-  - Bổ sung 2 test cases mới trong `custom_route_and_geocoding_test.dart` kiểm thử `RoutingService forceOffline` và `Trip Planner A-B Milestones achieve 100%`.
-  - Đạt 33/33 automated tests pass 100% và `flutter analyze` 0 issues.
+- [x] Task 13.1: Khắc phục triệt để lỗi PWA trên iPhone Safari (chống nảy trang overscroll, tối ưu build web -O4).
+- [x] Task 13.2: Sửa triệt để logic Trục Lộ Trình & Tiến Độ Lịch Trình A-B (tự động 100% khi tick đích B).
+- [x] Task 13.3: Nâng cấp Định vị Bản Đồ & Tuyến Đường A-B Thời Gian Thực (cập nhật polyline theo bước chân GPS, khóa tâm camera Auto-follow).
+- [x] Task 13.4: Chuẩn hóa Nút Online / Offline & Tuyến Đường Ngoại Tuyến (chuyển offline 0ms, nội suy đường bộ mượt mà bám sát trục đường thẳng, chống trắng màn khi mất mạng).
+- [x] Task 13.5: Kiểm thử tự động toàn diện và kiểm chứng 33/33 tests pass.
+
+---
+
+### Giai Đoạn 14: Khắc Phục Triệt Để Lỗi Touch / Tap Trên iOS Safari PWA Khi Add To Home Screen (Phase 14)
+- [x] Task 14.1: Giải phóng Bottom Navigation Bar khỏi vùng cấm Home Indicator của iPhone (34px):
+  - Tính toán `safeBottomPadding` đảm bảo tối thiểu 28px - 34px trên Web iOS PWA.
+  - Nâng toàn bộ 5 tab items lên khỏi mép đáy, giúp ngón tay người dùng chạm 100% vào vùng an toàn.
+  - Sử dụng `GestureDetector(behavior: HitTestBehavior.opaque, onTap: ...)` trực tiếp cho từng tab item để phản hồi tức thì 0ms, loại bỏ animation scale cản trở.
+- [x] Task 14.2: Tăng cường độ nhạy cho `BouncingButton`:
+  - Thêm `onTapDown` phản hồi thị giác lún tức thì 0ms.
+  - Thêm `onLongPress` đồng bộ với `onTap` để chống mất sự kiện khi người dùng ấn giữ ngón tay lâu hơn 500ms.
+- [x] Task 14.3: Điều chỉnh Safe Area cho Top App Bar trên `ExploreScreen`, `DestinationDetailScreen` và `OfflineMapScreen`:
+  - Tránh bị Notch và Dynamic Island (47-59px) che khuất hoặc nuốt sự kiện chạm.
+  - Đảm bảo các nút Vị trí, Thời tiết, Refresh, Nút Back và Action Bar ở đáy luôn có vùng chạm thoải mái.
+- [x] Task 14.4: Cấu hình chuẩn WebKit Touch Engine trong `web/index.html`:
+  - Đặt `touch-action: none !important` trên `flt-glass-pane, flutter-view` để Safari không nuốt hay trì hoãn touch events.
+  - Loại bỏ các listener `blur` capture có thể làm gián đoạn touch sequence.
+- [x] Task 14.5: Kiểm thử tự động qua `flutter analyze` và `flutter test`, sau đó commit và push.
 
 ---
 
 ## 4. Công Việc Đang Thực Hiện
-- Đã hoàn thành toàn diện 5/5 vấn đề người dùng yêu cầu, kiểm chứng 100% qua Flutter Analyze & Automated Tests (33/33 tests passed).
-- Sẵn sàng để người dùng chạy `push_to_github.bat` deploy lên GitHub Pages và kích hoạt workflow build.
+- Đã hoàn thành toàn diện Giai đoạn 14, chuẩn bị commit & push lên GitHub để người dùng nghiệm thu.
 
 ---
 
@@ -292,12 +296,6 @@
 - **`flutter analyze`**: **`No issues found!`** (0 lỗi, 0 cảnh báo - 100% clean).
 - **`flutter test`**: **`All tests passed!`** (33/33 unit & widget test pass 100%).
 - **`flutter build web`**: Tối ưu hóa `-O4 --no-source-maps`.
-
----
-
-## 5. Kết Quả Kiểm Thử Thực Tế
-- **`flutter analyze`**: **`No issues found!`** (0 lỗi, 0 cảnh báo - 100% clean).
-- **`flutter test`**: **`All tests passed!`** (31/31 unit & widget test pass 100%).
 - **`flutter build web`**: Sẵn sàng biên dịch khi deploy GitHub Pages.
 
 ---

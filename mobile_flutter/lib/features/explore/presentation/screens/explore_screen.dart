@@ -423,6 +423,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
     final featuredSpots = _controller.featuredSpots;
     final seasonalSpots = _controller.seasonalSpots;
     final trendingSpots = _controller.trendingSpots;
+    final topInset = MediaQuery.of(context).padding.top;
+    // Đảm bảo trên Web Standalone PWA không bị Dynamic Island / Notch (44-59px) che hoặc nuốt touch
+    final safeTopPadding = topInset > 20 ? 12.0 : 36.0;
 
     return Scaffold(
       backgroundColor: AppColors.editorialBg,
@@ -437,7 +440,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
             // 1. Top App Bar & Live Status Pill
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                padding: EdgeInsets.fromLTRB(16, safeTopPadding, 16, 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

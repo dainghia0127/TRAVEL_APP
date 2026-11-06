@@ -44,6 +44,13 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
+    /* Chuyển giao toàn bộ touch/pointer events trực tiếp cho Flutter Web engine không bị WebKit delay */
+    flutter-view, flt-glass-pane {
+      touch-action: none !important;
+      -webkit-user-select: none !important;
+      user-select: none !important;
+    }
+
     #splash-loading {
       position: fixed;
       top: 0;
@@ -91,28 +98,17 @@
   <script>
     // iOS Standalone PWA Touch & Viewport Fix
     (function() {
-      var isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      var isStandalone = window.navigator.standalone === true || 
-                         window.matchMedia('(display-mode: standalone)').matches;
+      // 1. Kích hoạt WebKit touch engine trên iOS Safari PWA
+      document.addEventListener('touchstart', function() {}, { passive: true });
 
-      // 1. Kích hoạt WebKit touch engine trên iOS PWA
-      window.addEventListener('touchstart', function() {}, { passive: true });
-
-      // 2. Tự động reset viewport scroll để tránh "dead-zone" ở đáy màn hình (GitHub Issue #115829)
-      window.addEventListener('blur', function() {
-        setTimeout(function() {
-          window.scrollTo(0, 0);
-        }, 100);
-      }, true);
-
-      // 3. Đánh thức Flutter view scheduler khi người dùng chuyển đổi app
+      // 2. Đánh thức Flutter view scheduler khi người dùng chuyển đổi app hoặc mở lại
       document.addEventListener('visibilitychange', function() {
         if (!document.hidden) {
           window.dispatchEvent(new Event('resize'));
         }
       });
 
-      // 4. Tự động gỡ bỏ Splash Screen mượt mà và an toàn
+      // 3. Tự động gỡ bỏ Splash Screen mượt mà và an toàn
       function dismissSplash() {
         var splash = document.getElementById('splash-loading');
         if (splash && splash.parentNode) {

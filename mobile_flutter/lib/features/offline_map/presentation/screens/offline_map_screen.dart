@@ -1094,6 +1094,8 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
     const filters = ['Tất cả', 'Nguồn nước', 'Cắm trại', 'Cửa rừng', 'Đích đến'];
     final isTesting = WidgetsBinding.instance.runtimeType.toString().contains('TestWidgetsFlutterBinding') ||
         WidgetsBinding.instance.runtimeType.toString().contains('AutomatedTestWidgetsFlutterBinding');
+    final topInset = MediaQuery.of(context).padding.top;
+    final safeTop = topInset > 24 ? topInset + 6 : 52.0;
 
     return Scaffold(
       backgroundColor: AppColors.bgDark,
@@ -1369,7 +1371,7 @@ class _OfflineMapScreenState extends State<OfflineMapScreen> {
 
           // Top Header & Trip Destinations Selector
           Positioned(
-            top: 48,
+            top: safeTop,
             left: 14,
             right: 14,
             child: Column(

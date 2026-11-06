@@ -323,6 +323,8 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final img = _resolveImage();
+    final bottomInset = MediaQuery.of(context).padding.bottom;
+    final safeBottomPadding = bottomInset > 24 ? bottomInset : 28.0;
 
     return Scaffold(
       backgroundColor: AppColors.editorialBg,
@@ -1227,7 +1229,7 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
             right: 0,
             bottom: 0,
             child: Container(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+              padding: EdgeInsets.fromLTRB(16, 12, 16, safeBottomPadding),
               decoration: BoxDecoration(
                 color: AppColors.editorialSurface,
                 border: const Border(top: BorderSide(color: AppColors.editorialBorder)),

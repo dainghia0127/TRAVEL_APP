@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:animations/animations.dart';
 import 'package:mobile_flutter/core/theme/app_theme.dart';
-import 'package:mobile_flutter/core/widgets/bouncing_button.dart';
 import 'package:mobile_flutter/features/explore/presentation/screens/explore_screen.dart';
 import 'package:mobile_flutter/features/offline_map/presentation/screens/offline_map_screen.dart';
 import 'package:mobile_flutter/features/safety/presentation/screens/safety_sos_screen.dart';
@@ -107,6 +106,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final primaryActiveColor = isEditorial ? AppColors.editorialPine : AppColors.emerald;
     final unselectedColor = isEditorial ? AppColors.editorialMuted : AppColors.textMuted;
 
+    final bottomInset = MediaQuery.of(context).padding.bottom;
+    // Đảm bảo trên Web hoặc khi inset = 0, luôn có tối thiểu 28px để hoàn toàn vượt lên trên
+    // thanh Home Indicator của iPhone (34px) trong chế độ Standalone PWA
+    final safeBottomPadding = bottomInset > 24 ? bottomInset : 28.0;
+
     return Scaffold(
       backgroundColor: isEditorial ? AppColors.editorialBg : AppColors.bgDark,
       // Smooth Material Motion Transition between Tabs
@@ -139,22 +143,24 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ),
           ],
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-        child: SafeArea(
-          top: false,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(_navItems.length, (index) {
-              final item = _navItems[index];
-              final isSelected = _currentIndex == index;
-              final isEmergency = item['isEmergency'] == true;
+        padding: EdgeInsets.fromLTRB(4, 6, 4, safeBottomPadding),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: List.generate(_navItems.length, (index) {
+            final item = _navItems[index];
+            final isSelected = _currentIndex == index;
+            final isEmergency = item['isEmergency'] == true;
 
-              final activeColor = isEmergency ? AppColors.emergencyRed : primaryActiveColor;
-              final inactiveColor = isEmergency ? Colors.red[400]! : unselectedColor;
+            final activeColor = isEmergency ? AppColors.emergencyRed : primaryActiveColor;
+            final inactiveColor = isEmergency ? Colors.red[400]! : unselectedColor;
 
-              return Expanded(
-                child: BouncingButton(
+            return Expanded(
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
                   onTap: () => _onTabSelected(index),
+                  onLongPress: () => _onTabSelected(index),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.symmetric(vertical: 6),
@@ -193,9 +199,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     ),
                   ),
                 ),
-              );
-            }),
-          ),
+              ),
+            );
+          }),
         ),
       ),
     );
